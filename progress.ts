@@ -52,4 +52,17 @@ export class Progress {
   public getTag(): string | undefined {
     return this.tag;
   }
+
+  public getDataValue(key: string) { // FIXME: getters
+    const map: { [key: string]: () => string | null } = {
+      bar: () => this.render ? this.render.renderBar([this]) : null,
+      eta: () => '???',
+      value: () => this.getValue().toString(),
+      total: () => this.getTotal().toString(),
+    }
+    if (map[key]) {
+      return map[key]() as string | null;
+    }
+    return this.payload && this.payload[key] ? this.payload[key] : null;
+  }
 }

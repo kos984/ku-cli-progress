@@ -2,21 +2,23 @@ import { Progress } from './progress';
 // @ts-ignore
 import chalk from 'chalk';
 
+export interface IBarParams {
+  completeChar: string;
+  resumeChar: string;
+  color: (str: string) => string
+  width: number;
+}
+
 export interface IRenderParams {
   template: string;
-  bar: Partial<{
-    completeChar: string;
-    resumeChar: string;
-    color: (str: string) => string
-    width: number;
-  }>
+  bar: Partial<IBarParams>
   format: {
-    [key: string]: (process: Progress) => string
+    [key: string]: (str: string) => string
   }
 }
 
 export class Render {
-  protected params: IRenderParams;
+  protected params: IRenderParams & { bar: IBarParams };
   protected colors: Array<(s: string) => string> = [];
   public constructor(params: Partial<IRenderParams> = {}) {
     this.params = {
@@ -30,44 +32,49 @@ export class Render {
         ...params.bar,
       },
       format: {
-        // TODO: think about this
-        bar: (progress: Progress) => this.renderBar([progress]),
-        eta: (progress: Progress) => '???',
-        value: (progress: Progress) => progress.getValue().toString(),
-        total: (progress: Progress) => progress.getTotal().toString(),
+        bar: (srt: string) => srt,
+        eta: (str: string) => str,
+        value: (str: string) => str,
+        total: (str: string) => str,
         ...params.format,
       },
     }
   }
 
   public render(progresses: Progress[]): string {
-    if (progresses.length < 1) {
+    if (!progresses.length) {
       return '';
     }
     return this.params.template.replace(/{([^}]+)}/g, (match, p) => {
       const [property, tag] = p.split('_').reverse();
       const progress = tag ? progresses.find(p => p.getTag() === tag) : progresses[0];
       if (!progress) {
-        throw new Error('progress not found')
+        return match;
       }
       if (property === 'bars' && progresses.length > 1) {
+        // do not allow format bars, just return
         return this.renderBar(progresses);
       }
-      const defaultF = (p: Progress) => match;
-      return (progress.getRender()?.params?.format[property] ?? this.params.format[property] ?? defaultF)(progress);
+
+      const value = progress.getDataValue(property);
+      if (!value) {
+        return  property === 'bar' ? this.renderBar([progress]) : match;
+      }
+      // ||
+      //  property === 'bar' ? this.renderBar([progress]) : match;
+
+      const render = progress.getRender() ?? this;
+      return render.params?.format[property] ? render.params.format[property](value) : value.toString();
     });
   }
 
-  protected renderBar(progresses: Progress[]): string {
-    // FIXME: fix params
-    const doneChar = '=';
-    const progressChar = '-';
-    const barSize = 40;
-
+  public renderBar(progresses: Progress[]): string {
+    const { completeChar, resumeChar, width } = this.params.bar;
     const lines = [];
+
     const last = progresses
       .map((item, index) => ({
-        size: Math.round(item.getProgress() * barSize),
+        size: Math.round(item.getProgress() * width),
         item,
         color: this.colors[index] ? this.colors[index] : (s: string) => s,
       }))
@@ -77,13 +84,13 @@ export class Render {
         if (length > 0) {
           const defaultColor = (s: string) => s;
           const color = current.item.getRender()?.params?.bar?.color ?? current.color ?? defaultColor;
-          lines.push(color(doneChar.repeat( length > barSize ? barSize : length )));
+          lines.push(color(completeChar.repeat( length > width ? width : length )));
         }
         return current;
       }, { size: 0 });
 
-    if (barSize - last.size > 0) {
-      lines.push(progressChar.repeat(barSize - last.size));
+    if (width - last.size > 0) {
+      lines.push(resumeChar.repeat(width - last.size));
     }
     return lines.join('');
   }
