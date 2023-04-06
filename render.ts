@@ -5,7 +5,6 @@ import chalk from 'chalk';
 export interface IBarParams {
   completeChar: string;
   resumeChar: string;
-  color: (str: string) => string
   width: number;
 }
 
@@ -28,7 +27,6 @@ export class Render {
         completeChar: '=',
         resumeChar: '-',
         width: 40,
-        color: s => s,
         ...params.bar,
       },
       format: {
@@ -57,13 +55,11 @@ export class Render {
       }
 
       const value = progress.getDataValue(property);
-      if (!value) {
-        return  property === 'bar' ? this.renderBar([progress]) : match;
-      }
-      // ||
-      //  property === 'bar' ? this.renderBar([progress]) : match;
-
       const render = progress.getRender() ?? this;
+
+      if (!value) {
+        return  property === 'bar' ? render.renderBar([progress]) : match;
+      }
       return render.params?.format[property] ? render.params.format[property](value) : value.toString();
     });
   }
@@ -83,13 +79,16 @@ export class Render {
         const length = current.size - prev.size;
         if (length > 0) {
           const defaultColor = (s: string) => s;
-          const color = current.item.getRender()?.params?.bar?.color ?? current.color ?? defaultColor;
+          // const color = current.item.getRender()?.params?.bar?.color ?? current.color ?? defaultColor;
+          const render = current.item.getRender() ?? this;
+          const color = render.params.format.bar;
           lines.push(color(completeChar.repeat( length > width ? width : length )));
         }
         return current;
       }, { size: 0 });
 
     if (width - last.size > 0) {
+      // TODO: color
       lines.push(resumeChar.repeat(width - last.size));
     }
     return lines.join('');
