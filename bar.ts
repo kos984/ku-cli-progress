@@ -1,6 +1,7 @@
 import { Progress } from './progress';
 import { Render } from './render';
 import { TerminalTty } from './terminal-tty';
+import { createDeflateRaw } from 'zlib';
 
 export class Bar {
   protected terminal = new TerminalTty()
@@ -14,15 +15,23 @@ export class Bar {
 
   public start() {
     // render
-    setInterval(() => {
-      const bars = this.progress.map( p => {
-        if (p.length > 0) {
-          const render = p[0].getRender() ?? this.render;
-          return render.render(p);
-        }
+    // setInterval(() => { }, 100);
+    this.loop(); // TODO: catch
+  }
+
+  protected async loop() {
+    while(true) {
+      await new Promise(r => {
+        const bars = this.progress.map( p => {
+          if (p.length > 0) {
+            const render = p[0].getRender() ?? this.render;
+            return render.render(p);
+          }
+        })
+        this.terminal.write(bars.join('\n'));
+        setTimeout(() => r(true), 100);
       })
-      this.terminal.write(bars.join('\n'));
-    }, 100);
+    }
   }
 
   public add(progress: Progress | Progress[]) {

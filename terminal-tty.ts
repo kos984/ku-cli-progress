@@ -26,10 +26,22 @@ export class TerminalTty {
   }
 
   public write(s: string, rawWrite=false){
-    this.clear();
     const lines = s.split('\n');
-    this.y = lines.length - 1;
-    this.stream.write(lines.map(l => l.substr(0, process.stdout.columns)).join('\n'));
+    this.stream.write('\x1B[?25l'); // disable cursor TODO: move out
+    this.resetCursor(this.y);
+    const maxLength = Math.min(process.stdout.rows, lines.length) - 1;
+    lines.forEach((l, i) => {
+      if (i > maxLength) {
+        return;
+      }
+      this.stream.write(l.substr(0, process.stdout.columns));
+      readline.clearLine(this.stream, 1);
+      if (i < maxLength) {
+        this.stream.write('\n');
+      }
+    });
+    this.stream.write('\x1B[?25h');
+    this.y = maxLength;
     this.prev = s;
   }
 
