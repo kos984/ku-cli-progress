@@ -1,6 +1,6 @@
-import { Render } from '../render';
-import { Progress } from '../progress';
-import { Bar } from '../bar';
+import { Render } from '../src/render';
+import { Progress } from '../src/progress';
+import { Bar } from '../src/bar';
 // @ts-ignore
 import chalk from 'chalk';
 
