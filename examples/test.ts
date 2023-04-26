@@ -1,15 +1,23 @@
-import { ProgressRender } from '../src/render';
+import { Render } from '../src/render';
 import { Progress } from '../src/progress';
-import { Render } from '../src/bar';
+import { Bar } from '../src/bar';
 // @ts-ignore
 import chalk from 'chalk';
 
 let progresses: (Progress | Progress[])[] = [];
 
+const formatBarWithTextInCenter = (barString: string, progress: Progress, text: string): string => {
+  const done = Math.round(progress.getProgress() * barString.length);
+  const start = barString.substr(0, barString.length / 2 - text.length / 2 - 1);
+  const end = barString.substr(barString.length / 2 + text.length / 2 + 1);
+  const out = `${start} ${text} ${end}`;
+  return chalk.yellowBright(out.substr(0, done)) + out.substr(done);
+};
+
 progresses = [
   new Progress({
-    total: 1000,
-    render: new ProgressRender({
+    total: 1030,
+    render: new Render({
       bar: {
         glue: '',
         completeChar: '∎',
@@ -17,39 +25,28 @@ progresses = [
       },
       format: {
         bar: (str, [progress]) => {
-          const done = (str.match(/∎+/) ?? [''])[0].length
-          const percentage = progress.getDataValue('percentage');
-          const start = str.substr(0, str.length / 2 - percentage.length / 2 - 1);
-          const end = str.substr(str.length / 2 + percentage.length / 2 + 1
-          );
-          const out = `${start} ${percentage} ${end}`;
-          return chalk.yellowBright(out.substr(0, done)) + out.substr(done);
+          const percentage = (Math.round(progress.getProgress() * 10000) / 100).toFixed(2) + '%';
+          return formatBarWithTextInCenter(str, progress, percentage + ' ETA: ' + progress.getDataValue('eta'));
         },
       }
     }),
   }),
   new Progress({
     total: 1000,
-    render: new ProgressRender({
+    render: new Render({
       bar: {
         glue: '',
         completeChar: '∎',
         resumeChar: ' ',
       },
       format: {
-        bar: (str, [progress]) => {
-          const percentage = progress.getDataValue('percentage');
-          const start = str.substr(0, str.length / 2 - percentage.length / 2 - 1);
-          const end = str.substr(str.length / 2 + percentage.length / 2 + 1
-          );
-          return chalk.redBright(`${start} ${percentage} ${end}`);
-        },
+        bar: (str, [progress]) => formatBarWithTextInCenter(str, progress, progress.getDataValue('percentage')),
       }
     }),
   }),
   new Progress({
     total: 2000,
-    render: new ProgressRender({
+    render: new Render({
       bar: {
         glue: '|',
         completeChar: '█',
@@ -61,7 +58,7 @@ progresses = [
     }),
   }),
   [
-    new Progress({ start: 20, total: 1000, tag: 'red', render: new ProgressRender({
+    new Progress({ start: 20, total: 1000, tag: 'red', render: new Render({
         template: `[{bars}] {test} {eta} {red_value}/{red_total} | {blue_value}/{blue_total}`,
         format: {
           value: str => chalk.red(str),
@@ -70,7 +67,7 @@ progresses = [
           bars: str => chalk.green(str),
         }
       })}),
-    new Progress({ start: 50, total: 1000, tag: 'blue', render: new ProgressRender({
+    new Progress({ start: 50, total: 1000, tag: 'blue', render: new Render({
         format: {
           value: str => Number(str) > 100 ? chalk.green(str) : chalk.blue(str),
           total: str => chalk.blue(str),
@@ -78,7 +75,7 @@ progresses = [
         }
       })})
   ],
-  new Progress({total: 5000, render: new ProgressRender({
+  new Progress({total: 5000, render: new Render({
       bar: {
         resumeChar: '▢',
         completeChar: '▣',
@@ -105,7 +102,7 @@ for(let i = 0; i < 20; i++) {
 // Just for fan ))
 // progresses.push((progresses[2] as Progress[])[1] as Progress);
 
-const bar = new Render(progresses);
+const bar = new Bar(progresses);
 bar.start();
 
 setInterval(() => {

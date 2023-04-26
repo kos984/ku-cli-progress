@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { Progress } from '../src/progress';
-import { Render } from '../src/bar';
+import { Bar } from '../src/bar';
 
 interface IFile {
   size: number;
@@ -29,7 +29,7 @@ const process = (file: IFile) => {
 const runner = async (files: IFile[], batchSize = 5) => {
   const bars = [];
   const mainProgress = new Progress({ total: files.length });
-  const bar = new Render([mainProgress]);
+  const bar = new Bar([mainProgress]);
   bar.start();
 
   files = Array.from(files).reverse();

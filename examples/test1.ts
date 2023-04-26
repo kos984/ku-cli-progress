@@ -1,6 +1,6 @@
-import { ProgressRender } from '../src/render';
+import { Render } from '../src/render';
 import { Progress } from '../src/progress';
-import { Render } from '../src/bar';
+import { Bar } from '../src/bar';
 // @ts-ignore
 import chalk from 'chalk';
 
@@ -9,7 +9,7 @@ let progresses: Progress[] = [];
 progresses = [
   new Progress({
     total: 1000,
-    render: new ProgressRender({
+    render: new Render({
       bar: {
         glue: '',
         completeChar: '∎',
@@ -17,7 +17,7 @@ progresses = [
       },
       format: {
         bar: (str, [progress]) => {
-          const done = (str.match(/∎+/) ?? [''])[0].length
+          const done = Math.round(progress.getProgress() * str.length);
           const percentage = progress.getDataValue('percentage');
           const start = str.substr(0, str.length / 2 - percentage.length / 2 - 1);
           const end = str.substr(str.length / 2 + percentage.length / 2 + 1
@@ -30,7 +30,7 @@ progresses = [
   }),
 ];
 
-const bar = new Render(progresses);
+const bar = new Bar(progresses);
 bar.start();
 
 setInterval(() => {

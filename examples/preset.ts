@@ -1,16 +1,20 @@
-import { ProgressRender } from '../src/progress-render';
 import { Render } from '../src/render';
+import { Bar } from '../src/bar';
+import { Progress } from '../src/progress';
 
-const render = new Render();
-// const progressClassic = bar.createProgress({ total: 1000, render: Render.shades() });
-// const progressRect = bar.createProgress({ total: 1000, render: Render.rect() });
+const progresses = [
+  new Progress({ total: 1000, render: new Render(Render.preset.shades) }),
+  new Progress({ total: 1000 })
+  // new Progress({ total: 1000, render: new Render(Render.preset.rect) })
+]
 
-// FIXME: it looks Ugly
-const progressClassic = render.createProgress({ total: 1000, render: ProgressRender.create(ProgressRender.preset.shades) });
-const progressRect = render.createProgress({ total: 1000, render: ProgressRender.create(ProgressRender.preset.rect) });
+const [progressClassic, progressRect] = progresses;
+const bar = new Bar(progresses,
+  new Render(Render.preset.rect)
+);
 
 progressClassic.increment(300);
 progressRect.increment(700);
 
-render.renderBars();
+bar.renderBars();
 

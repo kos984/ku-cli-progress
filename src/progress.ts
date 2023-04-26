@@ -1,11 +1,11 @@
-import { ProgressRender } from './progress-render';
+import { Render } from './render';
 import { EventEmitter } from 'events';
 import { Eta } from './eta';
 
 export interface IProgressParams {
   total: number;
   start?: number;
-  render?: ProgressRender;
+  render?: Render;
   tag?: string;
 }
 
@@ -13,7 +13,7 @@ export class Progress extends EventEmitter {
   protected tag?: string;
   protected count: number;
   protected total: number;
-  protected render?: ProgressRender;
+  protected render?: Render;
   protected payload: any;
   protected eta: Eta;
 
@@ -62,7 +62,7 @@ export class Progress extends EventEmitter {
     return progress > 1 ? 1 : progress;
   }
 
-  public getRender(): ProgressRender | undefined {
+  public getRender(): Render | undefined {
     return this.render;
   }
   public getTag(): string | undefined {
