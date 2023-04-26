@@ -1,11 +1,11 @@
-import { Render } from './render';
+import { ProgressRender } from './progress-render';
 import { EventEmitter } from 'events';
 import { Eta } from './eta';
 
 export interface IProgressParams {
   total: number;
   start?: number;
-  render?: Render;
+  render?: ProgressRender;
   tag?: string;
 }
 
@@ -13,7 +13,7 @@ export class Progress extends EventEmitter {
   protected tag?: string;
   protected count: number;
   protected total: number;
-  protected render?: Render;
+  protected render?: ProgressRender;
   protected payload: any;
   protected eta: Eta;
 
@@ -30,7 +30,7 @@ export class Progress extends EventEmitter {
   public increment(delta: number = 1, payload: any = {}): Progress {
     const value = this.count + delta;
     this.emit('tick', { value, delta, payload: this.payload, newPayload: payload });
-    return this.set(this.count + delta, payload);
+    return this.set(value, payload);
   }
 
   public set(count: number, payload: any): Progress {
@@ -62,22 +62,22 @@ export class Progress extends EventEmitter {
     return progress > 1 ? 1 : progress;
   }
 
-  public getRender(): Render | undefined {
+  public getRender(): ProgressRender | undefined {
     return this.render;
   }
   public getTag(): string | undefined {
     return this.tag;
   }
 
-  public getDataValue(key: string) { // FIXME: getters
+  public getDataValue(key: string) {
     const map: { [key: string]: () => string | null } = {
       bar: () => this.render ? this.render.renderBar({ progress: this }) : null,
-      speed: () => this.eta.getSpeed() + '/s',
-      eta: () => Math.round((this.getTotal() - this.getValue()) / this.eta.getSpeed()) + 's',
+      speed: () => Math.round(this.eta.getSpeed()) + '/s',
+      eta: () => this.eta.getEtaS() + 's',
       value: () => this.getValue().toString(),
       total: () => this.getTotal().toString(),
       percentage: () => Math.round(this.getProgress() * 100) + '%',
-      perMille: () => Math.round(this.getProgress() * 1000) + '‰',
+      duration: () => Math.round(this.eta.getDurationMs() / 1000) + 's',
     }
     if (map[key]) {
       return map[key]() as string | null;

@@ -1,6 +1,6 @@
-import { Render } from '../src/render';
+import { ProgressRender } from '../src/render';
 import { Progress } from '../src/progress';
-import { Bar } from '../src/bar';
+import { Render } from '../src/bar';
 // @ts-ignore
 import chalk from 'chalk';
 
@@ -9,7 +9,7 @@ let progresses: (Progress | Progress[])[] = [];
 progresses = [
   new Progress({
     total: 1000,
-    render: new Render({
+    render: new ProgressRender({
       bar: {
         glue: '',
         completeChar: '∎',
@@ -30,7 +30,7 @@ progresses = [
   }),
   new Progress({
     total: 1000,
-    render: new Render({
+    render: new ProgressRender({
       bar: {
         glue: '',
         completeChar: '∎',
@@ -49,7 +49,7 @@ progresses = [
   }),
   new Progress({
     total: 2000,
-    render: new Render({
+    render: new ProgressRender({
       bar: {
         glue: '|',
         completeChar: '█',
@@ -61,7 +61,7 @@ progresses = [
     }),
   }),
   [
-    new Progress({ start: 20, total: 1000, tag: 'red', render: new Render({
+    new Progress({ start: 20, total: 1000, tag: 'red', render: new ProgressRender({
         template: `[{bars}] {test} {eta} {red_value}/{red_total} | {blue_value}/{blue_total}`,
         format: {
           value: str => chalk.red(str),
@@ -70,7 +70,7 @@ progresses = [
           bars: str => chalk.green(str),
         }
       })}),
-    new Progress({ start: 50, total: 1000, tag: 'blue', render: new Render({
+    new Progress({ start: 50, total: 1000, tag: 'blue', render: new ProgressRender({
         format: {
           value: str => Number(str) > 100 ? chalk.green(str) : chalk.blue(str),
           total: str => chalk.blue(str),
@@ -78,7 +78,7 @@ progresses = [
         }
       })})
   ],
-  new Progress({total: 5000, render: new Render({
+  new Progress({total: 5000, render: new ProgressRender({
       bar: {
         resumeChar: '▢',
         completeChar: '▣',
@@ -105,7 +105,7 @@ for(let i = 0; i < 20; i++) {
 // Just for fan ))
 // progresses.push((progresses[2] as Progress[])[1] as Progress);
 
-const bar = new Bar(progresses);
+const bar = new Render(progresses);
 bar.start();
 
 setInterval(() => {
@@ -125,4 +125,4 @@ setInterval(() => {
     }
   })
 
-}, 500);
+}, 100);

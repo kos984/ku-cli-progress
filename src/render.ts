@@ -1,115 +1,75 @@
-import { Progress } from './progress';
+import { IProgressParams, Progress } from './progress';
+import { ProgressRender } from './progress-render';
+import { TerminalTty } from './terminals/terminal-tty';
+import { EventEmitter } from 'events';
+import { ITerminal } from './terminals/types';
+import { IRender } from './types';
 
-export interface IBarParams {
-  completeChar: string;
-  resumeChar: string;
-  width: number;
-  glue: string;
+export interface IBarOptions {
+  terminal?: ITerminal;
+  render?: IRender;
 }
 
-export interface IRenderParams {
-  template: string;
-  bar: Partial<IBarParams>
-  format: {
-    [key: string]: (str: string, progress: Progress[]) => string
-  }
-}
+export class Render extends EventEmitter {
+  protected terminal = new TerminalTty()
+  protected render = new ProgressRender();
 
-export class Render {
-  protected params: IRenderParams & { bar: IBarParams };
-  protected colors: Array<(s: string) => string> = [];
-  public constructor(params: Partial<IRenderParams> = {}) {
-    this.params = {
-      template: `[{bar}] {percentage} {perMille} ETA: {eta} {value}/{total}`,
-      ...params,
-      bar: {
-        completeChar: '=',
-        resumeChar: '-',
-        width: 40,
-        glue: '',
-        ...params.bar,
-      },
-      format: {
-        bar: (srt: string) => srt,
-        eta: (str: string) => str,
-        value: (str: string) => str,
-        total: (str: string) => str,
-        ...params.format,
-      },
-    }
+  protected progresses: Array<Progress | Progress[]>;
+
+  constructor(progresses: Array<Progress | Progress[]> = []) {
+    // FIXME: options
+    super();
+    this.progresses = progresses;
   }
 
-  public render(progresses: Progress[]): string {
-    if (!progresses.length) {
-      return '';
-    }
-    return this.params.template.replace(/{([^}]+)}/g, (match, p) => {
-      const [property, tag] = p.split('_').reverse();
-      const progress = tag ? progresses.find(p => p.getTag() === tag) : progresses[0];
-      if (!progress) {
-        return match;
+  public async start() {
+    this.emit('start');
+    while(true) {
+      await new Promise(r => {
+        this.renderBars();
+        setTimeout(() => r(true), 100);
+      });
+      if (this.isComplete(this.progresses)) {
+        this.renderBars();
+        this.emit('complete');
+        break;
       }
-
-      const render = progress.getRender() ?? this;
-      const formatFunction = render.params.format[property];
-      if (property === 'bars' && progresses.length > 1) {
-        // do not allow format bars, just return
-        return formatFunction ? formatFunction(this.renderBars(progresses), progresses) : this.renderBars(progresses);
-      }
-      const value = progress.getDataValue(property);
-      if (property === 'bar') {
-        return value ?? render.renderBar({ progress });
-      }
-      if (!value) {
-        return match;
-      }
-      return formatFunction ? formatFunction(value, progresses) : value.toString();
-    });
+    }
   }
 
-  public renderBar(params: { progress: Progress, renderResume?: boolean, size?: number }): string {
-    const { completeChar, resumeChar, width, glue } = this.params.bar;
-    const { renderResume, size } = {
-      renderResume: true,
-      size: params.size ?? Math.round(params.progress.getProgress() * width),
-      ...params,
-    }
-    const lines = [];
-    lines.push(completeChar.repeat(size));
-    if (renderResume) {
-      lines.push(resumeChar.repeat(width - size));
-    }
-    const color = this.params.format.bar;
-    return color(lines.join(glue), [params.progress]);
+  public add(progress: Progress | Progress[]) {
+    this.progresses.push(progress);
   }
 
-  public renderBars(progresses: Progress[]): string {
-    const { resumeChar, width, glue } = this.params.bar;
-    const lines = [];
-
-    const last = progresses
-      .map((item, index) => ({
-        size: Math.round(item.getProgress() * width),
-        item,
-        color: this.colors[index] ? this.colors[index] : (s: string) => s,
-      }))
-      .sort((a, b) => Math.sign(a.size - b.size))
-      .reduce((prev, current) => {
-        const length = current.size - prev.size;
-        if (length > 0) {
-          const render = current.item.getRender() ?? this;
-          lines.push(render.renderBar({
-            progress: current.item,
-            renderResume: false,
-            size: length > width ? width : length,
-          }))
-        }
-        return current;
-      }, { size: 0 });
-
-    if (width - last.size > 0) {
-      lines.push(resumeChar.repeat(width - last.size));
-    }
-    return lines.join(glue);
+  public remove(progress: Progress | Progress[]) {
+    this.progresses = this.progresses.filter(p => p !== progress);
+    this.renderBars();
   }
+
+  public createProgress(params: IProgressParams): Progress {
+    const progress = new Progress(params);
+    this.add(progress);
+    return progress;
+  }
+
+  public renderBars() {
+    const bars = this.progresses.map( p => {
+      const processes = Array.isArray(p) ? p : [p];
+      const render = processes[0].getRender() ?? this.render;
+      return render.render(processes);
+    })
+    this.terminal.write(bars.join('\n') + '\n');
+  }
+
+  protected isComplete(processes: Array<Progress | Progress[]>): boolean {
+    let completed = true;
+    for(const process of processes) {
+      completed = Array.isArray(process) ? this.isComplete(process) : process.getProgress() >= 1
+      if (!completed) {
+        return false;
+      }
+    }
+    return completed;
+  }
+
 }

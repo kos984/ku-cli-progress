@@ -1,11 +1,13 @@
 import * as readline from 'readline';
+import { ITerminal } from './types';
 import { WriteStream } from 'tty';
 
-export class TerminalTty {
+export class TerminalTty implements ITerminal {
   protected y = 0;
   protected prev = '';
+  protected stream: WriteStream = process.stdout;
 
-  public constructor(protected stream: WriteStream = process.stdout) { // TODO: add type
+  public constructor() {
     process.stdout.on('resize', () => {
       this.clear();
       this.refresh();
@@ -25,22 +27,23 @@ export class TerminalTty {
     readline.cursorTo(this.stream, 0);
   }
 
-  public write(s: string, rawWrite=false){
+  public write(s: string) {
     const lines = s.split('\n');
-    this.stream.write('\x1B[?25l'); // disable cursor TODO: move out
+    this.cursor(false);
     this.resetCursor(this.y);
-    const maxLength = Math.min(process.stdout.rows, lines.length) - 1;
+    const maxLength = Math.min(this.stream.rows, lines.length) - 1;
     lines.forEach((l, i) => {
       if (i > maxLength) {
         return;
       }
-      this.stream.write(l.substr(0, process.stdout.columns));
+      this.stream.write(l.substr(0, this.stream.columns));
       readline.clearLine(this.stream, 1);
       if (i < maxLength) {
         this.stream.write('\n');
       }
     });
-    this.stream.write('\x1B[?25h');
+    readline.clearScreenDown(this.stream);
+    this.cursor(true); // FIXME: need store prev variable
     this.y = maxLength;
     this.prev = s;
   }
