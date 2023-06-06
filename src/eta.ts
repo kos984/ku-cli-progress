@@ -10,7 +10,7 @@ export class Eta {
 
   public attach(progress: Progress) {
     this.progress = progress;
-    progress.on('tick', ({ delta, value }) => { // FIXME: remove events
+    progress.on('tick', ({ delta, value }) => {
       if (this.updates.length && Date.now() - this.updates[this.updates.length - 1].time < 200) {
         // ignore all updates faster then 100ms
         return;
