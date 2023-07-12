@@ -106,7 +106,7 @@ export class Render implements IRender {
     const { resumeChar, width, glue } = this.params.bar;
     const lines = [];
 
-    const last = progresses
+    const leftLength = progresses
       .map((item, index) => ({
         size: Math.round(item.getProgress() * width),
         item,
@@ -125,8 +125,8 @@ export class Render implements IRender {
         return current;
       }, { size: 0 });
 
-    if (width - last.size > 0) {
-      lines.push(resumeChar.repeat(width - last.size));
+    if (width - leftLength.size > 0) {
+      lines.push(resumeChar.repeat(width - leftLength.size));
     }
     return lines.join(glue);
   }
