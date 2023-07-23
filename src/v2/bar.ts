@@ -2,11 +2,37 @@ import { IBarOptions } from './interfaces/bar-options.interface';
 import { Progress } from './progress';
 
 export interface IFormatters {
-  [key: string]: (str: string) => string;
+  [key: string]: (str: string, index: number) => string;
 }
 
+export interface IParams {
+  template?: string;
+  options?: Partial<IBarOptions>;
+  formatters?: IFormatters
+}
+
+// TODO: handle soft close during process.exit(0);
+
 export class Bar {
-  public constructor(protected progresses: Progress[], protected template: string, protected options: IBarOptions, protected formatters: IFormatters = {}) {
+
+  protected template: string = `[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}`;
+  protected options: IBarOptions = {
+    completeChar: '=',
+    resumeChar: '-',
+    width: 40,
+    glue: '',
+  };
+  protected formatters!: IFormatters;
+
+  public constructor(protected progresses: Progress[], params?: IParams) {
+    this.template = params?.template ?? this.template;
+    this.options = { ...this.options, ...params?.options };
+    this.formatters = params?.formatters ?? {};
+
+  }
+
+  public getProgresses() {
+    return this.progresses;
   }
 
   public renderBars(progresses: Progress[]): string {
@@ -17,15 +43,17 @@ export class Bar {
       .map((item, index) => ({
         size: Math.round(item.getProgress() * width),
         item,
+        index,
       }))
       .sort((a, b) => Math.sign(a.size - b.size))
       .reduce((prev, current) => {
         const length = current.size - prev.size;
         if (length > 0) {
-          let line = this.getBarParts(length > width ? width : length, this.options).done;
-          if (this.formatters[`${current.item.getTag()}_bar`]) {
-            // FIXME: not perfect
-            line = this.formatters[`${current.item.getTag()}_bar`](line);
+          let line = this.getBarParts(length > width ? width : length).done;
+          const item = current.item;
+          const formatter = this.formatters[`${item.getTag()}_bar`] ?? this.formatters['bar'];
+          if (formatter) {
+            line = formatter(line, current.index);
           }
           lines.push(line);
         }
@@ -39,48 +67,50 @@ export class Bar {
   }
 
   public render(): string {
-    const options = this.options;
     return this.template.replace(/{([^}]+)}/g, (match, prop) => {
       const [property, tag] = prop.split('_').reverse();
-      const progress = tag ? this.progresses.find(p => p.getTag() === tag) : this.progresses[0];
-      const value = this.getDataValue(property, options, progress!);
+      const index = tag ? this.progresses.findIndex(p => p.getTag() === tag) : 0;
+      if (index < 0) return match;
+      const progress = this.progresses[index];
+      const value = this.getDataValue(property, progress);
       if (value === null) {
         return match;
       }
       if (this.formatters[prop]) {
-        return this.formatters[prop](value);
+        return this.formatters[prop](value, index);
       }
       return value;
     });
   }
 
-  public getBarParts(size: number, options: IBarOptions): { left: string; done: string } {
+  public getBarParts(size: number): { left: string; done: string } {
     return {
-      done: options.completeChar.repeat(size),
-      left: options.resumeChar.repeat(options.width - size)
+      done: this.options.completeChar.repeat(size),
+      left: this.options.resumeChar.repeat(this.options.width - size)
     }
   }
 
-  public bar(progress: number, options: IBarOptions): string { // TODO: format/color
-    const size =  Math.round(progress * options.width);
-    const parts = this.getBarParts(size, options);
-    return `${parts.done}${options.glue}${parts.left}`;
+  public bar(progress: number): string {
+    const size =  Math.round(progress * this.options.width);
+    const parts = this.getBarParts(size);
+    return `${parts.done}${this.options.glue}${parts.left}`;
   }
 
-  protected getDataValue = (key: string, options: IBarOptions, item: Progress): string | null => {
+  protected getDataValue = (key: string, item: Progress): string | null => {
     const map: { [key: string]: () => string } = {
-      bar: () => this.bar(item.getProgress(), options), // FIXME: remove options ??
       bars: () => this.renderBars(this.progresses),
-      // speed: () => Math.round(this.eta.getSpeed()) + '/s',
-      // eta: () => this.eta.getEtaS() + 's',
+      bar: () => this.bar(item.getProgress()), // FIXME: remove options ??
+      speed: () => Math.round(item.getEta().getSpeed()) + '/s',
+      eta: () => item.getEta().getEtaS() + 's',
       value: () => item.getValue().toString(),
       total: () => item.getTotal().toString(),
       percentage: () => Math.round(item.getProgress() * 100) + '%',
-      // duration: () => Math.round(item.eta.getDurationMs() / 1000) + 's',
+      duration: () => Math.round(item.getEta().getDurationMs() / 1000) + 's',
     }
-    let value = map[key] ? map[key]() : null;
+    const payload = item.getPayload();
+    let value = payload[key] ?? null;
+    value = (value === null && map[key]) ? map[key]() : value;
     if (value === null) return value;
-    // return this.payload && this.payload[key] ? this.payload[key] : null;
     return value;
   };
 

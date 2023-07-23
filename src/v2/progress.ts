@@ -1,6 +1,7 @@
 import { IProgress } from './interfaces/progress.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
 import { EventEmitter } from 'events';
+import { Eta } from './eta';
 
 export interface IProgressParams {
   total: number;
@@ -13,19 +14,19 @@ export class Progress extends EventEmitter implements IProgress, IBarItem {
   protected count: number;
   protected total: number;
   protected payload: any;
-  // protected eta: Eta;
+  protected eta: Eta;
 
-  public constructor(params: IProgressParams) {
+  public constructor(params: IProgressParams, payload = {}) {
     super();
     this.tag = params.tag;
     this.count = params.start ?? 0;
     this.total = params.total;
-    // this.render = params.render;
-    // this.eta = new Eta();
-    // this.eta.attach(this);
+    this.eta = new Eta(); // FIXME: pass to constructor
+    this.eta.attach(this);
+    this.payload = payload;
   }
 
-  public increment(delta: number = 1, payload: any = {}): Progress {
+  public increment(delta: number = 1, payload?: any): Progress {
     return this.update(this.count + delta, payload);
   }
 
@@ -36,7 +37,7 @@ export class Progress extends EventEmitter implements IProgress, IBarItem {
     return this;
   }
 
-  protected update(count: number, payload: any): Progress {
+  protected update(count: number, payload?: any): Progress {
     this.emit('update', {
       prev: {
         value: this.count,
@@ -48,7 +49,8 @@ export class Progress extends EventEmitter implements IProgress, IBarItem {
       }
     });
     this.count = count;
-    this.payload = payload;
+    this.payload = payload ? payload : this.payload;
+    // FIXME: add test about override
     return this;
   }
 
@@ -61,7 +63,7 @@ export class Progress extends EventEmitter implements IProgress, IBarItem {
   }
 
   public getPayload(): any {
-    return this.payload; // FIXME: need to update
+    return this.payload ?? {};
   }
 
   public getProgress(): number {
@@ -72,5 +74,9 @@ export class Progress extends EventEmitter implements IProgress, IBarItem {
   // FIXME: do I need it ?
   public getTag(): string | undefined {
     return this.tag;
+  }
+
+  public getEta(): Eta {
+    return this.eta;
   }
 }
