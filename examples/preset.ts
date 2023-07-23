@@ -5,7 +5,7 @@ import { Progress } from '../src/progress';
 const progresses = [
   new Progress({ total: 1000, render: new Render(Render.preset.shades) }),
   new Progress({ total: 1000 })
-  // new Progress({ total: 1000, render: new Render(Render.preset.rect) })
+  // new Progress({ total: 1000, render: new Bar(Bar.preset.rect) })
 ]
 
 const [progressClassic, progressRect] = progresses;

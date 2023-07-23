@@ -6,11 +6,11 @@ import { ITerminal } from './terminals/types';
 import { IRender } from './types';
 
 export interface IBarOptions {
-  terminal?: ITerminal; // TODO: file ???
+  terminal?: ITerminal;
   render?: IRender;
 }
 
-export class Bar extends EventEmitter { // FIXME: refactor to multi-bar ???
+export class Bar extends EventEmitter {
   protected terminal = new TerminalTty()
 
   constructor(

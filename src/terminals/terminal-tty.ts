@@ -43,7 +43,7 @@ export class TerminalTty implements ITerminal {
       }
     });
     readline.clearScreenDown(this.stream);
-    this.cursor(true); // FIXME: need store prev variable
+    this.cursor(true);
     this.y = maxLength;
     this.prev = s;
   }

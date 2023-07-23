@@ -86,7 +86,7 @@ progresses = [
 /*
 for(let i = 0; i < 20; i++) {
   progresses.push(
-    new Progress({total: 1000, render: new Render({
+    new Progress({total: 1000, render: new Bar({
         bar: {
           resumeChar: ' ',
           completeChar: '▣',
