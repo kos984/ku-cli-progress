@@ -14,7 +14,6 @@ export class BarsContainer {
   }
 
   public add(bar: Bar) {
-    // FIXME: attach if started
     this.items.push(bar)
     if (this.isStarted) {
       this.addListenerToProgress(bar)
@@ -34,6 +33,19 @@ export class BarsContainer {
       return bar.render();
     })
     this.terminal.write(lines.join('\n') + '\n');
+  }
+
+  // FIXME: need to test
+  public log(str: string) {
+    this.terminal.clear();
+    console.log(str);
+    this.terminal.refresh();
+  }
+
+  public testLog(f: () => void) {
+    this.terminal.clear();
+    f();
+    this.terminal.refresh();
   }
 
   public start() {

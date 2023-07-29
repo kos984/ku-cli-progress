@@ -2,7 +2,7 @@ import { IBarOptions } from './interfaces/bar-options.interface';
 import { Progress } from './progress';
 
 export interface IFormatters {
-  [key: string]: (str: string, index: number) => string;
+  [key: string]: (str: string, index: number, progresses: Progress[]) => string;
 }
 
 export interface IParams {
@@ -53,7 +53,7 @@ export class Bar {
           const item = current.item;
           const formatter = this.formatters[`${item.getTag()}_bar`] ?? this.formatters['bar'];
           if (formatter) {
-            line = formatter(line, current.index);
+            line = formatter(line, current.index, progresses);
           }
           lines.push(line);
         }
@@ -77,7 +77,7 @@ export class Bar {
         return match;
       }
       if (this.formatters[prop]) {
-        return this.formatters[prop](value, index);
+        return this.formatters[prop](value, index, this.progresses);
       }
       return value;
     });

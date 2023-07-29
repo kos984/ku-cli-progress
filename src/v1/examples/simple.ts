@@ -1,5 +1,5 @@
-import { Bar } from '../src/bar';
-import { Progress } from '../src/progress';
+import { Bar } from '../bar';
+import { Progress } from '../progress';
 
 const progress = new Progress({ total: 1000 });
 

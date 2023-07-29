@@ -2,14 +2,16 @@
   "name": "@open-commerce/progress-bar",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^18.15.11",
-    "chalk": "^4.1.2"
+    "chalk": "^4.1.2",
+    "typescript": "^5.1.6"
   }
 }

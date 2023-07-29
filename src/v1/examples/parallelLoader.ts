@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
-import { Progress } from '../src/progress';
-import { Bar } from '../src/bar';
+import { Progress } from '../progress';
+import { Bar } from '../bar';
 
 interface IFile {
   size: number;

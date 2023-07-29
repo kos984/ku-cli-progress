@@ -1,8 +1,8 @@
 import { Progress } from './progress';
 import { Render } from './render';
-import { TerminalTty } from './terminals/terminal-tty';
+import { TerminalTty } from '../terminals/terminal-tty';
 import { EventEmitter } from 'events';
-import { ITerminal } from './terminals/types';
+import { ITerminal } from '../terminals/types';
 import { IRender } from './types';
 
 export interface IBarOptions {

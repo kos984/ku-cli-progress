@@ -1,6 +1,6 @@
-import { Render } from '../src/render';
-import { Bar } from '../src/bar';
-import { Progress } from '../src/progress';
+import { Render } from '../render';
+import { Bar } from '../bar';
+import { Progress } from '../progress';
 
 const progresses = [
   new Progress({ total: 1000, render: new Render(Render.preset.shades) }),
