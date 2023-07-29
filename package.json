@@ -1,5 +1,5 @@
 {
-  "name": "@open-commerce/progress-bar",
+  "name": "ku-progress-bar",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
