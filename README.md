@@ -36,3 +36,5 @@ const bar = new BarsContainer(progresses);
 bar.start().catch(console.error);
 ```
 ![img_1.png](img_1.png)
+
+

@@ -2,13 +2,19 @@ import { IBarOptions } from './interfaces/bar-options.interface';
 import { Progress } from './progress';
 
 export interface IFormatters {
+  // FIXME: update index to progress
   [key: string]: (str: string, index: number, progresses: Progress[]) => string;
+}
+
+export interface IDataProviders {
+  [key: string]: (progress: Progress, progresses: Progress[]) => string;
 }
 
 export interface IParams {
   template?: string;
   options?: Partial<IBarOptions>;
-  formatters?: IFormatters
+  formatters?: IFormatters;
+  dataProviders?: IDataProviders;
 }
 
 // TODO: handle soft close during process.exit(0);
@@ -23,12 +29,23 @@ export class Bar {
     glue: '',
   };
   protected formatters!: IFormatters;
+  protected dataProviders!: IDataProviders;
 
   public constructor(protected progresses: Progress[], params?: IParams) {
     this.template = params?.template ?? this.template;
     this.options = { ...this.options, ...params?.options };
     this.formatters = params?.formatters ?? {};
-
+    this.dataProviders = {
+      bars: (progress, progresses) => this.renderBars(progresses),
+      bar: (progress) => this.bar(progress.getProgress()),
+      speed: (progress) => Math.round(progress.getEta().getSpeed()) + '/s',
+      eta: (progress) => progress.getEta().getEtaS() + 's',
+      value: (progress) => progress.getValue().toString(),
+      total: (progress) => progress.getTotal().toString(),
+      percentage: (progress) => Math.round(progress.getProgress() * 100) + '%',
+      duration: (progress) => Math.round(progress.getEta().getDurationMs() / 1000) + 's',
+      ...params?.dataProviders,
+    }
   }
 
   public getProgresses() {
@@ -97,19 +114,11 @@ export class Bar {
   }
 
   protected getDataValue = (key: string, item: Progress): string | null => {
-    const map: { [key: string]: () => string } = {
-      bars: () => this.renderBars(this.progresses),
-      bar: () => this.bar(item.getProgress()), // FIXME: remove options ??
-      speed: () => Math.round(item.getEta().getSpeed()) + '/s',
-      eta: () => item.getEta().getEtaS() + 's',
-      value: () => item.getValue().toString(),
-      total: () => item.getTotal().toString(),
-      percentage: () => Math.round(item.getProgress() * 100) + '%',
-      duration: () => Math.round(item.getEta().getDurationMs() / 1000) + 's',
-    }
+    // const map: { [key: string]: () => string } = {
+    // }
     const payload = item.getPayload();
     let value = payload[key] ?? null;
-    value = (value === null && map[key]) ? map[key]() : value;
+    value = (value === null && this.dataProviders[key]) ? this.dataProviders[key](item, this.progresses) : value;
     if (value === null) return value;
     return value;
   };

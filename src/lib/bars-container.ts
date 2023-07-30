@@ -1,4 +1,4 @@
-import { TerminalTty } from '../terminals/terminal-tty';
+import { TerminalTty } from './terminals/terminal-tty';
 import { Bar } from './bar';
 import { Progress } from './progress';
 
