@@ -1,13 +1,13 @@
 {
   "name": "ku-progress-bar",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "",
   "main": "dist/index.js",
   "homepage": "https://github.com/kos984/ku-cli-progress",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepublish": "npm run build"
+    "prepare": "npm run build"
   },
   "author": "",
   "license": "ISC",
