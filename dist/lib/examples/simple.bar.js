@@ -179,6 +179,6 @@ const interval = setInterval(() => {
     if (update === false) {
         clearInterval(interval);
     }
-    bar.log(() => console.log('this is a test: ' + textInBarRotation.getProgress()));
+    bar.logWrap(() => console.log('this is a test: ' + textInBarRotation.getProgress()));
 }, 300);
 //# sourceMappingURL=simple.bar.js.map

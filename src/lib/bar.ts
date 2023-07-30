@@ -34,7 +34,7 @@ export class Bar {
     this.terminal.write(lines.join('\n') + '\n');
   }
 
-  public log(logFunction: () => void) {
+  public logWrap(logFunction: () => void) {
     this.terminal.clear();
     logFunction();
     this.terminal.refresh();

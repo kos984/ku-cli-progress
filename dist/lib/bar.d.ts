@@ -10,7 +10,7 @@ export declare class Bar {
     add(bar: BarItem): this;
     removeByProgress(progress: Progress): void;
     render(): void;
-    log(logFunction: () => void): void;
+    logWrap(logFunction: () => void): void;
     start(): void;
     protected addListenerToProgress(item: BarItem): void;
     protected refresh: () => void;

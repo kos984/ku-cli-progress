@@ -82,7 +82,6 @@ export class BarItem {
 
   public render(): string {
     return this.template.replace(/{([^{}]+)}/g, (match, prop) => {
-      console.log(match, prop);
       const [property, tag] = prop.split('_').reverse();
       const index = tag ? this.progresses.findIndex(p => p.getTag() === tag) : 0;
       if (index < 0) return match;
