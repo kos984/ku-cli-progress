@@ -1,0 +1,26 @@
+import { IBarOptions } from './interfaces/bar-options.interface';
+import { Progress } from './progress';
+export interface IFormatters {
+    [key: string]: (str: string, index: number, progresses: Progress[]) => string;
+}
+export interface IParams {
+    template?: string;
+    options?: Partial<IBarOptions>;
+    formatters?: IFormatters;
+}
+export declare class Bar {
+    protected progresses: Progress[];
+    protected template: string;
+    protected options: IBarOptions;
+    protected formatters: IFormatters;
+    constructor(progresses: Progress[], params?: IParams);
+    getProgresses(): Progress[];
+    renderBars(progresses: Progress[]): string;
+    render(): string;
+    getBarParts(size: number): {
+        left: string;
+        done: string;
+    };
+    bar(progress: number): string;
+    protected getDataValue: (key: string, item: Progress) => string | null;
+}
