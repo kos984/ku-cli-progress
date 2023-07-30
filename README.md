@@ -3,10 +3,8 @@ cli progress bar
 # Installation
 
 ```sqlite-psql
-$ npm install  FIXME
+$ npm install  ku-progress-bar
 ```
-
-# How to use
 
 ## Simple bar
 ```
@@ -37,4 +35,6 @@ bar.start().catch(console.error);
 ```
 ![img_1.png](img_1.png)
 
+see examples simple.bar.ts
 
+![img_2.png](img_2.png)

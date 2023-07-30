@@ -28,6 +28,7 @@ bar.add(new BarItem([
     new Progress({ total: 100, start: 90, tag: 'yellow' }),
   ], {
   template: `[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}`,
+  options: presets.shades,
   formatters: {
     'bar': (str, progress, progresses) => {
       const index = progresses.findIndex(p => p === progress);
@@ -209,4 +210,4 @@ const interval = setInterval(() => {
   }
   bar.log(() => console.log('this is a test: ' + textInBarRotation.getProgress()));
 
-}, 1000);
+}, 300);
