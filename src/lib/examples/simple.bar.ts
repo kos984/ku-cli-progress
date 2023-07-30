@@ -207,6 +207,6 @@ const interval = setInterval(() => {
   if (update === false) {
     clearInterval(interval);
   }
-  bar.log('this is a test: ' + textInBarRotation.getProgress());
+  bar.log(() => console.log('this is a test: ' + textInBarRotation.getProgress()));
 
 }, 1000);
