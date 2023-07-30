@@ -1,21 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const bars_container_1 = require("../bars-container");
-const progress_1 = require("../progress");
 const bar_1 = require("../bar");
+const progress_1 = require("../progress");
+const bar_item_1 = require("../bar-item");
 const chalk = require("chalk");
 const presets_1 = require("../presets");
-const barsContainer = new bars_container_1.BarsContainer();
+const bar = new bar_1.Bar();
 const p = new progress_1.Progress({ total: 100 });
-barsContainer.add(new bar_1.Bar([p]));
-barsContainer.add(new bar_1.Bar([p, new progress_1.Progress({ total: 100, start: 50, tag: 'red' }), p], {
+bar.add(new bar_item_1.BarItem([p]));
+bar.add(new bar_item_1.BarItem([p, new progress_1.Progress({ total: 100, start: 50, tag: 'red' }), p], {
     template: `[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {red_value} {value}/{total}`,
     formatters: {
         'red_bar': str => chalk.red(str),
         'bar': str => chalk.green(str),
     }
 }));
-barsContainer.add(new bar_1.Bar([
+bar.add(new bar_item_1.BarItem([
     new progress_1.Progress({ total: 100, start: 50, tag: 'green' }),
     new progress_1.Progress({ total: 100, start: 65, tag: 'red' }),
     new progress_1.Progress({ total: 100, start: 78, tag: 'blue' }),
@@ -23,7 +23,8 @@ barsContainer.add(new bar_1.Bar([
 ], {
     template: `[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}`,
     formatters: {
-        'bar': (str, index) => {
+        'bar': (str, progress, progresses) => {
+            const index = progresses.findIndex(p => p === progress);
             const colors = [chalk.green, chalk.red, chalk.blue, chalk.yellow];
             return colors[index](str);
         },
@@ -32,24 +33,23 @@ barsContainer.add(new bar_1.Bar([
 const progressWithCustomPayload = new progress_1.Progress({ total: 100, start: 75 }, {
     user: 'John Doe',
 });
-barsContainer.add(new bar_1.Bar([progressWithCustomPayload], {
+bar.add(new bar_item_1.BarItem([progressWithCustomPayload], {
     template: `[{bar}] {percentage} custom: {custom}`,
     formatters: {
         user: str => chalk.bold(str),
     }
 }));
-barsContainer.add(new bar_1.Bar([new progress_1.Progress({ total: 100, start: 33 })], {
+bar.add(new bar_item_1.BarItem([new progress_1.Progress({ total: 100, start: 33 })], {
     options: presets_1.presets.rect
 }));
-barsContainer.add(new bar_1.Bar([new progress_1.Progress({ total: 100, start: 77 })], {
+bar.add(new bar_item_1.BarItem([new progress_1.Progress({ total: 100, start: 77 })], {
     options: presets_1.presets.shades
 }));
 const textInBarProgress = new progress_1.Progress({ total: 200, start: 0 });
-barsContainer.add(new bar_1.Bar([textInBarProgress], {
+bar.add(new bar_item_1.BarItem([textInBarProgress], {
     options: presets_1.presets.rect,
     formatters: {
-        bar: (str, index, progresses) => {
-            const progress = progresses[index];
+        bar: (str, progress) => {
             const percentage = ' ' + (Math.round(progress.getProgress() * 10000) / 100).toFixed(2) + '% ';
             const done = Math.round(progress.getProgress() * str.length);
             const startPosition = Math.round(str.length / 2 - percentage.length / 2);
@@ -61,13 +61,13 @@ barsContainer.add(new bar_1.Bar([textInBarProgress], {
     }
 }));
 const textInBarRotation = new progress_1.Progress({ total: 100, start: 0 });
-function* rotate(values, timeoutMs) {
+function* rotate(values, minTimeoutMs) {
     let last = 0;
     let index = 0;
     let next = true;
     while (true) {
         const now = Date.now();
-        if (next && now - last > timeoutMs) {
+        if (next && now - last > minTimeoutMs) {
             index = ++index % values.length;
             last = now;
         }
@@ -75,16 +75,16 @@ function* rotate(values, timeoutMs) {
     }
 }
 const spin = rotate(['\\', '|', '/', '-'], 150);
-barsContainer.add(new bar_1.Bar([textInBarProgress], {
+bar.add(new bar_item_1.BarItem([textInBarProgress], {
     template: '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
     options: presets_1.presets.rect,
     formatters: {
         bar: str => chalk.yellowBright(str),
-        percentage: (str, index, progresses) => spin.next(progresses[index].getProgress() < 1).value + ' ' + str,
+        percentage: (str, progress) => spin.next(progress.getProgress() < 1).value + ' ' + str,
     }
 }));
-barsContainer.add(new bar_1.Bar([textInBarProgress], {
-    template: '[{bar}] {percentage} {spin} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
+bar.add(new bar_item_1.BarItem([textInBarProgress], {
+    template: ' {percentage} {spin} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}\n[{bar}][{spin}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
     options: {
         glue: '>>>>',
         width: 36,
@@ -95,10 +95,11 @@ barsContainer.add(new bar_1.Bar([textInBarProgress], {
         bar: str => chalk.yellowBright(str),
     },
     dataProviders: {
-        spin: (progress) => spin.next(progress.getProgress() < 1).value
-    }
+        spin: (progress) => spin.next(progress.getProgress() < 1).value,
+        longText: () => 'this is a long text with multi lines\nline 2 with some text',
+    },
 }));
-barsContainer.add(new bar_1.Bar([textInBarProgress], {
+bar.add(new bar_item_1.BarItem([textInBarProgress], {
     template: '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
     options: {
         glue: '|',
@@ -107,8 +108,8 @@ barsContainer.add(new bar_1.Bar([textInBarProgress], {
         completeChar: ' ',
     },
     formatters: {
-        bar: (str, index, progresses) => {
-            const percent = (progresses[index].getProgress() * 100).toFixed(2) + '% >>>';
+        bar: (str, progress) => {
+            const percent = (progress.getProgress() * 100).toFixed(2) + '% >>>';
             const [start, end] = str.split('|');
             const text = percent.length < start.length
                 ? start.substr(0, start.length - percent.length) + percent
@@ -117,7 +118,7 @@ barsContainer.add(new bar_1.Bar([textInBarProgress], {
         },
     }
 }));
-barsContainer.add(new bar_1.Bar([textInBarProgress], {
+bar.add(new bar_item_1.BarItem([textInBarProgress], {
     template: '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
     options: {
         glue: '|',
@@ -126,8 +127,8 @@ barsContainer.add(new bar_1.Bar([textInBarProgress], {
         completeChar: ' ',
     },
     formatters: {
-        bar: (str, index, progresses) => {
-            const percent = '<<< ' + (progresses[index].getProgress() * 100).toFixed(2) + '%';
+        bar: (str, progress) => {
+            const percent = '<<< ' + (progress.getProgress() * 100).toFixed(2) + '%';
             const [end, start] = str.split('|');
             const text = end.length > percent.length
                 ? percent + end.substr(0, end.length - percent.length)
@@ -136,26 +137,26 @@ barsContainer.add(new bar_1.Bar([textInBarProgress], {
         },
     }
 }));
-barsContainer.add(new bar_1.Bar([textInBarProgress], {
+bar.add(new bar_item_1.BarItem([textInBarProgress], {
     template: '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
     options: presets_1.presets.shades,
     formatters: {
-        bar: (str, index, progresses) => {
+        bar: (str) => {
             return chalk.blueBright(str);
         },
     }
 }));
-barsContainer.add(new bar_1.Bar([textInBarProgress], {
+bar.add(new bar_item_1.BarItem([textInBarProgress], {
     template: '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
     options: { ...presets_1.presets.shades, glue: '|' },
     formatters: {
-        bar: (str, index, progresses) => {
+        bar: (str) => {
             const [start, end] = str.split('|');
             return chalk.blueBright(start) + chalk.redBright(end);
         },
     }
 }));
-barsContainer.start();
+bar.start();
 const interval = setInterval(() => {
     let update = false;
     if (progressWithCustomPayload.getProgress() < 1) {
@@ -177,6 +178,6 @@ const interval = setInterval(() => {
     if (update === false) {
         clearInterval(interval);
     }
-    barsContainer.log('this is a test: ' + textInBarRotation.getProgress());
+    bar.log(() => console.log('this is a test: ' + textInBarRotation.getProgress()));
 }, 1000);
 //# sourceMappingURL=simple.bar.js.map

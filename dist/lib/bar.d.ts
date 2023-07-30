@@ -1,31 +1,17 @@
-import { IBarOptions } from './interfaces/bar-options.interface';
+import { TerminalTty } from './terminals/terminal-tty';
+import { BarItem } from './bar-item';
 import { Progress } from './progress';
-export interface IFormatters {
-    [key: string]: (str: string, index: number, progresses: Progress[]) => string;
-}
-export interface IDataProviders {
-    [key: string]: (progress: Progress, progresses: Progress[]) => string;
-}
-export interface IParams {
-    template?: string;
-    options?: Partial<IBarOptions>;
-    formatters?: IFormatters;
-    dataProviders?: IDataProviders;
-}
 export declare class Bar {
-    protected progresses: Progress[];
-    protected template: string;
-    protected options: IBarOptions;
-    protected formatters: IFormatters;
-    protected dataProviders: IDataProviders;
-    constructor(progresses: Progress[], params?: IParams);
-    getProgresses(): Progress[];
-    renderBars(progresses: Progress[]): string;
-    render(): string;
-    getBarParts(size: number): {
-        left: string;
-        done: string;
-    };
-    bar(progress: number): string;
-    protected getDataValue: (key: string, item: Progress) => string | null;
+    protected terminal: TerminalTty;
+    protected items: BarItem[];
+    protected isStarted: boolean;
+    protected nextUpdate: null | Promise<never>;
+    constructor(terminal?: TerminalTty);
+    add(bar: BarItem): this;
+    removeByProgress(progress: Progress): void;
+    render(): void;
+    log(logFunction: () => void): void;
+    start(): void;
+    protected addListenerToProgress(item: BarItem): void;
+    protected refresh: () => void;
 }
