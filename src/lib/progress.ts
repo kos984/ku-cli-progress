@@ -21,7 +21,7 @@ export class Progress extends EventEmitter implements IProgress, IBarItem {
     this.tag = params.tag;
     this.count = params.start ?? 0;
     this.total = params.total;
-    this.eta = new Eta(); // FIXME: pass to constructor
+    this.eta = new Eta();
     this.eta.attach(this);
     this.payload = payload;
   }
