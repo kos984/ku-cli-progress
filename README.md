@@ -12,7 +12,7 @@ $ npm install  FIXME
 ```
 const progress = new Progress({ total: 1000 });
 
-const bar = new BarsContainer([progress]);
+const bar = new Bar([progress]);
 
 progress.increment(300);
 
@@ -31,7 +31,7 @@ for (let i = 0; i < 30; i++) {
   progresses.push(progress);
 }
 
-const bar = new BarsContainer(progresses);
+const bar = new Bar(progresses);
 
 bar.start().catch(console.error);
 ```

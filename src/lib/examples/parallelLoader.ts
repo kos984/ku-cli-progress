@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
-import { BarsContainer } from '../bars-container';
 import { Bar } from '../bar';
+import { BarItem } from '../bar-item';
 import { Progress } from '../progress';
 
 interface IFile {
@@ -30,10 +30,10 @@ const process = (file: IFile) => {
 const runner = async (files: IFile[], batchSize = 5) => {
   const bars = [];
   const mainProgress = new Progress({ total: files.length });
-  // const bar = new Bar([mainProgress]);
+  // const bar = new BarItem([mainProgress]);
   // bar.start();
-  const barsContainer = new BarsContainer();
-  barsContainer.add(new Bar([mainProgress]));
+  const barsContainer = new Bar();
+  barsContainer.add(new BarItem([mainProgress]));
   barsContainer.start();
 
   files = Array.from(files).reverse();
@@ -45,7 +45,7 @@ const runner = async (files: IFile[], batchSize = 5) => {
     }
     return new Promise(r => {
       const progress = new Progress({ total: file.size });
-      barsContainer.add(new Bar([progress]))
+      barsContainer.add(new BarItem([progress]))
       const emitter = process(file);
       emitter.on('data', (size) => progress.increment(size)); // progress increment
       emitter.on('end', () => {
