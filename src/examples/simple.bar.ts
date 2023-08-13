@@ -1,8 +1,8 @@
-import { Bar } from '../bar';
-import { Progress } from '../progress';
-import { BarItem } from '../bar-item';
+import { Bar } from '../lib/bar';
+import { Progress } from '../lib/progress';
+import { BarItem } from '../lib/bar-item';
 import * as chalk from 'chalk';
-import { presets } from '../presets';
+import { presets } from '../lib/presets';
 
 const bar = new Bar();
 const p = new Progress({ total: 100 });
@@ -208,6 +208,6 @@ const interval = setInterval(() => {
   if (update === false) {
     clearInterval(interval);
   }
-  bar.logWrap(() => console.log('this is a test: ' + textInBarRotation.getProgress()));
+  // bar.logWrap(() => console.log('this is a test: ' + textInBarRotation.getProgress()));
 
 }, 300);

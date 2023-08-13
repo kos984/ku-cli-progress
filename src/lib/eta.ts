@@ -1,22 +1,33 @@
-import { Progress } from './progress';
+import { IEta } from './interfaces/eta.interface';
+import { IProgress, IUpdateEvent } from './interfaces/progress.interface';
 
-// FIXME: should be fixed
-export class Eta {
-  protected progress?: Progress;
-  protected started = Date.now();
+export class Eta implements IEta {
+  protected progress?: IProgress;
+  protected started = Date.now(); // TODO: think about this
   protected updates: {time: number, value: number}[] = [];
   protected duration = 0;
   protected speed = NaN;
   protected updated = 0;
 
-  public attach(progress: Progress) {
+  public attachProgress(progress: IProgress): IEta {
     this.progress = progress;
-    progress.on('update', params => {
-      this.updates.push({
-        value: params.new.value,
-        time: Date.now(),
-      })
+    return this;
+  }
+
+  public update(params: IUpdateEvent): Eta {
+    this.updates.push({
+      value: params.new.value,
+      time: Date.now(),
     });
+    return this;
+  }
+
+  public set(count: number): Eta {
+    this.updates = [{
+      value: count,
+      time: Date.now(),
+    }];
+    return this;
   }
 
   public getEtaS(): number {
@@ -45,7 +56,7 @@ export class Eta {
     return this.speed;
   }
 
-  public getDurationMs() {
+  public getDurationMs(): number {
     if ((this.progress?.getProgress() ?? 0) >= 1) {
       return this.duration;
     }

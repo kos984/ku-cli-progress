@@ -1,5 +1,5 @@
 import * as readline from 'readline';
-import { ITerminal } from './types';
+import { ITerminal } from '../interfaces/terminal.interface';
 import { WriteStream } from 'tty';
 
 export class TerminalTty implements ITerminal {

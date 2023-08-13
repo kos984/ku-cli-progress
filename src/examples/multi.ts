@@ -1,6 +1,6 @@
-import { Progress } from '../progress';
-import { Bar } from '../bar';
-import { BarItem } from '../bar-item';
+import { Progress } from '../lib/progress';
+import { Bar } from '../lib/bar';
+import { BarItem } from '../lib/bar-item';
 
 const bar = new Bar();
 
