@@ -1,7 +1,7 @@
 import { IProgress, IUpdateEvent } from './interfaces/progress.interface';
 import { EventEmitter } from 'events';
-import { Eta } from './eta';
 import { IEta } from './interfaces/eta.interface';
+import { Eta } from './eta';
 
 export interface IProgressParams {
   total: number;
@@ -22,7 +22,7 @@ export class Progress implements IProgress {
     this.tag = params.tag;
     this.count = params.start ?? 0;
     this.total = params.total;
-    this.eta = (params.eta ?? new Eta()).attachProgress(this);
+    this.eta = params.eta ?? new Eta();
     this.payload = payload;
   }
 
@@ -55,7 +55,7 @@ export class Progress implements IProgress {
       total: this.total,
     }
     this.emitter.emit('update', updatePayload);
-    this.eta.update(updatePayload);
+    this.eta.update(count, this.total);
     this.count = count;
     this.payload = payload ? payload : this.payload;
     // FIXME: add test about override
