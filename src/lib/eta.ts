@@ -121,7 +121,6 @@ export class Eta implements IEta {
     const timeElapsed = current.time - prev.time;
     // Ignore rapid updates and completion of progress
     if (timeElapsed < 100 || (this.left <= 0)) {
-      console.log('return...', timeElapsed, this.left);
       return false;
     }
     const speed = (current.count - prev.count) * 1000 / timeElapsed;
