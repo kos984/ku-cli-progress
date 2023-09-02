@@ -103,10 +103,8 @@ describe('progress', () => {
       expect(progress.getPayload()).toEqual({ foo: 'bar' });
     });
   });
-  it('update', () => {
-    expect(true).toBe(true);
-  });
   it('tag', () => {
-    expect(true).toBe(true);
+    const progress = new Progress<{ foo: string }>({ total: 100, start: 0, tag: 'RED' });
+    expect(progress.getTag()).toBe('RED');
   });
 });
