@@ -1,5 +1,4 @@
-import { Progress } from '../progress';
-import { Eta } from '../eta';
+import { Progress, Eta } from '../../';
 
 describe('progress', () => {
   it('should init correct', () => {
