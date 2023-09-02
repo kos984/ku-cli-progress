@@ -122,7 +122,7 @@ export class BarItem implements IBarItem {
       .reduce((prev, current) => {
         const length = current.size - prev.size;
         if (length > 0) {
-          let line = this.getBarParts(length > width ? width : length).done;
+          let line = this.getBarParts(length).done;
           const item = current.item;
           const formatter = this.formatters[`${item.getTag()}_bar`] ?? this.formatters['bar'];
           if (formatter) {

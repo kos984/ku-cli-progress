@@ -1,4 +1,5 @@
 import { BarItem, Progress } from '../../';
+import { IEta } from '../interfaces/eta.interface';
 
 describe('Progress Bar Lib', () => {
   it('should construct with progress or array of progresses', () => {
@@ -10,9 +11,16 @@ describe('Progress Bar Lib', () => {
 
   describe('single bar', () => {
     it('render', () => {
-      const progress = new Progress({ total: 100 });
+      const eta: IEta = {
+        update: jest.fn(),
+        set: jest.fn(() => eta),
+        getEtaS: jest.fn(() => 9),
+        getSpeed: jest.fn(() => 10),
+        getDurationMs: jest.fn( () => 1000),
+      };
+      const progress = new Progress({ total: 100, eta });
       const barItem = new BarItem(progress);
-      expect(barItem.render()).toEqual('[----------------------------------------] 0% ETA: NaN speed: NaN duration: 0s 0/100');
+      expect(barItem.render()).toEqual('[----------------------------------------] 0% ETA: 9s speed: 10/s duration: 1s 0/100');
     });
 
     it('should replace data from payload', () => {
@@ -45,7 +53,7 @@ describe('Progress Bar Lib', () => {
           value: str => 'done: ' + str
         }
       });
-      expect(barItem.render()).toEqual('[----------------------------------------] done: 20');
+      expect(barItem.render()).toEqual('[========--------------------------------] done: 20');
     })
   });
 
@@ -106,6 +114,28 @@ describe('Progress Bar Lib', () => {
       // console.log('aaaaaa', barItem.render());
       expect(barItem.render()).toEqual(
         '[############================------------] NaN/NaN/{speed}',
+      );
+    });
+    it('tags', () => {
+      const progress1 = new Progress({ total: 100, tag: 'p1' });
+      const progress2 = new Progress({ total: 100, tag: 'p2' });
+
+      progress1.increment(30);
+      progress2.increment(70);
+
+      const barItem = new BarItem([progress1, progress2], {
+        template: '[{bars}] value 1: {p1_value}; value 2: {p2_value}',
+        formatters: {
+          'bar': (str, progress, progresses) => {
+            const index = progresses.findIndex(p => p === progress);
+            const colors = ['#', '=', '+'];
+            return colors[index].repeat(str.length);
+          },
+        },
+      });
+      // console.log('aaaaaa', barItem.render());
+      expect(barItem.render()).toEqual(
+        '[############================------------] value 1: 30; value 2: 70',
       );
     });
   });
