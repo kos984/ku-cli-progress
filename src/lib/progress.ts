@@ -1,5 +1,5 @@
+import * as EventEmitter from 'events';
 import { IProgress, IUpdateEvent } from './interfaces/progress.interface';
-import { EventEmitter } from 'events';
 import { IEta } from './interfaces/eta.interface';
 import { Eta } from './eta';
 
@@ -10,15 +10,15 @@ export interface IProgressParams {
   eta?: IEta;
 }
 
-export class Progress implements IProgress {
-  public readonly emitter = new EventEmitter();
+export class Progress<IPayload> implements IProgress {
+  public readonly emitter: EventEmitter = new EventEmitter();
   protected tag?: string;
   protected count: number;
   protected total: number;
-  protected payload: any;
+  protected payload: IPayload;
   protected eta: IEta;
 
-  public constructor(params: IProgressParams, payload = {}) {
+  public constructor(params: IProgressParams, payload?: IPayload) {
     this.tag = params.tag;
     this.count = params.start ?? 0;
     this.total = params.total;
@@ -26,11 +26,11 @@ export class Progress implements IProgress {
     this.payload = payload;
   }
 
-  public increment(delta: number = 1, payload?: any): Progress {
+  public increment(delta: number = 1, payload?: any): IProgress {
     return this.update(this.count + delta, payload);
   }
 
-  public set(count: number, payload: any): Progress {
+  public set(count: number, payload: any = {}): IProgress {
     this.count = count;
     this.payload = payload;
     this.eta.set(count);
@@ -42,7 +42,7 @@ export class Progress implements IProgress {
     return this;
   }
 
-  protected update(count: number, payload?: any): Progress {
+  protected update(count: number, payload?: any): IProgress {
     const updatePayload = {
       prev: {
         value: this.count,
@@ -70,8 +70,8 @@ export class Progress implements IProgress {
     return this.count;
   }
 
-  public getPayload(): any {
-    return this.payload ?? {};
+  public getPayload(): IPayload {
+    return this.payload;
   }
 
   public getProgress(): number {
