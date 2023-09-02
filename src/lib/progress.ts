@@ -58,7 +58,6 @@ export class Progress<IPayload> implements IProgress {
     this.eta.update(count, this.total);
     this.count = count;
     this.payload = payload !== undefined ? payload : this.payload;
-    // FIXME: add test about override
     return this;
   }
 
