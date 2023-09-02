@@ -57,7 +57,7 @@ export class Progress<IPayload> implements IProgress {
     this.emitter.emit('update', updatePayload);
     this.eta.update(count, this.total);
     this.count = count;
-    this.payload = payload ? payload : this.payload;
+    this.payload = payload !== undefined ? payload : this.payload;
     // FIXME: add test about override
     return this;
   }

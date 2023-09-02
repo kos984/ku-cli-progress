@@ -20,7 +20,7 @@ export interface IProgress {
   getTag(): string;
   getValue(): number;
   getTotal(): number;
-  getPayload(): object;
+  getPayload(): any;
   set(count: number, payload: any): IProgress;
   on( type: 'update', listener: (e: IUpdateEvent) => void ): IProgress;
 }
