@@ -87,7 +87,7 @@ export class Eta implements IEta {
   protected updateEta() {
     const speed = this.getSpeed();
     if (Number.isNaN(speed) || speed === 0) {
-      return NaN;
+      this.eta = NaN;
     }
     this.eta = Math.round(this.left / speed);
   }
