@@ -10,15 +10,15 @@ export interface IProgressParams {
   eta?: IEta;
 }
 
-export class Progress<IPayload> implements IProgress {
+export class Progress implements IProgress {
   public readonly emitter: EventEmitter = new EventEmitter();
   protected tag?: string;
   protected count: number;
   protected total: number;
-  protected payload: IPayload;
+  protected payload: { [key: string]: any };
   protected eta: IEta;
 
-  public constructor(params: IProgressParams, payload?: IPayload) {
+  public constructor(params: IProgressParams, payload: { [key: string]: any } = {}) {
     this.tag = params.tag;
     this.count = params.start ?? 0;
     this.total = params.total;
@@ -30,7 +30,7 @@ export class Progress<IPayload> implements IProgress {
     return this.update(this.count + delta, payload);
   }
 
-  public set(count: number, payload: any = {}): IProgress {
+  public set(count: number, payload: { [key: string]: any } = {}): IProgress {
     this.count = count;
     this.payload = payload;
     this.eta.set(count);
@@ -69,7 +69,7 @@ export class Progress<IPayload> implements IProgress {
     return this.count;
   }
 
-  public getPayload(): IPayload {
+  public getPayload(): { [key: string]: any } {
     return this.payload;
   }
 

@@ -7,7 +7,7 @@ describe('progress', () => {
     expect(progress.getProgress()).toBe(0);
     expect(progress.getEta()).toBeInstanceOf(Eta);
     expect(progress.getValue()).toBe(0);
-    expect(progress.getPayload()).toBeUndefined();
+    expect(progress.getPayload()).toEqual({});
     expect(progress.getTag()).toBe(undefined);
     expect(progress.getTotal()).toBe(100);
   });
@@ -34,7 +34,7 @@ describe('progress', () => {
   });
   it('update payload', () => {
     const progress = new Progress({ total: 100 });
-    expect(progress.getPayload()).toBeUndefined();
+    expect(progress.getPayload()).toEqual({});
     progress.increment(1, { foo: 'bar' });
     expect(progress.getPayload()).toMatchObject({ foo: 'bar' });
     progress.set(0, { foo: 'barBar' });
@@ -77,7 +77,7 @@ describe('progress', () => {
   describe('getPayload', () => {
     it('without init', () => {
       const progress = new Progress({ total: 100, start: 0 });
-      expect(progress.getPayload()).toBeUndefined();
+      expect(progress.getPayload()).toEqual({});
     });
     it('with init', () => {
       const progress = new Progress({ total: 100, start: 0 }, {
@@ -86,7 +86,7 @@ describe('progress', () => {
       expect(progress.getPayload()).toEqual({ foo: 'bar' });
     });
     it('update payload', () => {
-      const progress = new Progress<{ foo: string }>({ total: 100, start: 0 }, {
+      const progress = new Progress({ total: 100, start: 0 }, {
         foo: 'bar',
       });
       progress.increment(undefined, { foo: 'baz' });
@@ -94,7 +94,7 @@ describe('progress', () => {
       expect(progress.getPayload()).toEqual({ foo: 'baz' });
     });
     it('should not update payload to undefined', () => {
-      const progress = new Progress<{ foo: string }>({ total: 100, start: 0 }, {
+      const progress = new Progress({ total: 100, start: 0 }, {
         foo: 'bar',
       });
       progress.increment(undefined, undefined);
@@ -104,7 +104,7 @@ describe('progress', () => {
     });
   });
   it('tag', () => {
-    const progress = new Progress<{ foo: string }>({ total: 100, start: 0, tag: 'RED' });
+    const progress = new Progress({ total: 100, start: 0, tag: 'RED' });
     expect(progress.getTag()).toBe('RED');
   });
 });
