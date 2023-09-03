@@ -2,15 +2,26 @@ import { TerminalTty } from './terminals/terminal-tty';
 import { ITerminal } from './interfaces/terminal.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
 import { IProgress } from './interfaces/progress.interface';
+import EventEmitter from 'events';
+
+export interface IOptions {
+  refreshTimeMs: number;
+}
 
 export class Bar {
   protected items: IBarItem[] = [];
   protected isStarted = false;
   protected nextUpdate: null | Promise<never> = null;
+  protected timeOutId: NodeJS.Timeout | undefined;
 
   public constructor(
     protected terminal: ITerminal = new TerminalTty(),
+    protected options?: IOptions
     ) {
+    this.options = {
+      refreshTimeMs: 50,
+      ...options
+    };
   }
 
   public add(bar: IBarItem) {
@@ -47,9 +58,22 @@ export class Bar {
     this.render();
   }
 
+  public stop() {
+    this.items.forEach(item => this.removeListenersFromProgresses(item));
+    clearTimeout(this.timeOutId);
+    this.nextUpdate = null;
+    this.isStarted = false;
+  }
+
   protected addListenerToProgress(item: IBarItem) {
     item.getProgresses().forEach(progress => {
       progress.on('update', this.refresh);
+    });
+  }
+
+  protected removeListenersFromProgresses(item: IBarItem) {
+    item.getProgresses().forEach(progress => {
+      (progress.emitter as EventEmitter).removeListener('update', this.refresh);
     });
   }
 
@@ -58,10 +82,10 @@ export class Bar {
       return;
     }
     this.nextUpdate = new Promise(resolve => {
-      setTimeout(() => {
+      this.timeOutId = setTimeout(() => {
         this.nextUpdate = null;
         this.render();
-      }, 50); // FIXME: config or constant
+      }, this.options.refreshTimeMs);
     })
   }
 }
