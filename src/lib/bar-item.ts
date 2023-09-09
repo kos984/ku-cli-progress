@@ -19,7 +19,7 @@ export interface IParams {
 
 export class BarItem implements IBarItem {
 
-  protected template: string = `[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}`;
+  protected template!: string;
   protected options: IBarOptions = {
     completeChar: '=',
     resumeChar: '-',
@@ -28,9 +28,11 @@ export class BarItem implements IBarItem {
   };
   protected formatters!: IFormatters;
   protected dataProviders!: IDataProviders;
+  protected progresses: IProgress[];
 
-  public constructor(protected progresses: IProgress[], params?: IParams) {
-    this.template = params?.template ?? this.template;
+  public constructor(progresses: IProgress | IProgress[], params?: IParams) {
+    this.progresses = Array.isArray(progresses) ? progresses : [progresses];
+    this.template = params?.template ?? this.getDefaultTemplate(this.progresses);
     this.options = { ...this.options, ...params?.options };
     this.formatters = params?.formatters ?? {};
     const formatNumber = (num: number, suffix: string): string =>
@@ -52,16 +54,11 @@ export class BarItem implements IBarItem {
     return this.progresses;
   }
 
-  public bar(progress: number): string {
-    const size =  Math.round(progress * this.options.width);
-    const parts = this.getBarParts(size);
-    return `${parts.done}${this.options.glue}${parts.left}`;
-  }
-
   public render(): string {
+    const next = this.getCounterByProperty(this.progresses.length);
     return this.template.replace(/{([^{}]+)}/g, (match, prop) => {
       const [property, tag] = prop.split('_').reverse();
-      const index = tag ? this.progresses.findIndex(p => p.getTag() === tag) : 0;
+      const index = tag ? this.progresses.findIndex(p => p.getTag() === tag) : next(property); // TODO: it can be improved with generators ?
       if (index < 0) return match;
       const progress = this.progresses[index];
       const value = this.getDataValue(property, progress);
@@ -74,6 +71,42 @@ export class BarItem implements IBarItem {
       return value;
     });
   }
+
+  protected getCounterByProperty(max) {
+    const map = new Map();
+    return (key) => {
+      const index = map.get(key) ?? 0;
+      map.set(key, index + 1);
+      if (index >= max) {
+        return -1;
+      }
+      return index;
+    }
+  }
+
+  protected getDefaultTemplate(progresses) {
+    if (progresses.length > 1) {
+      return `[{bars}] ${
+        progresses.map(() => '{percentage}').join('/')
+      } ETA: ${
+        progresses.map(() => '{eta}').join('/')
+      } speed: ${
+        progresses.map(() => '{speed}').join('/')
+      } duration: ${
+        progresses.map(() => '{duration}').join('/')
+      } ${
+        progresses.map(() => '{value}/{total}').join(' ')
+      }`;
+    }
+    return `[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}`;
+  }
+
+  protected bar(progress: number): string {
+    const size =  Math.round(progress * this.options.width);
+    const parts = this.getBarParts(size);
+    return `${parts.done}${this.options.glue}${parts.left}`;
+  }
+
 
   protected renderBars(progresses: IProgress[]): string {
     const { resumeChar, width, glue } = this.options;
@@ -89,7 +122,7 @@ export class BarItem implements IBarItem {
       .reduce((prev, current) => {
         const length = current.size - prev.size;
         if (length > 0) {
-          let line = this.getBarParts(length > width ? width : length).done;
+          let line = this.getBarParts(length).done;
           const item = current.item;
           const formatter = this.formatters[`${item.getTag()}_bar`] ?? this.formatters['bar'];
           if (formatter) {

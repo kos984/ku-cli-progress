@@ -1,66 +1,138 @@
 import { IEta } from './interfaces/eta.interface';
-import { IProgress, IUpdateEvent } from './interfaces/progress.interface';
+
+const defaultParams: IEtaParams = {
+  deps: 5,
+  debounce: 0.02,
+}
+
+export interface IEtaParams {
+  /**
+   * deps - indicates the number of recent instantaneous speeds used to
+   * compute the average speed. As a new instantaneous speed is calculated
+   * and added to the speedMoment array, greater weight is assigned to older
+   * speeds. This helps to smooth out potential rapid speed changes and
+   * makes the calculations more robust.
+   */
+  deps: number;
+  /**
+   * debounce - a parameter utilized to filter out minor speed fluctuations.
+   * It defines the threshold at which a speed change becomes significant
+   * enough to be considered in the calculations. For instance, with a
+   * relatively large debounce value, small speed oscillations resulting
+   * from noise or measurement inaccuracies won't affect the ETA calculations.
+   */
+  debounce: number;
+}
 
 export class Eta implements IEta {
-  protected progress?: IProgress;
-  protected started = Date.now(); // TODO: think about this
-  protected updates: {time: number, value: number}[] = [];
-  protected duration = 0;
-  protected speed = NaN;
-  protected updated = 0;
+  protected started!: number;
+  protected last!: { time: number, count: number };
+  protected left!: number;
+  protected duration!: number;
+  protected speedMoment = [];
+  protected speed!: number;
+  protected eta!: number;
 
-  public attachProgress(progress: IProgress): IEta {
-    this.progress = progress;
+  protected params: IEtaParams;
+
+  public constructor(params?: IEtaParams) {
+    this.params = {
+      ...defaultParams,
+      ...params,
+    };
+    this.set(0);
+  }
+
+  public set(count: number): IEta {
+    this.left = 0;
+    const time = this.getTime();
+    this.speedMoment = [];
+    this.speed = NaN;
+    this.duration = 0;
+    this.last = { count, time };
+    this.started = time;
     return this;
   }
 
-  public update(params: IUpdateEvent): Eta {
-    this.updates.push({
-      value: params.new.value,
-      time: Date.now(),
-    });
-    return this;
-  }
-
-  public set(count: number): Eta {
-    this.updates = [{
-      value: count,
-      time: Date.now(),
-    }];
+  public update(value: number, total: number): IEta {
+    this.updateDuration(true);
+    this.left = total - value;
+    const current = {
+      count: value,
+      time: this.getTime(),
+    };
+    if (this.updateSpeedMoments(this.last, current)) {
+      this.last = current;
+    }
+    this.updateSpeed();
     return this;
   }
 
   public getEtaS(): number {
-    const speed = this.getSpeed();
-    if (Number.isNaN(speed) || !this.progress) {
-      return NaN;
-    }
-    return Math.round((this.progress.getTotal() - this.progress.getValue()) / speed)
+    if (this.left <= 0) return NaN;
+    this.updateEta();
+    return this.eta;
   }
 
   public getSpeed(): number {
-    if (this.updates.length < 2) {
-      return NaN;
-    }
-    if (!Number.isNaN(this.speed) && Date.now() - this.updated < 1000) {
-      return this.speed;
-    }
-    const last = this.updates[this.updates.length - 1];
-    const start = this.updates.reduce((prev, next) => {
-      if (last.time - prev.time <= 5000) {
-        return prev;
-      }
-      return next === last ? prev : next;
-    });
-    this.speed = ( last.value - start.value ) * 1000 / ( last.time - start.time );
+    if (this.left <= 0) return NaN;
     return this.speed;
   }
 
   public getDurationMs(): number {
-    if ((this.progress?.getProgress() ?? 0) >= 1) {
+    this.updateDuration();
+    return this.duration;
+  }
+
+  protected updateEta() {
+    const speed = this.getSpeed();
+    if (Number.isNaN(speed) || speed === 0) {
+      this.eta = NaN;
+    }
+    this.eta = Math.round(this.left / speed);
+  }
+
+  protected updateDuration(force = false) {
+    if (!force && this.left <= 0) {
       return this.duration;
     }
-    this.duration = Date.now() - this.started;
-    return this.duration;
+    this.duration = this.getTime() - this.started;
+  }
+
+  protected updateSpeed(): void {
+    let sum = 0;
+    let count = 0;
+    this.speedMoment.forEach((s, i) => {
+      const k = 1 + (1 / this.params.deps) * i;
+      sum += s * k;
+      count += k;
+    });
+    const speed = sum / count;
+    const prevSpeed = Number.isNaN(this.speed) ? 0 : this.speed;
+    const k = speed / prevSpeed;
+    const debounce = this.params.debounce;
+    if (k > 1 && k - 1 > debounce || 1 - k > debounce) {
+      this.speed = speed;
+    }
+  }
+
+
+  protected updateSpeedMoments(prev: { count: number, time: number }, current: { count: number, time: number }): boolean {
+    const timeElapsed = current.time - prev.time;
+    // Ignore rapid updates and completion of progress
+    if (timeElapsed < 100 || (this.left <= 0)) {
+      return false;
+    }
+    const speed = (current.count - prev.count) * 1000 / timeElapsed;
+    this.speedMoment.push(speed);
+    if (this.speedMoment.length > this.params.deps) {
+      this.speedMoment.shift();
+    }
+    return true;
+  }
+
+  protected getTime() {
+    const time = Date.now();
+    return time;
   }
 }

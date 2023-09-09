@@ -1,7 +1,7 @@
+import * as EventEmitter from 'events';
 import { IProgress, IUpdateEvent } from './interfaces/progress.interface';
-import { EventEmitter } from 'events';
-import { Eta } from './eta';
 import { IEta } from './interfaces/eta.interface';
+import { Eta } from './eta';
 
 export interface IProgressParams {
   total: number;
@@ -11,26 +11,26 @@ export interface IProgressParams {
 }
 
 export class Progress implements IProgress {
-  public readonly emitter = new EventEmitter();
+  public readonly emitter: EventEmitter = new EventEmitter();
   protected tag?: string;
   protected count: number;
   protected total: number;
-  protected payload: any;
+  protected payload: { [key: string]: any };
   protected eta: IEta;
 
-  public constructor(params: IProgressParams, payload = {}) {
+  public constructor(params: IProgressParams, payload: { [key: string]: any } = {}) {
     this.tag = params.tag;
     this.count = params.start ?? 0;
     this.total = params.total;
-    this.eta = (params.eta ?? new Eta()).attachProgress(this);
+    this.eta = params.eta ?? new Eta();
     this.payload = payload;
   }
 
-  public increment(delta: number = 1, payload?: any): Progress {
+  public increment(delta: number = 1, payload?: any): IProgress {
     return this.update(this.count + delta, payload);
   }
 
-  public set(count: number, payload: any): Progress {
+  public set(count: number, payload: { [key: string]: any } = {}): IProgress {
     this.count = count;
     this.payload = payload;
     this.eta.set(count);
@@ -42,7 +42,7 @@ export class Progress implements IProgress {
     return this;
   }
 
-  protected update(count: number, payload?: any): Progress {
+  protected update(count: number, payload?: any): IProgress {
     const updatePayload = {
       prev: {
         value: this.count,
@@ -55,10 +55,9 @@ export class Progress implements IProgress {
       total: this.total,
     }
     this.emitter.emit('update', updatePayload);
-    this.eta.update(updatePayload);
+    this.eta.update(count, this.total);
     this.count = count;
-    this.payload = payload ? payload : this.payload;
-    // FIXME: add test about override
+    this.payload = payload !== undefined ? payload : this.payload;
     return this;
   }
 
@@ -70,8 +69,8 @@ export class Progress implements IProgress {
     return this.count;
   }
 
-  public getPayload(): any {
-    return this.payload ?? {};
+  public getPayload(): { [key: string]: any } {
+    return this.payload;
   }
 
   public getProgress(): number {
