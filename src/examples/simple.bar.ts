@@ -44,7 +44,7 @@ const progressWithCustomPayload = new Progress({ total: 100, start: 75 }, {
 })
 
 bar.add(new BarItem([progressWithCustomPayload], {
-  template: "[{bar}] {percentage} custom: {custom}",
+  template: '[{bar}] {percentage} custom: {custom}',
   formatters: {
     // format custom payload
     user: str => chalk.bold(str),
