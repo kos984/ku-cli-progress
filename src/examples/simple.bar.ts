@@ -13,7 +13,7 @@ bar.add(new BarItem([p]));
 // add multi color bar with tags
 bar.add(new BarItem([p, new Progress({ total: 100, start: 50, tag: 'red' }), p], {
   // override default template
-  template: `[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {red_value} {value}/{total}`,
+  template: '[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {red_value} {value}/{total}',
   formatters: {
     'red_bar': str => chalk.red(str),
     'bar': str => chalk.green(str),
@@ -27,7 +27,7 @@ bar.add(new BarItem([
     new Progress({ total: 100, start: 78, tag: 'blue' }),
     new Progress({ total: 100, start: 90, tag: 'yellow' }),
   ], {
-  template: `[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}`,
+  template: '[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
   options: presets.shades,
   formatters: {
     'bar': (str, progress, progresses) => {
@@ -44,7 +44,7 @@ const progressWithCustomPayload = new Progress({ total: 100, start: 75 }, {
 })
 
 bar.add(new BarItem([progressWithCustomPayload], {
-  template: `[{bar}] {percentage} custom: {custom}`,
+  template: '[{bar}] {percentage} custom: {custom}',
   formatters: {
     // format custom payload
     user: str => chalk.bold(str),
@@ -80,7 +80,7 @@ bar.add(new BarItem([textInBarProgress], {
 
 const textInBarRotation = new Progress({ total: 100, start: 0 });
 
-function * rotate(values: any[], minTimeoutMs: number): Generator<string, string, boolean> {
+function * rotate(values: string[], minTimeoutMs: number): Generator<string, string, boolean> {
   let last = 0;
   let index = 0;
   let next: boolean = true;

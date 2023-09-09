@@ -28,7 +28,6 @@ const process = (file: IFile) => {
 }
 
 const runner = async (files: IFile[], batchSize = 5) => {
-  const bars = [];
   const mainProgress = new Progress({ total: files.length });
   // const bar = new BarItem([mainProgress]);
   // bar.start();
@@ -37,8 +36,8 @@ const runner = async (files: IFile[], batchSize = 5) => {
   barsContainer.start();
 
   files = Array.from(files).reverse();
-  const promises: Promise<any>[] = [];
-  const next = (): Promise<any> => {
+  const promises: Promise<boolean>[] = [];
+  const next = (): Promise<boolean> => {
     const file = files.pop();
     if (!file) {
       return Promise.resolve(true);
@@ -49,7 +48,6 @@ const runner = async (files: IFile[], batchSize = 5) => {
       const emitter = process(file);
       emitter.on('data', (size) => progress.increment(size)); // progress increment
       emitter.on('end', () => {
-        // bar.remove(progress);
         barsContainer.logWrap(() => {
           console.log('some progress done');
         });
@@ -57,7 +55,6 @@ const runner = async (files: IFile[], batchSize = 5) => {
         mainProgress.increment();
         r(true);
       });
-      // on error
     }).then(() => next());
   }
   while (promises.length < batchSize) {

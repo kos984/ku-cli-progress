@@ -98,7 +98,7 @@ export class BarItem implements IBarItem {
         progresses.map(() => '{value}/{total}').join(' ')
       }`;
     }
-    return `[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}`;
+    return '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}';
   }
 
   protected bar(progress: number): string {

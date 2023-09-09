@@ -81,10 +81,11 @@ export class Bar {
     if (!this.isStarted || this.nextUpdate) {
       return;
     }
-    this.nextUpdate = new Promise(resolve => {
+    this.nextUpdate = new Promise(resolve  => {
       this.timeOutId = setTimeout(() => {
         this.nextUpdate = null;
         this.render();
+        resolve(undefined);
       }, this.options.refreshTimeMs);
     })
   }

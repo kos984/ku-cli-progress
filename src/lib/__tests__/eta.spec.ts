@@ -1,4 +1,4 @@
-import { Eta } from '../../';
+import { Eta, IEta } from '../../';
 
 describe('Eta', () => {
   let eta;
@@ -50,7 +50,7 @@ describe('Eta', () => {
     const etaDebounce = new Eta({ deps: 3, debounce: 0.10});
     const etaDeps = new Eta({ deps: 5, debounce: 0.01});
     const etas = [eta, etaDebounce, etaDeps];
-    const getTimeSpy = etas.map(eta => jest.spyOn(eta as any, 'getTime'));
+    const getTimeSpy = etas.map(eta => jest.spyOn(eta as Eta & { getTime: () => number }, 'getTime'));
 
     it('init', () => {
       getTimeSpy.forEach(spy => spy.mockReturnValue(0));

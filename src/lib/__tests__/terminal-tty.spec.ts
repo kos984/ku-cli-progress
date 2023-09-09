@@ -1,4 +1,5 @@
 import { TerminalTty } from '../../';
+import { WriteStream } from 'tty';
 
 describe('terminal tty', () => {
   const mockStream = {
@@ -18,7 +19,7 @@ describe('terminal tty', () => {
     expect(terminal).toBeDefined();
   });
   it('should write data to stream', () => {
-    const terminal = new TerminalTty(mockStream as any);
+    const terminal = new TerminalTty(mockStream as never as WriteStream);
     terminal.write('some test');
     expect(mockStream.write).toBeCalled();
   });
@@ -27,7 +28,7 @@ describe('terminal tty', () => {
     mockStream.on.mockImplementation((type: string, handler: (...params) => void) => {
       listeners.push(handler);
     })
-    const terminal = new TerminalTty(mockStream as any);
+    const terminal = new TerminalTty(mockStream as never as WriteStream);
     const clear = jest.spyOn(terminal, 'clear');
     const refresh = jest.spyOn(terminal, 'refresh');
     expect(listeners.length).toBe(1);
@@ -36,7 +37,7 @@ describe('terminal tty', () => {
     expect(refresh).toBeCalledTimes(1);
   });
   it('should not render more then screen size', () => {
-    const terminal = new TerminalTty(mockStream as any);
+    const terminal = new TerminalTty(mockStream as never as WriteStream);
     const text = ('0'.repeat(mockStream.columns * 2)+'\n')
       .repeat(mockStream.rows * 2);
     terminal.write(text);

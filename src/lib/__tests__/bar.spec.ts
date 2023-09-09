@@ -1,4 +1,4 @@
-import { Bar, Progress, Eta, ITerminal, BarItem } from '../../';
+import { Bar, Progress, BarItem, ITerminal } from '../../';
 
 describe('Bar', () => {
   const mockTerminal = {
@@ -16,7 +16,7 @@ describe('Bar', () => {
 
   it('should use default terminal if not send any', () =>{
     const bar = new Bar();
-    expect((bar as any).terminal).toBeDefined();
+    expect((bar as Bar & { terminal: ITerminal }).terminal).toBeDefined();
   });
 
   it('bar start without updates', async () => {
