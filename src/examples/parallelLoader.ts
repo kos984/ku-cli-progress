@@ -50,6 +50,9 @@ const runner = async (files: IFile[], batchSize = 5) => {
       emitter.on('data', (size) => progress.increment(size)); // progress increment
       emitter.on('end', () => {
         // bar.remove(progress);
+        barsContainer.logWrap(() => {
+          console.log('some progress done');
+        });
         barsContainer.removeByProgress(progress);
         mainProgress.increment();
         r(true);
