@@ -5,12 +5,14 @@
   "main": "dist/index.js",
   "homepage": "https://github.com/kos984/ku-cli-progress",
   "scripts": {
+    "prebuild": "rimraf dist",
     "build": "tsc",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "rimraf '{.eslintcache}' && eslint src --quiet",
     "lint:ci": "npx eslint src -f json -o reports/eslint-report.json || true",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "prelint": "eslint-config-prettier .eslintrc.json"
   },
   "author": "Kostiantyn Upir",
   "license": "MIT",
@@ -26,6 +28,7 @@
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.6.4",
+    "lint-staged": "^14.0.1",
     "prettier": "^3.0.3",
     "ts-jest": "^29.1.1",
     "typescript": "^5.1.6"
