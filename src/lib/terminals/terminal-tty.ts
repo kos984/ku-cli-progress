@@ -1,14 +1,15 @@
 import * as readline from 'readline';
-import { ITerminal } from './types';
+import { ITerminal } from '../interfaces/terminal.interface';
 import { WriteStream } from 'tty';
 
 export class TerminalTty implements ITerminal {
   protected y = 0;
   protected prev = '';
-  protected stream: WriteStream = process.stdout;
 
-  public constructor() {
-    process.stdout.on('resize', () => {
+  public constructor(
+    protected stream: WriteStream = process.stderr
+  ) {
+    stream.on('resize', () => {
       this.clear();
       this.refresh();
     });
@@ -36,7 +37,7 @@ export class TerminalTty implements ITerminal {
       if (i > maxLength) {
         return;
       }
-      this.stream.write(l.substr(0, this.stream.columns));
+      this.stream.write(l.substring(0, this.stream.columns));
       readline.clearLine(this.stream, 1);
       if (i < maxLength) {
         this.stream.write('\n');

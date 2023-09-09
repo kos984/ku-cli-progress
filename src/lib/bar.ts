@@ -1,18 +1,29 @@
 import { TerminalTty } from './terminals/terminal-tty';
-import { BarItem } from './bar-item';
-import { Progress } from './progress';
+import { ITerminal } from './interfaces/terminal.interface';
+import { IBarItem } from './interfaces/bar-item.interface';
+import { IProgress } from './interfaces/progress.interface';
+
+export interface IOptions {
+  refreshTimeMs: number;
+}
 
 export class Bar {
-  protected items: BarItem[] = [];
+  protected items: IBarItem[] = [];
   protected isStarted = false;
   protected nextUpdate: null | Promise<never> = null;
+  protected timeOutId: NodeJS.Timeout | undefined;
 
   public constructor(
-    protected terminal = new TerminalTty(),
-    ) { // FIXME: terminal should be interface
+    protected terminal: ITerminal = new TerminalTty(),
+    protected options?: IOptions
+    ) {
+    this.options = {
+      refreshTimeMs: 50,
+      ...options
+    };
   }
 
-  public add(bar: BarItem) {
+  public add(bar: IBarItem) {
     this.items.push(bar)
     if (this.isStarted) {
       this.addListenerToProgress(bar)
@@ -20,7 +31,7 @@ export class Bar {
     return this;
   }
 
-  public removeByProgress(progress: Progress) {
+  public removeByProgress(progress: IProgress) {
     this.items = this.items.filter(
       item => !item.getProgresses().find(p => p == progress)
     )
@@ -46,9 +57,22 @@ export class Bar {
     this.render();
   }
 
-  protected addListenerToProgress(item: BarItem) {
+  public stop() {
+    this.items.forEach(item => this.removeListenersFromProgresses(item));
+    clearTimeout(this.timeOutId);
+    this.nextUpdate = null;
+    this.isStarted = false;
+  }
+
+  protected addListenerToProgress(item: IBarItem) {
     item.getProgresses().forEach(progress => {
       progress.on('update', this.refresh);
+    });
+  }
+
+  protected removeListenersFromProgresses(item: IBarItem) {
+    item.getProgresses().forEach(progress => {
+      (progress.emitter).removeListener('update', this.refresh);
     });
   }
 
@@ -56,11 +80,12 @@ export class Bar {
     if (!this.isStarted || this.nextUpdate) {
       return;
     }
-    this.nextUpdate = new Promise(resolve => {
-      setTimeout(() => {
+    this.nextUpdate = new Promise(resolve  => {
+      this.timeOutId = setTimeout(() => {
         this.nextUpdate = null;
         this.render();
-      }, 50); // FIXME: config or constant
+        resolve(undefined);
+      }, this.options.refreshTimeMs);
     })
   }
 }

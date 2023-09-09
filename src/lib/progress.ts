@@ -1,44 +1,49 @@
-import { IProgress } from './interfaces/progress.interface';
-import { IBarItem } from './interfaces/bar-item.interface';
-import { EventEmitter } from 'events';
+import * as EventEmitter from 'events';
+import { IProgress, IUpdateEvent } from './interfaces/progress.interface';
+import { IEta } from './interfaces/eta.interface';
 import { Eta } from './eta';
 
 export interface IProgressParams {
   total: number;
   start?: number;
   tag?: string;
+  eta?: IEta;
 }
 
-export class Progress extends EventEmitter implements IProgress, IBarItem {
+export class Progress<IPayload extends object = object> implements IProgress<IPayload> {
+  public readonly emitter: EventEmitter = new EventEmitter();
   protected tag?: string;
   protected count: number;
   protected total: number;
-  protected payload: any;
-  protected eta: Eta;
+  protected payload: IPayload;
+  protected eta: IEta;
 
-  public constructor(params: IProgressParams, payload = {}) {
-    super();
+  public constructor(params: IProgressParams, payload: IPayload = {} as IPayload) {
     this.tag = params.tag;
     this.count = params.start ?? 0;
     this.total = params.total;
-    this.eta = new Eta();
-    this.eta.attach(this);
+    this.eta = params.eta ?? new Eta();
     this.payload = payload;
   }
 
-  public increment(delta: number = 1, payload?: any): Progress {
+  public increment(delta: number = 1, payload?: IPayload): IProgress<IPayload> {
     return this.update(this.count + delta, payload);
   }
 
-  public set(count: number, payload: any): Progress {
+  public set(count: number, payload: IPayload = {} as IPayload): IProgress<IPayload> {
     this.count = count;
     this.payload = payload;
-    // FIXME: clean all timers, or just call update with diff ?
+    this.eta.set(count);
     return this;
   }
 
-  protected update(count: number, payload?: any): Progress {
-    this.emit('update', {
+  public on(type: 'update', listener: (e: IUpdateEvent<IPayload>) => void): IProgress<IPayload> {
+    this.emitter.on(type, listener);
+    return this;
+  }
+
+  protected update(count: number, payload?: IPayload): IProgress<IPayload> {
+    const updatePayload = {
       prev: {
         value: this.count,
         payload: this.payload
@@ -46,11 +51,13 @@ export class Progress extends EventEmitter implements IProgress, IBarItem {
       new: {
         value: count,
         payload,
-      }
-    });
+      },
+      total: this.total,
+    }
+    this.emitter.emit('update', updatePayload);
+    this.eta.update(count, this.total);
     this.count = count;
-    this.payload = payload ? payload : this.payload;
-    // FIXME: add test about override
+    this.payload = payload ?? this.payload;
     return this;
   }
 
@@ -62,8 +69,8 @@ export class Progress extends EventEmitter implements IProgress, IBarItem {
     return this.count;
   }
 
-  public getPayload(): any {
-    return this.payload ?? {};
+  public getPayload(): IPayload {
+    return this.payload;
   }
 
   public getProgress(): number {
@@ -71,12 +78,11 @@ export class Progress extends EventEmitter implements IProgress, IBarItem {
     return progress > 1 ? 1 : progress;
   }
 
-  // FIXME: do I need it ?
   public getTag(): string | undefined {
     return this.tag;
   }
 
-  public getEta(): Eta {
+  public getEta(): IEta {
     return this.eta;
   }
 }

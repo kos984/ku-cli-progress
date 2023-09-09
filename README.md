@@ -38,3 +38,6 @@ bar.start().catch(console.error);
 see examples simple.bar.ts
 
 ![img_2.png](img_2.png)
+
+
+# using tags
