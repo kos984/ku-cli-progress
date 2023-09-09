@@ -9,7 +9,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "rimraf '{.eslintcache}' && eslint src --quiet",
-    "lint:ci": "npx eslint -f json -o reports/eslint-report.json src || true",
+    "lint:ci": "npx eslint src -f json -o reports/eslint-report.json || true",
     "prepare": "npm run build"
   },
   "author": "Kostiantyn Upir",
