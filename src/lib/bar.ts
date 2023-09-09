@@ -77,7 +77,7 @@ export class Bar {
   }
 
   protected refresh = () => {
-    if (!this.isStarted || this.nextUpdate) {
+    if (!this.isStarted || this.nextUpdate !== null) {
       return;
     }
     this.nextUpdate = new Promise(resolve  => {
