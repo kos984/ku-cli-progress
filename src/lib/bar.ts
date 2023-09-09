@@ -2,7 +2,6 @@ import { TerminalTty } from './terminals/terminal-tty';
 import { ITerminal } from './interfaces/terminal.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
 import { IProgress } from './interfaces/progress.interface';
-import EventEmitter from 'events';
 
 export interface IOptions {
   refreshTimeMs: number;
@@ -73,7 +72,7 @@ export class Bar {
 
   protected removeListenersFromProgresses(item: IBarItem) {
     item.getProgresses().forEach(progress => {
-      (progress.emitter as EventEmitter).removeListener('update', this.refresh);
+      (progress.emitter).removeListener('update', this.refresh);
     });
   }
 

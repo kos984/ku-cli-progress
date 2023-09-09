@@ -58,7 +58,7 @@ export class BarItem implements IBarItem {
     const next = this.getCounterByProperty(this.progresses.length);
     return this.template.replace(/{([^{}]+)}/g, (match, prop) => {
       const [property, tag] = prop.split('_').reverse();
-      const index = tag ? this.progresses.findIndex(p => p.getTag() === tag) : next(property); // TODO: it can be improved with generators ?
+      const index = tag ? this.progresses.findIndex(p => p.getTag() === tag) : next(property);
       if (index < 0) return match;
       const progress = this.progresses[index];
       const value = this.getDataValue(property, progress);

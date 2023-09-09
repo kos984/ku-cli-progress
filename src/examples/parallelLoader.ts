@@ -29,8 +29,6 @@ const process = (file: IFile) => {
 
 const runner = async (files: IFile[], batchSize = 5) => {
   const mainProgress = new Progress({ total: files.length });
-  // const bar = new BarItem([mainProgress]);
-  // bar.start();
   const barsContainer = new Bar();
   barsContainer.add(new BarItem([mainProgress]));
   barsContainer.start();

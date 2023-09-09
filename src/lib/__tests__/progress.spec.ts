@@ -96,7 +96,7 @@ describe('progress', () => {
       const progress = new Progress({ total: 100, start: 0 }, {
         foo: 'bar',
       });
-      progress.increment(undefined, undefined);
+      progress.increment();
       expect(progress.getPayload()).toEqual({ foo: 'bar' });
       progress.increment();
       expect(progress.getPayload()).toEqual({ foo: 'bar' });

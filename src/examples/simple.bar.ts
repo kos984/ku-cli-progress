@@ -70,10 +70,10 @@ bar.add(new BarItem([textInBarProgress], {
       const percentage = ' ' + (Math.round(progress.getProgress() * 10000) / 100).toFixed(2) + '% ';
       const done = Math.round(progress.getProgress() * str.length);
       const startPosition = Math.round(str.length / 2 - percentage.length / 2);
-      const out = str.substr(0, startPosition)
+      const out = str.substring(0, startPosition)
         + percentage
-        + str.substr(startPosition + percentage.length);
-      return chalk.yellowBright(out.substr(0, done)) + out.substr(done);
+        + str.substring(startPosition + percentage.length);
+      return chalk.yellowBright(out.substring(0, done)) + out.substring(done);
     }
   }
 }));
@@ -118,7 +118,7 @@ bar.add(new BarItem([textInBarProgress], {
   },
   dataProviders: {
     spin: (progress) => spin.next(progress.getProgress() < 1).value,
-    longText: () => 'this is a long text with multi lines\nline 2 with some text', // FIXME: is it need ?
+    longText: () => 'this is a long text with multi lines\nline 2 with some text',
   },
 }));
 
@@ -135,9 +135,9 @@ bar.add(new BarItem([textInBarProgress], {
       const percent = (progress.getProgress() * 100).toFixed(2) + '% >>>';
       const [start, end] = str.split('|');
       const text = percent.length < start.length
-        ? start.substr(0, start.length - percent.length) + percent
+        ? start.substring(0, start.length - percent.length) + percent
         // : percent.substr(-start.length);
-       : percent.substr(percent.length - start.length);
+       : percent.substring(percent.length - start.length);
       return chalk.yellowBright(text + end);
     },
   }
@@ -156,8 +156,8 @@ bar.add(new BarItem([textInBarProgress], {
       const percent = '<<< ' + (progress.getProgress() * 100).toFixed(2) + '%';
       const [end, start] = str.split('|');
       const text = end.length > percent.length
-        ? percent + end.substr(0, end.length - percent.length)
-        : percent.substr(0, end.length);
+        ? percent + end.substring(0, end.length - percent.length)
+        : percent.substring(0, end.length);
       return chalk.greenBright(start + text);
     },
   }
@@ -208,6 +208,4 @@ const interval = setInterval(() => {
   if (update === false) {
     clearInterval(interval);
   }
-  // bar.logWrap(() => console.log('this is a test: ' + textInBarRotation.getProgress()));
-
 }, 300);

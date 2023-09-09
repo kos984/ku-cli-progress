@@ -1,4 +1,4 @@
-import { Eta, IEta } from '../../';
+import { Eta } from '../../';
 
 describe('Eta', () => {
   let eta;

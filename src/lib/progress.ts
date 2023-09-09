@@ -57,7 +57,7 @@ export class Progress<IPayload extends object = object> implements IProgress<IPa
     this.emitter.emit('update', updatePayload);
     this.eta.update(count, this.total);
     this.count = count;
-    this.payload = payload !== undefined ? payload : this.payload;
+    this.payload = payload ?? this.payload;
     return this;
   }
 

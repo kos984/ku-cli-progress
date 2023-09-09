@@ -111,7 +111,6 @@ describe('Progress Bar Lib', () => {
           },
         },
       });
-      // console.log('aaaaaa', barItem.render());
       expect(barItem.render()).toEqual(
         '[############================------------] NaN/NaN/{speed}',
       );
@@ -133,7 +132,6 @@ describe('Progress Bar Lib', () => {
           },
         },
       });
-      // console.log('aaaaaa', barItem.render());
       expect(barItem.render()).toEqual(
         '[############================------------] value 1: 30; value 2: 70',
       );
