@@ -14,13 +14,13 @@ describe('progress', () => {
   it('should emit message after update', async () => {
     const progress = new Progress({ total: 100 });
     let message;
-    const listener = e => message = e;
+    const listener = e => (message = e);
     progress.on('update', listener);
     progress.increment();
     expect(message).toMatchObject({
       prev: {
         value: 0,
-        payload: {}
+        payload: {},
       },
       new: {
         value: 1,
@@ -40,14 +40,16 @@ describe('progress', () => {
     expect(progress.getPayload()).toMatchObject({ foo: 'barBar' });
   });
   it('set should should works correct', () => {
-    const progress = new Progress({ total: 100, eta: {
+    const progress = new Progress({
+      total: 100,
+      eta: {
         set: jest.fn(),
         getEtaS: jest.fn(),
         getSpeed: jest.fn(),
         update: jest.fn(),
         getDurationMs: jest.fn(),
-      }},
-    );
+      },
+    });
     progress.set(50);
     expect(progress.getPayload()).toMatchObject({});
     expect(progress.getValue()).toBe(50);
@@ -79,23 +81,32 @@ describe('progress', () => {
       expect(progress.getPayload()).toEqual({});
     });
     it('with init', () => {
-      const progress = new Progress({ total: 100, start: 0 }, {
-        foo: 'bar',
-      });
+      const progress = new Progress(
+        { total: 100, start: 0 },
+        {
+          foo: 'bar',
+        },
+      );
       expect(progress.getPayload()).toEqual({ foo: 'bar' });
     });
     it('update payload', () => {
-      const progress = new Progress({ total: 100, start: 0 }, {
-        foo: 'bar',
-      });
+      const progress = new Progress(
+        { total: 100, start: 0 },
+        {
+          foo: 'bar',
+        },
+      );
       progress.increment(undefined, { foo: 'baz' });
       expect(progress.getValue()).toBe(1);
       expect(progress.getPayload()).toEqual({ foo: 'baz' });
     });
     it('should not update payload to undefined', () => {
-      const progress = new Progress({ total: 100, start: 0 }, {
-        foo: 'bar',
-      });
+      const progress = new Progress(
+        { total: 100, start: 0 },
+        {
+          foo: 'bar',
+        },
+      );
       progress.increment();
       expect(progress.getPayload()).toEqual({ foo: 'bar' });
       progress.increment();

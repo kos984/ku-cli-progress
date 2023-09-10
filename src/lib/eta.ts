@@ -3,7 +3,7 @@ import { IEta } from './interfaces/eta.interface';
 const defaultParams: IEtaParams = {
   deps: 5,
   debounce: 0.02,
-}
+};
 
 export interface IEtaParams {
   /**
@@ -26,7 +26,7 @@ export interface IEtaParams {
 
 export class Eta implements IEta {
   protected started!: number;
-  protected last!: { time: number, count: number };
+  protected last!: { time: number; count: number };
   protected left!: number;
   protected duration!: number;
   protected speedMoment = [];
@@ -111,19 +111,21 @@ export class Eta implements IEta {
     const prevSpeed = Number.isNaN(this.speed) ? 0 : this.speed;
     const k = speed / prevSpeed;
     const debounce = this.params.debounce;
-    if (k > 1 && k - 1 > debounce || 1 - k > debounce) {
+    if ((k > 1 && k - 1 > debounce) || 1 - k > debounce) {
       this.speed = speed;
     }
   }
 
-
-  protected updateSpeedMoments(prev: { count: number, time: number }, current: { count: number, time: number }): boolean {
+  protected updateSpeedMoments(
+    prev: { count: number; time: number },
+    current: { count: number; time: number },
+  ): boolean {
     const timeElapsed = current.time - prev.time;
     // Ignore rapid updates and completion of progress
-    if (timeElapsed < 100 || (this.left <= 0)) {
+    if (timeElapsed < 100 || this.left <= 0) {
       return false;
     }
-    const speed = (current.count - prev.count) * 1000 / timeElapsed;
+    const speed = ((current.count - prev.count) * 1000) / timeElapsed;
     this.speedMoment.push(speed);
     if (this.speedMoment.length > this.params.deps) {
       this.speedMoment.shift();
