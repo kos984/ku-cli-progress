@@ -10,7 +10,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "rimraf '{.eslintcache}' && eslint src --quiet",
-    "lint:ci": "npx eslint src -f json -o reports/eslint-report.json || true",
+    "lint:ci": "npx eslint src -f json -o reports/eslint-report.json",
     "prepare": "npm run husky:install && npm run build",
     "husky:install": "husky install",
     "prelint": "npx eslint-config-prettier .eslintrc.cjs"

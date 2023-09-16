@@ -75,6 +75,34 @@ describe('Bar', () => {
     ]);
   });
 
+  it('should be able remove by progress', async () => {
+    const bar = new Bar(mockTerminal, barOptions);
+    const progress = new Progress({ total: 100 });
+    const progressToRemove = new Progress({ total: 200, start: 50 });
+    const barItemToRemove = new BarItem(progressToRemove);
+    const barItemToRemove2 = new BarItem([]);
+    bar.addProgress(progress).add(barItemToRemove).start();
+    progress.increment();
+    await new Promise(resolve => setTimeout(resolve, refreshTimeMs * 2));
+    bar.remove(barItemToRemove);
+    bar.remove(barItemToRemove2);
+    await new Promise(resolve => setTimeout(resolve, refreshTimeMs * 2));
+    bar.stop();
+    expect(mockTerminal.write.mock.calls).toEqual([
+      [
+        '[----------------------------------------] 0% ETA: NaN speed: NaN duration: 0s 0/100\n' +
+          '[==========------------------------------] 25% ETA: NaN speed: NaN duration: 0s 50/200\n',
+      ],
+      [
+        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n' +
+          '[==========------------------------------] 25% ETA: NaN speed: NaN duration: 0s 50/200\n',
+      ],
+      [
+        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n',
+      ],
+    ]);
+  });
+
   it('should be able add new process', async () => {
     const bar = new Bar(mockTerminal, barOptions);
     const progress = new Progress({ total: 100 });

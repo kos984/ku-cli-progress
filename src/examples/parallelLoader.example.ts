@@ -36,7 +36,7 @@ const next = (barsContainer: Bar, mainProgress: Progress): Promise<boolean> => {
     const progress = new Progress({ total: file.size });
     barsContainer.add(new BarItem([progress]));
     const emitter = process(file);
-    emitter.on('data', size => progress.increment(size)); // progress increment
+    emitter.on('data', size => progress.increment(size));
     emitter.on('end', () => {
       barsContainer.logWrap(() => {
         console.log('some progress done');
