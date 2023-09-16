@@ -10,7 +10,9 @@ export interface IProgressParams {
   eta?: IEta;
 }
 
-export class Progress<IPayload extends object = object> implements IProgress<IPayload> {
+export class Progress<IPayload extends object = object>
+  implements IProgress<IPayload>
+{
   public readonly emitter: EventEmitter = new EventEmitter();
   protected tag?: string;
   protected count: number;
@@ -18,7 +20,10 @@ export class Progress<IPayload extends object = object> implements IProgress<IPa
   protected payload: IPayload;
   protected eta: IEta;
 
-  public constructor(params: IProgressParams, payload: IPayload = {} as IPayload) {
+  public constructor(
+    params: IProgressParams,
+    payload: IPayload = {} as IPayload,
+  ) {
     this.tag = params.tag;
     this.count = params.start ?? 0;
     this.total = params.total;
@@ -30,14 +35,20 @@ export class Progress<IPayload extends object = object> implements IProgress<IPa
     return this.update(this.count + delta, payload);
   }
 
-  public set(count: number, payload: IPayload = {} as IPayload): IProgress<IPayload> {
+  public set(
+    count: number,
+    payload: IPayload = {} as IPayload,
+  ): IProgress<IPayload> {
     this.count = count;
     this.payload = payload;
     this.eta.set(count);
     return this;
   }
 
-  public on(type: 'update', listener: (e: IUpdateEvent<IPayload>) => void): IProgress<IPayload> {
+  public on(
+    type: 'update',
+    listener: (e: IUpdateEvent<IPayload>) => void,
+  ): IProgress<IPayload> {
     this.emitter.on(type, listener);
     return this;
   }
@@ -46,14 +57,14 @@ export class Progress<IPayload extends object = object> implements IProgress<IPa
     const updatePayload = {
       prev: {
         value: this.count,
-        payload: this.payload
+        payload: this.payload,
       },
       new: {
         value: count,
         payload,
       },
       total: this.total,
-    }
+    };
     this.emitter.emit('update', updatePayload);
     this.eta.update(count, this.total);
     this.count = count;

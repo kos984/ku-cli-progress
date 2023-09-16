@@ -6,24 +6,22 @@ export class TerminalTty implements ITerminal {
   protected y = 0;
   protected prev = '';
 
-  public constructor(
-    protected stream: WriteStream = process.stderr
-  ) {
+  public constructor(protected stream: WriteStream = process.stderr) {
     stream.on('resize', () => {
       this.clear();
       this.refresh();
     });
   }
 
-  public cursor(enabled: boolean){
-    if (enabled){
+  public cursor(enabled: boolean) {
+    if (enabled) {
       this.stream.write('\x1B[?25h');
-    }else{
+    } else {
       this.stream.write('\x1B[?25l');
     }
   }
 
-  public resetCursor(lines: number){
+  public resetCursor(lines: number) {
     readline.moveCursor(this.stream, 0, -lines);
     readline.cursorTo(this.stream, 0);
   }
@@ -59,5 +57,4 @@ export class TerminalTty implements ITerminal {
   public refresh() {
     this.write(this.prev);
   }
-
 }

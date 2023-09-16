@@ -1,5 +1,5 @@
 export interface ITerminal {
-  write(s: string): void
+  write(s: string): void;
   clear(): void;
   refresh(): void;
 }
