@@ -63,8 +63,8 @@ bar.add(
 
 ## Parameters of the `BarItem` class:
 
-  1. **`progresses`** (`IProgress | IProgress[]`):
-  An object or an array of objects of type `IProgress` representing the progress.
+1. **`progresses`** (`IProgress | IProgress[]`):
+ An object or an array of objects of type `IProgress` representing the progress.
 
   2. **`params`** (`IParams | undefined`):
    Additional parameters to customize the appearance and behavior of the progress bar.
