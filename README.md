@@ -63,10 +63,10 @@ bar.add(
 
 ## Parameters of the `BarItem` class:
 
-1. **`progresses`** (`IProgress | IProgress[]`):
-   An object or an array of objects of type `IProgress` representing the progress.
+  1. **`progresses`** (`IProgress | IProgress[]`):
+  An object or an array of objects of type `IProgress` representing the progress.
 
-2. **`params`** (`IParams | undefined`):
+  2. **`params`** (`IParams | undefined`):
    Additional parameters to customize the appearance and behavior of the progress bar.
     - **`template`** (`string | undefined`): Template for displaying the progress bar.
     - **`options`** (`Partial<IBarOptions> | undefined`): Configuration settings for displaying the progress bar.
@@ -79,12 +79,12 @@ In the `BarItem` class, the `template` represents a string template that defines
 
 Let's review some key placeholders you can use in the template:
 
-- `{bar}`: Placeholder for inserting the progress bar.
-- `{percentage}`: Placeholder for inserting the progress percentage.
-- `{eta}`: Placeholder for inserting the estimated time of arrival (ETA).
-- `{speed}`: Placeholder for inserting the progress speed.
-- `{value}`: Placeholder for inserting the current value.
-- `{total}`: Placeholder for inserting the total value.
+  - `{bar}`: Placeholder for inserting the progress bar.
+  - `{percentage}`: Placeholder for inserting the progress percentage.
+  - `{eta}`: Placeholder for inserting the estimated time of arrival (ETA).
+  - `{speed}`: Placeholder for inserting the progress speed.
+  - `{value}`: Placeholder for inserting the current value.
+  - `{total}`: Placeholder for inserting the total value.
 
 These placeholders are replaced with the actual progress values during the generation of the progress bar string.
 
@@ -155,16 +155,16 @@ The `IBarOptions` interface defines the configuration options for customizing th
 
 #### Properties:
 
-1. **`completeChar`** (`string`):
+ 1. **`completeChar`** (`string`):
     - The character used to represent the completed portion of the progress bar.
 
-2. **`resumeChar`** (`string`):
+ 2. **`resumeChar`** (`string`):
     - The character used to represent the remaining portion of the progress bar that needs to be filled.
 
-3. **`width`** (`number`):
+ 3. **`width`** (`number`):
     - The total width of the progress bar, indicating the number of characters to use for the entire progress representation.
 
-4. **`glue`** (`string`):
+ 4. **`glue`** (`string`):
     - A string used to separate multiple progress bars if displayed together.
 
 ### Example Usage:
