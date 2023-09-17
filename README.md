@@ -68,10 +68,10 @@ bar.add(
 
 2.  **`params`** (`IParams | undefined`):
    Additional parameters to customize the appearance and behavior of the progress bar.
-     -   **`template`** (`string | undefined`): Template for displaying the progress bar.
-     -   **`options`** (`Partial<IBarOptions> | undefined`): Configuration settings for displaying the progress bar.
-     -   **`formatters`** (`IFormatters | undefined`): Formatting functions for each progress.
-     -   **`dataProviders`** (`IDataProviders | undefined`): Functions to provide additional data.
+    -   **`template`** (`string | undefined`): Template for displaying the progress bar.
+    -   **`options`** (`Partial<IBarOptions> | undefined`): Configuration settings for displaying the progress bar.
+    -   **`formatters`** (`IFormatters | undefined`): Formatting functions for each progress.
+    -   **`dataProviders`** (`IDataProviders | undefined`): Functions to provide additional data.
 
 ### Template Format:
 
@@ -155,16 +155,16 @@ The `IBarOptions` interface defines the configuration options for customizing th
 
 #### Properties:
 
- 1.  **`completeChar`** (`string`):
+1.  **`completeChar`** (`string`):
     -   The character used to represent the completed portion of the progress bar.
 
- 2.  **`resumeChar`** (`string`):
+2.  **`resumeChar`** (`string`):
     -   The character used to represent the remaining portion of the progress bar that needs to be filled.
 
- 3.  **`width`** (`number`):
+3.  **`width`** (`number`):
     -   The total width of the progress bar, indicating the number of characters to use for the entire progress representation.
 
- 4.  **`glue`** (`string`):
+4.  **`glue`** (`string`):
     -   A string used to separate multiple progress bars if displayed together.
 
 ### Example Usage:
