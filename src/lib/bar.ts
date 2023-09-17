@@ -47,6 +47,7 @@ export class Bar {
       item => !item.getProgresses().find(p => p == progress),
     );
     this.refresh();
+    return this;
   }
 
   public render() {
@@ -54,18 +55,21 @@ export class Bar {
       return bar.render();
     });
     this.terminal.write(lines.join('\n') + '\n');
+    return this;
   }
 
   public logWrap(logFunction: () => void) {
     this.terminal.clear();
     logFunction();
     this.terminal.refresh();
+    return this;
   }
 
   public start() {
     this.isStarted = true;
     this.items.forEach(item => this.addListenerToProgress(item));
     this.render();
+    return this;
   }
 
   public stop() {
@@ -73,6 +77,7 @@ export class Bar {
     clearTimeout(this.timeOutId);
     this.nextUpdate = null;
     this.isStarted = false;
+    return this;
   }
 
   protected addListenerToProgress(item: IBarItem) {
