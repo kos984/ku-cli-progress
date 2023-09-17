@@ -64,7 +64,7 @@ bar.add(
 ## Parameters of the `BarItem` class:
 
 1. **`progresses`** (`IProgress | IProgress[]`):
-  An object or an array of objects of type `IProgress` representing the progress.
+   An object or an array of objects of type `IProgress` representing the progress.
 
 2. **`params`** (`IParams | undefined`):
   Additional parameters to customize the appearance and behavior of the progress bar.
@@ -79,12 +79,12 @@ In the `BarItem` class, the `template` represents a string template that defines
 
 Let's review some key placeholders you can use in the template:
 
-- `{bar}`: Placeholder for inserting the progress bar.
-- `{percentage}`: Placeholder for inserting the progress percentage.
-- `{eta}`: Placeholder for inserting the estimated time of arrival (ETA).
-- `{speed}`: Placeholder for inserting the progress speed.
-- `{value}`: Placeholder for inserting the current value.
-- `{total}`: Placeholder for inserting the total value.
+  - `{bar}`: Placeholder for inserting the progress bar.
+  - `{percentage}`: Placeholder for inserting the progress percentage.
+  - `{eta}`: Placeholder for inserting the estimated time of arrival (ETA).
+  - `{speed}`: Placeholder for inserting the progress speed.
+  - `{value}`: Placeholder for inserting the current value.
+  - `{total}`: Placeholder for inserting the total value.
 
 These placeholders are replaced with the actual progress values during the generation of the progress bar string.
 
