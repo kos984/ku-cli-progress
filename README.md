@@ -64,9 +64,9 @@ bar.add(
 ## Parameters of the `BarItem` class:
 
 1. **`progresses`** (`IProgress | IProgress[]`):
- An object or an array of objects of type `IProgress` representing the progress.
+  An object or an array of objects of type `IProgress` representing the progress.
 
- 2. **`params`** (`IParams | undefined`):
+2. **`params`** (`IParams | undefined`):
   Additional parameters to customize the appearance and behavior of the progress bar.
     - **`template`** (`string | undefined`): Template for displaying the progress bar.
     - **`options`** (`Partial<IBarOptions> | undefined`): Configuration settings for displaying the progress bar.
@@ -182,5 +182,6 @@ const options: IBarOptions = {
  - TBD
 
 # Some random examples
+ see src/examples/random.bar.example.ts
 
 ![multi-files-processing](src/docs/images/random.bar.example.gif)
