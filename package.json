@@ -1,6 +1,6 @@
 {
   "name": "ku-progress-bar",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "cli progress bar",
   "main": "dist/index.js",
   "homepage": "https://github.com/kos984/ku-cli-progress",
@@ -8,6 +8,16 @@
     "type": "git",
     "url": "git+https://github.com/kos984/ku-cli-progress.git"
   },
+  "keywords": [
+    "bar",
+    "progress",
+    "progressbar",
+    "multibarbar",
+    "console",
+    "cli",
+    "tty",
+    "terminal"
+  ],
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc",
