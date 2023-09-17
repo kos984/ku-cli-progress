@@ -1,3 +1,17 @@
 node_modules
 .idea
 src
+coverage
+reports
+.github
+.husky
+docs
+reports
+sonar-project.properties
+dist/examples
+dist/lib/__tests__
+.eslintrc.cjs
+.nvmrc
+.prettierrc.json
+tsconfig.build.json
+tsconfig.json
