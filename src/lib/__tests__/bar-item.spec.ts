@@ -16,33 +16,44 @@ describe('Progress Bar Lib', () => {
         set: jest.fn(() => eta),
         getEtaS: jest.fn(() => 9),
         getSpeed: jest.fn(() => 10),
-        getDurationMs: jest.fn( () => 1000),
+        getDurationMs: jest.fn(() => 1000),
       };
       const progress = new Progress({ total: 100, eta });
       const barItem = new BarItem(progress);
-      expect(barItem.render()).toEqual('[----------------------------------------] 0% ETA: 9s speed: 10/s duration: 1s 0/100');
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] 0% ETA: 9s speed: 10/s duration: 1s 0/100',
+      );
     });
 
     it('should replace data from payload', () => {
       const progress = new Progress({ total: 100 }, { foo: 'bar' });
       const barItem = new BarItem(progress, {
-        template: '[{bar}] {foo}'
+        template: '[{bar}] {foo}',
       });
-      expect(barItem.render()).toEqual('[----------------------------------------] bar');
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] bar',
+      );
     });
     it('should replace data from payload (override default data)', () => {
-      const progress = new Progress({ total: 100 }, { speed: '[speed override]' });
+      const progress = new Progress(
+        { total: 100 },
+        { speed: '[speed override]' },
+      );
       const barItem = new BarItem(progress, {
         template: '[{bar}] {speed}',
       });
-      expect(barItem.render()).toEqual('[----------------------------------------] [speed override]');
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] [speed override]',
+      );
     });
     it('should NOT replace data if not found any from defined & payload', () => {
       const progress = new Progress({ total: 100 });
       const barItem = new BarItem(progress, {
-        template: '[{bar}] {foo}'
+        template: '[{bar}] {foo}',
       });
-      expect(barItem.render()).toEqual('[----------------------------------------] {foo}');
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] {foo}',
+      );
     });
     it('formatters', () => {
       const progress = new Progress({ total: 100 });
@@ -50,11 +61,13 @@ describe('Progress Bar Lib', () => {
       const barItem = new BarItem(progress, {
         template: '[{bar}] {value}',
         formatters: {
-          value: str => 'done: ' + str
-        }
+          value: str => 'done: ' + str,
+        },
       });
-      expect(barItem.render()).toEqual('[========--------------------------------] done: 20');
-    })
+      expect(barItem.render()).toEqual(
+        '[========--------------------------------] done: 20',
+      );
+    });
   });
 
   describe('multicolor bar', () => {
@@ -82,7 +95,7 @@ describe('Progress Bar Lib', () => {
 
       const barItem = new BarItem([progress1, progress2, progress3], {
         formatters: {
-          'bar': (str, progress, progresses) => {
+          bar: (str, progress, progresses) => {
             const index = progresses.findIndex(p => p === progress);
             const colors = ['#', '=', '+'];
             return colors[index].repeat(str.length);
@@ -90,7 +103,7 @@ describe('Progress Bar Lib', () => {
         },
       });
       expect(barItem.render()).toEqual(
-        '[############++++++++++++++++------------] 30%/0%/70% ETA: NaN/NaN/NaN speed: NaN/NaN/NaN duration: 0s/0s/0s 30/100 0/100 70/100'
+        '[############++++++++++++++++------------] 30%/0%/70% ETA: NaN/NaN/NaN speed: NaN/NaN/NaN duration: 0s/0s/0s 30/100 0/100 70/100',
       );
     });
 
@@ -104,7 +117,7 @@ describe('Progress Bar Lib', () => {
       const barItem = new BarItem([progress1, progress2], {
         template: '[{bars}] {speed}/{speed}/{speed}',
         formatters: {
-          'bar': (str, progress, progresses) => {
+          bar: (str, progress, progresses) => {
             const index = progresses.findIndex(p => p === progress);
             const colors = ['#', '=', '+'];
             return colors[index].repeat(str.length);
@@ -125,7 +138,7 @@ describe('Progress Bar Lib', () => {
       const barItem = new BarItem([progress1, progress2], {
         template: '[{bars}] value 1: {p1_value}; value 2: {p2_value}',
         formatters: {
-          'bar': (str, progress, progresses) => {
+          bar: (str, progress, progresses) => {
             const index = progresses.findIndex(p => p === progress);
             const colors = ['#', '=', '+'];
             return colors[index].repeat(str.length);

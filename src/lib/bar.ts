@@ -2,6 +2,7 @@ import { TerminalTty } from './terminals/terminal-tty';
 import { ITerminal } from './interfaces/terminal.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
 import { IProgress } from './interfaces/progress.interface';
+import { BarItem } from './bar-item';
 
 export interface IOptions {
   refreshTimeMs: number;
@@ -15,46 +16,60 @@ export class Bar {
 
   public constructor(
     protected terminal: ITerminal = new TerminalTty(),
-    protected options?: IOptions
-    ) {
+    protected options?: IOptions,
+  ) {
     this.options = {
       refreshTimeMs: 50,
-      ...options
+      ...options,
     };
   }
 
   public add(bar: IBarItem) {
-    this.items.push(bar)
+    this.items.push(bar);
     if (this.isStarted) {
-      this.addListenerToProgress(bar)
+      this.addListenerToProgress(bar);
     }
     return this;
   }
 
+  public remove(bar: IBarItem) {
+    const progresses = bar.getProgresses();
+    if (!progresses.length) return;
+    return this.removeByProgress(progresses[0]);
+  }
+
+  public addProgress(progress: IProgress) {
+    return this.add(new BarItem(progress));
+  }
+
   public removeByProgress(progress: IProgress) {
     this.items = this.items.filter(
-      item => !item.getProgresses().find(p => p == progress)
-    )
+      item => !item.getProgresses().find(p => p == progress),
+    );
     this.refresh();
+    return this;
   }
 
   public render() {
-    const lines = this.items.map( bar => {
+    const lines = this.items.map(bar => {
       return bar.render();
-    })
+    });
     this.terminal.write(lines.join('\n') + '\n');
+    return this;
   }
 
   public logWrap(logFunction: () => void) {
     this.terminal.clear();
     logFunction();
     this.terminal.refresh();
+    return this;
   }
 
   public start() {
     this.isStarted = true;
-    this.items.forEach(item => this.addListenerToProgress(item))
+    this.items.forEach(item => this.addListenerToProgress(item));
     this.render();
+    return this;
   }
 
   public stop() {
@@ -62,6 +77,7 @@ export class Bar {
     clearTimeout(this.timeOutId);
     this.nextUpdate = null;
     this.isStarted = false;
+    return this;
   }
 
   protected addListenerToProgress(item: IBarItem) {
@@ -72,20 +88,20 @@ export class Bar {
 
   protected removeListenersFromProgresses(item: IBarItem) {
     item.getProgresses().forEach(progress => {
-      (progress.emitter).removeListener('update', this.refresh);
+      progress.emitter.removeListener('update', this.refresh);
     });
   }
 
   protected refresh = () => {
-    if (!this.isStarted || this.nextUpdate) {
+    if (!this.isStarted || this.nextUpdate !== null) {
       return;
     }
-    this.nextUpdate = new Promise(resolve  => {
+    this.nextUpdate = new Promise(resolve => {
       this.timeOutId = setTimeout(() => {
         this.nextUpdate = null;
         this.render();
         resolve(undefined);
       }, this.options.refreshTimeMs);
-    })
-  }
+    });
+  };
 }

@@ -25,9 +25,11 @@ describe('terminal tty', () => {
   });
   it('should refresh when screen size updated', () => {
     const listeners = [];
-    mockStream.on.mockImplementation((type: string, handler: (...params) => void) => {
-      listeners.push(handler);
-    })
+    mockStream.on.mockImplementation(
+      (type: string, handler: (...params) => void) => {
+        listeners.push(handler);
+      },
+    );
     const terminal = new TerminalTty(mockStream as never as WriteStream);
     const clear = jest.spyOn(terminal, 'clear');
     const refresh = jest.spyOn(terminal, 'refresh');
@@ -38,8 +40,9 @@ describe('terminal tty', () => {
   });
   it('should not render more then screen size', () => {
     const terminal = new TerminalTty(mockStream as never as WriteStream);
-    const text = ('0'.repeat(mockStream.columns * 2)+'\n')
-      .repeat(mockStream.rows * 2);
+    const text = ('0'.repeat(mockStream.columns * 2) + '\n').repeat(
+      mockStream.rows * 2,
+    );
     terminal.write(text);
     const calsWithText = mockStream.write.mock.calls
       .filter((s: [string]) => s.length > 0 && s[0].includes('000'))
