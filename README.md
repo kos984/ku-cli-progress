@@ -55,11 +55,11 @@ bar.add(
 );
 ```
 
-![composite-progress](src/docs/images/composite-progress.example.gif)
+![composite-progress](docs/images/composite-progress.example.gif)
 
 #Multi Bar
 
-![multi-files-processing](src/docs/images/multi-files-processing.example.gif)
+![multi-files-processing](docs/images/multi-files-processing.example.gif)
 
 ## Parameters of the `BarItem` class:
 
@@ -184,4 +184,4 @@ const options: IBarOptions = {
 # Some random examples
  see src/examples/random.bar.example.ts
 
-![multi-files-processing](src/docs/images/random.bar.example.gif)
+![multi-files-processing](docs/images/random.bar.example.gif)
