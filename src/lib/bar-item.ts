@@ -15,6 +15,7 @@ export interface IDataProviders {
 }
 
 export interface IParams {
+  tagDelimiter?: string;
   template?: string;
   options?: Partial<IBarOptions>;
   formatters?: IFormatters;
@@ -23,6 +24,7 @@ export interface IParams {
 
 export class BarItem implements IBarItem {
   protected template!: string;
+  protected tagDelimiter!: string;
   protected options: IBarOptions = {
     completeChar: '=',
     resumeChar: '-',
@@ -35,6 +37,7 @@ export class BarItem implements IBarItem {
 
   public constructor(progresses: IProgress | IProgress[], params?: IParams) {
     this.progresses = Array.isArray(progresses) ? progresses : [progresses];
+    this.tagDelimiter = params?.tagDelimiter ?? '_';
     this.template =
       params?.template ?? this.getDefaultTemplate(this.progresses);
     this.options = { ...this.options, ...params?.options };
@@ -43,7 +46,7 @@ export class BarItem implements IBarItem {
       Number.isNaN(num) ? NaN.toString() : num + suffix;
     this.dataProviders = {
       bars: (progress, progresses) => this.renderBars(progresses),
-      bar: progress => this.bar(progress.getProgress()),
+      bar: progress => this.bar(progress.getProgress(), progress),
       speed: progress =>
         formatNumber(Math.round(progress.getEta().getSpeed()), '/s'),
       eta: progress => formatNumber(progress.getEta().getEtaS(), 's'),
@@ -63,7 +66,7 @@ export class BarItem implements IBarItem {
   public render(): string {
     const next = this.getCounterByProperty(this.progresses.length);
     return this.template.replace(/{([^{}]+)}/g, (match, prop) => {
-      const [property, tag] = prop.split('_').reverse();
+      const [property, tag] = prop.split(this.tagDelimiter).reverse();
       const index = tag
         ? this.progresses.findIndex(p => p.getTag() === tag)
         : next(property);
@@ -107,9 +110,9 @@ export class BarItem implements IBarItem {
     return '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}';
   }
 
-  protected bar(progress: number): string {
-    const size = Math.round(progress * this.options.width);
-    const parts = this.getBarParts(size);
+  protected bar(done: number, progress: IProgress): string {
+    const size = Math.round(done * this.options.width);
+    const parts = this.getBarParts(size, progress);
     return `${parts.done}${this.options.glue}${parts.left}`;
   }
 
@@ -118,9 +121,10 @@ export class BarItem implements IBarItem {
     item: IProgress,
     progresses: IProgress[],
   ) {
-    const line = this.getBarParts(length).done;
+    const line = this.getBarParts(length, item).done;
     const formatter =
-      this.formatters[`${item.getTag()}_bar`] ?? this.formatters['bar'];
+      this.formatters[`${item.getTag()}${this.tagDelimiter}bar`] ??
+      this.formatters['bar'];
     return formatter ? formatter(line, item, progresses) : line;
   }
 
@@ -152,7 +156,11 @@ export class BarItem implements IBarItem {
     return lines.join(glue);
   }
 
-  protected getBarParts(size: number): { left: string; done: string } {
+  protected getBarParts(
+    size: number,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    progress: IProgress,
+  ): { left: string; done: string } {
     return {
       done: this.options.completeChar.repeat(size),
       left: this.options.resumeChar.repeat(this.options.width - size),

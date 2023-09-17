@@ -16,6 +16,7 @@ export interface IUpdateEvent<IPayload> {
 export interface IProgress<IPayload extends object = object> {
   emitter: EventEmitter;
   getProgress(): number;
+  increment(delta: number, payload?: IPayload): IProgress<IPayload>;
   getEta(): IEta;
   getTag(): string;
   getValue(): number;
