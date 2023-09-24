@@ -18,7 +18,7 @@ export interface IProgress<IPayload extends object = object> {
   getProgress(): number;
   increment(delta: number, payload?: IPayload): IProgress<IPayload>;
   getEta(): IEta;
-  getTag(): string;
+  getTag(): string | undefined;
   getValue(): number;
   getTotal(): number;
   getPayload(): IPayload;
