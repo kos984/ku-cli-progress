@@ -195,7 +195,10 @@ describe('Progress Bar Lib', () => {
         template: '[{bars}]',
         formatters: {
           bar: (str, progress, progresses) => {
-            const colors = [chalk.yellowBright, chalk.blueBright];
+            const colors = [
+              (s: string) => `yellow${s}clearYellow`,
+              (s: string) => `blue${s}clearBlue`,
+            ];
             const index = progresses.findIndex(p => p === progress);
             return (colors[index] || chalk.yellow)(str);
           },
@@ -209,22 +212,22 @@ describe('Progress Bar Lib', () => {
         results.push(barItem.render());
       }
       expect(results).toEqual([
-        '[\u001b[94m⣿⣿⣿⣿\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[94m⣿⣿⣿⣿⣤\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[94m⣿⣿⣿⣿⣤\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[94m⣿⣿⣿⣿⣦\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣶\u001b[39m\u001b[94m⣿⣿⣿⣶\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣶\u001b[39m\u001b[94m⣿⣿⣿⣶\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣷\u001b[39m\u001b[94m⣿⣿⣿⣷\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿⣄\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿⣤\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿⣦\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿⣦\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣿⣶\u001b[39m\u001b[94m⣿⣿⣿⣶\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣿⣷\u001b[39m\u001b[94m⣿⣿⣿⣷\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣿⣷\u001b[39m\u001b[94m⣿⣿⣿⣷\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
-        '[\u001b[93m⣿⣿\u001b[39m\u001b[94m⣿⣿⣿⣿\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[blue⣿⣿⣿⣿clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[blue⣿⣿⣿⣿⣤clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[blue⣿⣿⣿⣿⣤clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[blue⣿⣿⣿⣿⣦clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣶clearYellowblue⣿⣿⣿⣶clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣶clearYellowblue⣿⣿⣿⣶clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣷clearYellowblue⣿⣿⣿⣷clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣿clearYellowblue⣿⣿⣿⣿clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣿clearYellowblue⣿⣿⣿⣿⣄clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣿clearYellowblue⣿⣿⣿⣿⣤clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣿clearYellowblue⣿⣿⣿⣿⣦clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣿clearYellowblue⣿⣿⣿⣿⣦clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣿⣶clearYellowblue⣿⣿⣿⣶clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣿⣷clearYellowblue⣿⣿⣿⣷clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣿⣷clearYellowblue⣿⣿⣿⣷clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[yellow⣿⣿clearYellowblue⣿⣿⣿⣿clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
       ]);
     });
   });
