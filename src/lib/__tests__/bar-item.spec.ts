@@ -1,5 +1,6 @@
-import { BarItem, Progress } from '../../';
+import { BarItem, presets, Progress } from '../../';
 import { IEta } from '../interfaces/eta.interface';
+import * as chalk from 'chalk';
 
 describe('Progress Bar Lib', () => {
   it('should construct with progress or array of progresses', () => {
@@ -148,6 +149,83 @@ describe('Progress Bar Lib', () => {
       expect(barItem.render()).toEqual(
         '[############================------------] value 1: 30; value 2: 70',
       );
+    });
+  });
+
+  describe('braille', () => {
+    it('should render single braille', () => {
+      const progress = new Progress({ total: 300 });
+
+      const barItem = new BarItem(progress, {
+        options: presets.braille,
+        template: '[{bar}]',
+      });
+      const results = [];
+      results.push(barItem.render());
+      for (let i = 0; i < 15; i++) {
+        progress.increment();
+        results.push(barItem.render());
+      }
+      expect(results).toEqual([
+        '[⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣤⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣤⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣦⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣶⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣶⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣷⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣿⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣿⣄⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣿⣤⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣿⣦⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣿⣦⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣿⣶⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣿⣷⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣿⣷⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[⣿⣿⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+      ]);
+    });
+
+    it('should render composite braille', () => {
+      const progress1 = new Progress({ total: 300 });
+      const progress2 = new Progress({ total: 300, start: 30 });
+
+      const barItem = new BarItem([progress1, progress2], {
+        options: presets.braille,
+        template: '[{bars}]',
+        formatters: {
+          bar: (str, progress, progresses) => {
+            const colors = [chalk.yellowBright, chalk.blueBright];
+            const index = progresses.findIndex(p => p === progress);
+            return (colors[index] || chalk.yellow)(str);
+          },
+        },
+      });
+      const results = [];
+      results.push(barItem.render());
+      for (let i = 0; i < 15; i++) {
+        progress1.increment();
+        progress2.increment();
+        results.push(barItem.render());
+      }
+      expect(results).toEqual([
+        '[\u001b[94m⣿⣿⣿⣿\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[94m⣿⣿⣿⣿⣤\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[94m⣿⣿⣿⣿⣤\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[94m⣿⣿⣿⣿⣦\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣶\u001b[39m\u001b[94m⣿⣿⣿⣶\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣶\u001b[39m\u001b[94m⣿⣿⣿⣶\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣷\u001b[39m\u001b[94m⣿⣿⣿⣷\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿⣄\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿⣤\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿⣦\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣿\u001b[39m\u001b[94m⣿⣿⣿⣿⣦\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣿⣶\u001b[39m\u001b[94m⣿⣿⣿⣶\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣿⣷\u001b[39m\u001b[94m⣿⣿⣿⣷\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣿⣷\u001b[39m\u001b[94m⣿⣿⣿⣷\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+        '[\u001b[93m⣿⣿\u001b[39m\u001b[94m⣿⣿⣿⣿\u001b[39m⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
+      ]);
     });
   });
 });

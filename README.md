@@ -20,6 +20,35 @@ bar.renderBars();
 [============----------------------------] 30% ETA: NaN speed: NaN duration: 0s 300/1000
 ```
 
+## Presets
+
+```typescript
+import { Bar, BarItem, presets, Progress } from '../';
+import * as chalk from 'chalk';
+
+const bar = new Bar();
+const progress = new Progress({ total: 100 });
+
+bar.add(new BarItem(progress, {
+  options: presets.braille,
+}));
+
+bar.start();
+
+```
+
+```console
+✗ ts-node ./src/examples/presets.example.ts
+ classic [============----------------------------] 31% ETA: 7s speed: 10/s duration: 3s 31/100
+ shades  [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 31% ETA: 7s speed: 10/s duration: 3s 31/100
+ rect    [■■■■■■■■■■■■                            ] 31% ETA: 7s speed: 10/s duration: 3s 31/100
+ braille [⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀] 31% ETA: 7s speed: 10/s duration: 3s 31/100
+```
+
+![img.png](docs/images/presets.png)
+
+![braille-progress](docs/images/braille.svg)
+
 # Multi bars
 
 ```typescript
