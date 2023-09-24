@@ -150,6 +150,47 @@ describe('Progress Bar Lib', () => {
         '[############================------------] value 1: 30; value 2: 70',
       );
     });
+
+    it('should correct render composite bar', () => {
+      const progress1 = new Progress({ total: 100, tag: 'p1' });
+      const progress2 = new Progress({ total: 100, start: 30, tag: 'p2' });
+
+      const barItem = new BarItem([progress1, progress2], {
+        template: '[{bars}]',
+        formatters: {
+          bar: (str, progress, progresses) => {
+            const index = progresses.findIndex(p => p === progress);
+            const colors = ['#', '=', '+'];
+            return colors[index].repeat(str.length);
+          },
+        },
+      });
+      const results = [];
+      results.push(barItem.render());
+      for (let i = 0; i < 15; i++) {
+        progress1.increment();
+        progress2.increment();
+        results.push(barItem.render());
+      }
+      expect(results).toEqual([
+        '[============----------------------------]',
+        '[============----------------------------]',
+        '[#============---------------------------]',
+        '[#============---------------------------]',
+        '[##============--------------------------]',
+        '[##============--------------------------]',
+        '[##============--------------------------]',
+        '[###============-------------------------]',
+        '[###============-------------------------]',
+        '[####============------------------------]',
+        '[####============------------------------]',
+        '[####============------------------------]',
+        '[#####============-----------------------]',
+        '[#####============-----------------------]',
+        '[######============----------------------]',
+        '[######============----------------------]',
+      ]);
+    });
   });
 
   describe('braille', () => {

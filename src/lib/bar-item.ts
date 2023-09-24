@@ -154,7 +154,7 @@ export class BarItem implements IBarItem {
         (prev, current, index) => {
           const extraChar =
             index === progresses.length - 1 &&
-            this.options.completeChar?.length &&
+            this.options.completeChars?.length &&
             this.progresses.length > 1 &&
             current.size < current.progress.getProgress() * this.options.width;
 
