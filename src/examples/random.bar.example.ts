@@ -1,17 +1,7 @@
 /* eslint-disable max-classes-per-file */
-import { Bar, Progress, BarItem, presets, IBarItem, IProgress } from '../';
+import { Bar, Progress, BarItem, presets, IProgress } from '../';
 import * as chalk from 'chalk';
-
-class TextBarItem implements IBarItem {
-  constructor(protected text: string) {}
-  public getProgresses(): IProgress[] {
-    return [];
-  }
-
-  render(): string {
-    return chalk.cyan(this.text);
-  }
-}
+import { TextBarItem } from './text-bar-item';
 
 const progresses: IProgress[] = [];
 const bar = new Bar();
@@ -280,10 +270,8 @@ function* rotate(
 {
   bar.add(new TextBarItem('Custom bar item:'));
   class CustomBarItem extends BarItem {
-    protected getBarParts(
-      size: number,
-      progress: IProgress,
-    ): { left: string; done: string } {
+    protected getBarParts(params): { left: string; done: string } {
+      const { size } = params;
       const customDoneStr = progress.getProgress() < 1 ? 'ᗧ' : 'ᗣ';
       // '🍒'.length = 2
       const half = this.options.resumeChar.repeat(this.options.width / 2 - 1);
@@ -323,6 +311,25 @@ function* rotate(
       },
     }),
   );
+}
+
+{
+  const progress = new Progress({ total: 100 });
+  bar.add(
+    new BarItem(progress, {
+      options: {
+        ...presets.braille,
+        glue: '|',
+      },
+      formatters: {
+        bar: str => {
+          const [done, left] = str.split('|');
+          return chalk.yellowBright(done) + chalk.yellow(left);
+        },
+      },
+    }),
+  );
+  progresses.push(progress);
 }
 
 bar.start();
