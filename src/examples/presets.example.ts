@@ -1,6 +1,7 @@
 import { Bar, BarItem, presets, Progress } from '../';
 import * as chalk from 'chalk';
 import { TextBarItem } from './text-bar-item';
+import { loopProgresses } from './helpers';
 
 const bar = new Bar();
 const progress = new Progress({ total: 100 });
@@ -48,11 +49,4 @@ bar.start();
 
 const progresses = [progress, redProgress, blueProgress];
 
-progresses.forEach(progress => {
-  const interval = setInterval(() => {
-    progress.increment();
-    if (progress.getProgress() >= 1) {
-      clearInterval(interval);
-    }
-  }, 100);
-});
+loopProgresses(progresses);

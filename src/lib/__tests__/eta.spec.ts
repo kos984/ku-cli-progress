@@ -10,11 +10,11 @@ describe('Eta', () => {
   });
 
   it('should initialize correctly', () => {
-    expect(eta.getSpeed()).toEqual(NaN);
-    expect(eta.getDurationMs()).toBe(0);
-    expect(eta.getEtaS()).toBe(NaN);
+    expect(eta.getSpeed()).toEqual(0);
+    expect(eta.getDurationMs()).toEqual(expect.any(Number));
+    expect(eta.getEtaS()).toBe(Infinity);
     eta.update(1, 100);
-    expect(eta.getEtaS()).toBe(NaN);
+    expect(eta.getEtaS()).toBe(Infinity);
   });
 
   it('should update speed, eta and duration correctly', () => {
@@ -32,8 +32,8 @@ describe('Eta', () => {
     eta.set(10);
     const started = eta.started;
     getTimeSpy.mockReturnValue(started);
-    expect(eta.getSpeed()).toBe(NaN);
-    expect(eta.getEtaS()).toBe(NaN);
+    expect(eta.getSpeed()).toBe(0);
+    expect(eta.getEtaS()).toBe(Infinity);
     expect(eta.getDurationMs(0));
 
     getTimeSpy.mockReturnValue(started + 1000);
@@ -55,8 +55,12 @@ describe('Eta', () => {
     it('init', () => {
       getTimeSpy.forEach(spy => spy.mockReturnValue(0));
       etas.forEach(eta => eta.set(0));
-      expect(etas.map(eta => eta.getSpeed())).toEqual([NaN, NaN, NaN]);
-      expect(etas.map(eta => eta.getEtaS())).toEqual([NaN, NaN, NaN]);
+      expect(etas.map(eta => eta.getSpeed())).toEqual([0, 0, 0]);
+      expect(etas.map(eta => eta.getEtaS())).toEqual([
+        Infinity,
+        Infinity,
+        Infinity,
+      ]);
       expect(etas.map(eta => eta.getDurationMs())).toEqual([0, 0, 0]);
     });
 
@@ -163,18 +167,18 @@ describe('Eta', () => {
     it('should update duration if value incremented', () => {
       eta.update(110, 100);
       expect(eta.getDurationMs()).toBe(11000);
-      expect(eta.getSpeed()).toBe(NaN);
-      expect(eta.getEtaS()).toBe(NaN);
+      expect(eta.getSpeed()).toBe(0);
+      expect(eta.getEtaS()).toBe(0);
     });
 
-    it('should return NaN for speed', () => {
+    it('should return 0 for speed', () => {
       eta.update(110, 100);
-      expect(eta.getSpeed()).toBe(NaN);
+      expect(eta.getSpeed()).toBe(0);
     });
 
-    it('should return NaN for eta if total > count', () => {
+    it('should return 0 for eta if total > count', () => {
       eta.update(110, 100);
-      expect(eta.getSpeed()).toBe(NaN);
+      expect(eta.getSpeed()).toBe(0);
     });
   });
 });

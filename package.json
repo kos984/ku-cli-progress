@@ -1,6 +1,6 @@
 {
   "name": "ku-progress-bar",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "description": "cli progress bar",
   "main": "dist/index.js",
   "homepage": "https://github.com/kos984/ku-cli-progress",
@@ -9,6 +9,8 @@
     "url": "git+https://github.com/kos984/ku-cli-progress.git"
   },
   "keywords": [
+    "progress-bar",
+    "progress bar",
     "bar",
     "progress",
     "progressbar",

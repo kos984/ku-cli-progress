@@ -1,4 +1,5 @@
 import { Bar, BarItem, Progress } from '../';
+import { loopProgresses } from './helpers';
 
 const bar = new Bar();
 const progress = new Progress({ total: 100 }, { task: 'users creating...' });
@@ -25,10 +26,5 @@ bar.add(
 );
 progress.increment(1, { task: 'permission granting...' });
 
-const interval = setInterval(() => {
-  if (progress.getProgress() >= 1) {
-    clearInterval(interval);
-  }
-  progress.increment();
-}, 50);
 bar.start();
+loopProgresses([progress], () => 50);

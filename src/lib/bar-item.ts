@@ -22,6 +22,13 @@ export interface IParams {
   dataProviders?: IDataProviders;
 }
 
+interface IProgressInfo {
+  size: number;
+  delta: number;
+  progress: IProgress;
+  index: number;
+}
+
 export class BarItem implements IBarItem {
   protected template!: string;
   protected tagDelimiter!: string;
@@ -42,21 +49,7 @@ export class BarItem implements IBarItem {
       params?.template ?? this.getDefaultTemplate(this.progresses);
     this.options = { ...this.options, ...params?.options };
     this.formatters = params?.formatters ?? {};
-    const formatNumber = (num: number, suffix: string): string =>
-      Number.isNaN(num) ? NaN.toString() : num + suffix;
-    this.dataProviders = {
-      bars: (progress, progresses) => this.renderBars(progresses),
-      bar: progress => this.bar(progress.getProgress(), progress),
-      speed: progress =>
-        formatNumber(Math.round(progress.getEta().getSpeed()), '/s'),
-      eta: progress => formatNumber(progress.getEta().getEtaS(), 's'),
-      value: progress => progress.getValue().toString(),
-      total: progress => progress.getTotal().toString(),
-      percentage: progress => Math.round(progress.getProgress() * 100) + '%',
-      duration: progress =>
-        Math.round(progress.getEta().getDurationMs() / 1000) + 's',
-      ...params?.dataProviders,
-    };
+    this.dataProviders = this.getDataProviders(params?.dataProviders);
   }
 
   public getProgresses(): IProgress[] {
@@ -134,30 +127,49 @@ export class BarItem implements IBarItem {
     return formatter ? formatter(line, params.progress, this.progresses) : line;
   }
 
+  private calculateProgressInfo(
+    progress: IProgress,
+    width,
+    index,
+  ): IProgressInfo {
+    const done = progress.getProgress() * width;
+    return {
+      size: Math.round(done),
+      delta: done - Math.floor(done),
+      progress,
+      index,
+    };
+  }
+
+  private isExtraCharRequired(
+    progresses: IProgress[],
+    index,
+    current: IProgressInfo,
+  ): boolean {
+    return (
+      index === progresses.length - 1 &&
+      this.options.completeChars?.length &&
+      this.progresses.length > 1 &&
+      current.size < current.progress.getProgress() * this.options.width
+    );
+  }
+
   // eslint-disable-next-line max-lines-per-function
   protected renderBars(progresses: IProgress[]): string {
     const { resumeChar, width, glue } = this.options;
     const lines = [];
-
     const leftLength = progresses
-      .map((progress, index) => {
-        const done = progress.getProgress() * width;
-        return {
-          size: Math.round(done),
-          delta: done - Math.floor(done),
-          progress,
-          index,
-        };
-      })
+      .map((progress, index) =>
+        this.calculateProgressInfo(progress, width, index),
+      )
       .sort((a, b) => Math.sign(a.size - b.size))
       .reduce(
         (prev, current, index) => {
-          const extraChar =
-            index === progresses.length - 1 &&
-            this.options.completeChars?.length &&
-            this.progresses.length > 1 &&
-            current.size < current.progress.getProgress() * this.options.width;
-
+          const extraChar = this.isExtraCharRequired(
+            progresses,
+            index,
+            current,
+          );
           const length = current.size - prev.size;
           if (length > 0) {
             lines.push(
@@ -224,4 +236,43 @@ export class BarItem implements IBarItem {
     if (value === null) return value;
     return value;
   };
+
+  // eslint-disable-next-line max-lines-per-function
+  protected getDataProviders(dataProviders?: IDataProviders) {
+    const formatNumber = (num: number, suffix: string): string => {
+      if (!Number.isFinite(num)) return '\u221E';
+      return num + suffix;
+    };
+    const formatEtaHumanReadable = (num: number): string => {
+      if (!Number.isFinite(num)) return '\u221E';
+      return [
+        { period: 3600 * 24, name: 'd' },
+        { period: 3600, name: 'h' },
+        { period: 60, name: 'm' },
+        { period: 1, name: 's' },
+      ].reduce(
+        ({ n, str }, { period, name }) => {
+          return n > period
+            ? { n: n % period, str: str + Math.floor(n / period) + name }
+            : { n, str };
+        },
+        { n: num, str: '' },
+      ).str;
+    };
+    return {
+      bars: (progress, progresses) => this.renderBars(progresses),
+      bar: progress => this.bar(progress.getProgress(), progress),
+      speed: progress =>
+        formatNumber(Math.round(progress.getEta().getSpeed()), '/s'),
+      eta: progress => formatNumber(progress.getEta().getEtaS(), 's'),
+      etaHumanReadable: progress =>
+        formatEtaHumanReadable(progress.getEta().getEtaS()),
+      value: progress => progress.getValue().toString(),
+      total: progress => progress.getTotal().toString(),
+      percentage: progress => Math.round(progress.getProgress() * 100) + '%',
+      duration: progress =>
+        Math.round(progress.getEta().getDurationMs() / 1000) + 's',
+      ...dataProviders,
+    };
+  }
 }

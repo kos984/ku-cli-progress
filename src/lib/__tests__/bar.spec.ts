@@ -27,7 +27,7 @@ describe('Bar', () => {
     bar.stop();
     expect(mockTerminal.write.mock.calls).toEqual([
       [
-        '[----------------------------------------] 0% ETA: NaN speed: NaN duration: 0s 0/100\n',
+        '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n',
       ],
     ]);
   });
@@ -42,10 +42,10 @@ describe('Bar', () => {
     bar.stop();
     expect(mockTerminal.write.mock.calls).toEqual([
       [
-        '[----------------------------------------] 0% ETA: NaN speed: NaN duration: 0s 0/100\n',
+        '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n',
       ],
       [
-        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n',
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
       ],
     ]);
   });
@@ -62,15 +62,15 @@ describe('Bar', () => {
     bar.stop();
     expect(mockTerminal.write.mock.calls).toEqual([
       [
-        '[----------------------------------------] 0% ETA: NaN speed: NaN duration: 0s 0/100\n' +
-          '[==========------------------------------] 25% ETA: NaN speed: NaN duration: 0s 50/200\n',
+        '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n' +
+          '[==========------------------------------] 25% ETA: ∞ speed: 0/s duration: 0s 50/200\n',
       ],
       [
-        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n' +
-          '[==========------------------------------] 25% ETA: NaN speed: NaN duration: 0s 50/200\n',
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n' +
+          '[==========------------------------------] 25% ETA: ∞ speed: 0/s duration: 0s 50/200\n',
       ],
       [
-        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n',
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
       ],
     ]);
   });
@@ -90,15 +90,15 @@ describe('Bar', () => {
     bar.stop();
     expect(mockTerminal.write.mock.calls).toEqual([
       [
-        '[----------------------------------------] 0% ETA: NaN speed: NaN duration: 0s 0/100\n' +
-          '[==========------------------------------] 25% ETA: NaN speed: NaN duration: 0s 50/200\n',
+        '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n' +
+          '[==========------------------------------] 25% ETA: ∞ speed: 0/s duration: 0s 50/200\n',
       ],
       [
-        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n' +
-          '[==========------------------------------] 25% ETA: NaN speed: NaN duration: 0s 50/200\n',
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n' +
+          '[==========------------------------------] 25% ETA: ∞ speed: 0/s duration: 0s 50/200\n',
       ],
       [
-        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n',
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
       ],
     ]);
   });
@@ -116,14 +116,14 @@ describe('Bar', () => {
     bar.stop();
     expect(mockTerminal.write.mock.calls).toEqual([
       [
-        '[----------------------------------------] 0% ETA: NaN speed: NaN duration: 0s 0/100\n',
+        '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n',
       ],
       [
-        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n',
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
       ],
       [
-        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n' +
-          '[==========------------------------------] 26% ETA: NaN speed: NaN duration: 0s 51/200\n',
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n' +
+          '[==========------------------------------] 26% ETA: ∞ speed: 0/s duration: 0s 51/200\n',
       ],
     ]);
   });
@@ -139,10 +139,10 @@ describe('Bar', () => {
     bar.stop();
     expect(mockTerminal.write.mock.calls).toEqual([
       [
-        '[----------------------------------------] 0% ETA: NaN speed: NaN duration: 0s 0/100\n',
+        '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n',
       ],
       [
-        '[----------------------------------------] 1% ETA: NaN speed: NaN duration: 0s 1/100\n',
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
       ],
       ['some log'],
     ]);
@@ -158,10 +158,10 @@ describe('Bar', () => {
     bar.stop();
     expect(mockTerminal.write.mock.calls).toEqual([
       [
-        '[----------------------------------------] 0% ETA: NaN speed: NaN duration: 0s 0/100\n',
+        '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n',
       ],
       [
-        '[=---------------------------------------] 3% ETA: NaN speed: NaN duration: 0s 3/100\n',
+        '[=---------------------------------------] 3% ETA: ∞ speed: 0/s duration: 0s 3/100\n',
       ],
     ]);
   });

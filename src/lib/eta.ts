@@ -44,10 +44,10 @@ export class Eta implements IEta {
   }
 
   public set(count: number): IEta {
-    this.left = 0;
+    this.left = Infinity;
     const time = this.getTime();
     this.speedMoment = [];
-    this.speed = NaN;
+    this.speed = 0;
     this.duration = 0;
     this.last = { count, time };
     this.started = time;
@@ -69,13 +69,13 @@ export class Eta implements IEta {
   }
 
   public getEtaS(): number {
-    if (this.left <= 0) return NaN;
+    if (this.left <= 0) return 0;
     this.updateEta();
     return this.eta;
   }
 
   public getSpeed(): number {
-    if (this.left <= 0) return NaN;
+    if (this.left <= 0) return 0;
     return this.speed;
   }
 
@@ -87,7 +87,7 @@ export class Eta implements IEta {
   protected updateEta() {
     const speed = this.getSpeed();
     if (Number.isNaN(speed) || speed === 0) {
-      this.eta = NaN;
+      this.eta = Infinity;
     }
     this.eta = Math.round(this.left / speed);
   }
@@ -108,7 +108,7 @@ export class Eta implements IEta {
       count += k;
     });
     const speed = sum / count;
-    const prevSpeed = Number.isNaN(this.speed) ? 0 : this.speed;
+    const prevSpeed = this.speed;
     const k = speed / prevSpeed;
     const debounce = this.params.debounce;
     if ((k > 1 && k - 1 > debounce) || 1 - k > debounce) {
