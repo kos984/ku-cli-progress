@@ -17,7 +17,7 @@ bar.renderBars();
 
 ```console
 ✗ ts-node ./src/examples/simple-start.ts
-[============----------------------------] 30% ETA: NaN speed: NaN duration: 0s 300/1000
+[============----------------------------] 30% ETA: 71s speed: 10/s duration: 30s 300/1000
 ```
 
 ## Presets
@@ -111,6 +111,7 @@ Let's review some key placeholders you can use in the template:
 -   `{bar}`: Placeholder for inserting the progress bar.
 -   `{percentage}`:  Placeholder for inserting the progress percentage.
 -   `{eta}`: Placeholder for inserting the estimated time of arrival (ETA).
+-   `{etaHumanReadable}`: Placeholder for inserting the estimated time (ETA). (`2h47m30s`)
 -   `{speed}`:   Placeholder for inserting the progress speed.
 -   `{value}`: Placeholder for inserting the current value.
 -   `{total}`: Placeholder for inserting the total value.
@@ -208,7 +209,28 @@ const options: IBarOptions = {
 ```
 
 # Using tags
--   TBD
+
+It is possible use tags in templates and formatters
+
+```typescript
+const progress = new Progress({ total: 100 });
+progresses.push(progress);
+bar.add(
+  new BarItem(
+    [progress, new Progress({ total: 100, start: 50, tag: 'red' })],
+    {
+      template:
+        '[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {red:value} {value}/{total}',
+      tagDelimiter: ':',
+      formatters: {
+        'red:bar': str => chalk.red(str),
+        bar: str => chalk.green(str),
+      },
+    },
+  ),
+);
+```
+
 
 # Some random examples
  see src/examples/random.bar.example.ts

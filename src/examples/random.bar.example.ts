@@ -2,6 +2,7 @@
 import { Bar, Progress, BarItem, presets, IProgress } from '../';
 import * as chalk from 'chalk';
 import { TextBarItem } from './text-bar-item';
+import { loopProgresses } from './helpers';
 
 const progresses: IProgress[] = [];
 const bar = new Bar();
@@ -25,9 +26,10 @@ const bar = new Bar();
       {
         // override default template
         template:
-          '[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {red_value} {value}/{total}',
+          '[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {red:value} {value}/{total}',
+        tagDelimiter: ':',
         formatters: {
-          red_bar: str => chalk.red(str),
+          'red:bar': str => chalk.red(str),
           bar: str => chalk.green(str),
         },
       },
@@ -334,15 +336,4 @@ function* rotate(
 
 bar.start();
 
-const interval = setInterval(() => {
-  let update = false;
-  progresses.forEach(process => {
-    if (process.getProgress() < 1) {
-      process.increment(1);
-      update = true;
-    }
-  });
-  if (update === false) {
-    clearInterval(interval);
-  }
-}, 300);
+loopProgresses(progresses, () => 300);

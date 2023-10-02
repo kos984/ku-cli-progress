@@ -1,4 +1,4 @@
-import { BarItem, presets, Progress } from '../../';
+import { BarItem, Eta, presets, Progress } from '../../';
 import { IEta } from '../interfaces/eta.interface';
 import * as chalk from 'chalk';
 
@@ -82,7 +82,7 @@ describe('Progress Bar Lib', () => {
 
       const barItem = new BarItem([progress1, progress2, progress3]);
       expect(barItem.render()).toEqual(
-        '[============================------------] 30%/0%/70% ETA: NaN/NaN/NaN speed: NaN/NaN/NaN duration: 0s/0s/0s 30/100 0/100 70/100',
+        '[============================------------] 30%/0%/70% ETA: ∞/∞/∞ speed: 0/s/0/s/0/s duration: 0s/0s/0s 30/100 0/100 70/100',
       );
     });
 
@@ -104,7 +104,7 @@ describe('Progress Bar Lib', () => {
         },
       });
       expect(barItem.render()).toEqual(
-        '[############++++++++++++++++------------] 30%/0%/70% ETA: NaN/NaN/NaN speed: NaN/NaN/NaN duration: 0s/0s/0s 30/100 0/100 70/100',
+        '[############++++++++++++++++------------] 30%/0%/70% ETA: ∞/∞/∞ speed: 0/s/0/s/0/s duration: 0s/0s/0s 30/100 0/100 70/100',
       );
     });
 
@@ -126,7 +126,7 @@ describe('Progress Bar Lib', () => {
         },
       });
       expect(barItem.render()).toEqual(
-        '[############================------------] NaN/NaN/{speed}',
+        '[############================------------] 0/s/0/s/{speed}',
       );
     });
     it('tags', () => {
@@ -270,6 +270,28 @@ describe('Progress Bar Lib', () => {
         '[yellow⣿⣷clearYellowblue⣿⣿⣿⣷clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
         '[yellow⣿⣿clearYellowblue⣿⣿⣿⣿clearBlue⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀]',
       ]);
+    });
+    it('human readable eta', () => {
+      const eta = new Eta();
+      const getEtaS = jest.spyOn(eta, 'getEtaS');
+      getEtaS.mockReturnValue(1e1 as never);
+      const progress = new Progress({ total: 1e6, eta });
+      const barItem = new BarItem(progress, {
+        template: '{eta} {etaHumanReadable}',
+      });
+      expect(barItem.render()).toEqual('10s 10s');
+      getEtaS.mockReturnValue(1e2 as never);
+      expect(barItem.render()).toEqual('100s 1m40s');
+      getEtaS.mockReturnValue(1e3 as never);
+      expect(barItem.render()).toEqual('1000s 16m40s');
+      getEtaS.mockReturnValue(1e4 as never);
+      expect(barItem.render()).toEqual('10000s 2h46m40s');
+      getEtaS.mockReturnValue(1e5 as never);
+      expect(barItem.render()).toEqual('100000s 1d3h46m40s');
+      getEtaS.mockReturnValue(1e6 as never);
+      expect(barItem.render()).toEqual('1000000s 11d13h46m40s');
+      getEtaS.mockReturnValue(NaN as never);
+      expect(barItem.render()).toEqual('∞ ∞');
     });
   });
 });

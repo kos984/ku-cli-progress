@@ -1,5 +1,6 @@
 import { Bar, BarItem, presets, Progress } from '../';
 import * as chalk from 'chalk';
+import { loopProgresses } from './helpers';
 
 const bar = new Bar().start();
 const progresses = [
@@ -19,18 +20,4 @@ bar.add(
   }),
 );
 
-progresses.forEach(progress => {
-  const next = () => {
-    setTimeout(
-      () => {
-        progress.increment();
-        if (progress.getProgress() >= 1) {
-          return;
-        }
-        next();
-      },
-      Math.round(Math.random() * 10),
-    );
-  };
-  next();
-});
+loopProgresses(progresses, () => Math.random() * 10);
