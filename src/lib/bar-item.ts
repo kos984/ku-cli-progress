@@ -1,36 +1,79 @@
 import { IBarOptions } from './interfaces/bar-options.interface';
 import { IProgress } from './interfaces/progress.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
+import { BarDataProvider } from './data-providers/bar/bar.data-provider';
+import { BarDataResult } from './data-providers/bar/bar.data-result';
 
-export interface IFormatters {
-  [key: string]: (
-    str: string,
+export interface IBarFormatter {
+  (
+    str: BarDataResult,
     progress: IProgress,
     progresses: IProgress[],
-  ) => string;
+  ): BarDataResult | string;
+}
+
+export interface IFormatter {
+  (str: string, progress: IProgress, progresses: IProgress[]): string;
+}
+
+export interface IObjectFormatter<IFormatter> {
+  formatter: IFormatter;
+}
+
+export interface IFormatters {
+  bars: IBarFormatter | IObjectFormatter<IBarFormatter>;
+  bar: IBarFormatter | IObjectFormatter<IBarFormatter>;
+  speed: IFormatter | IObjectFormatter<IFormatter>;
+  eta: IFormatter | IObjectFormatter<IFormatter>;
+  etaHumanReadable: IFormatter | IObjectFormatter<IFormatter>;
+  value: IFormatter | IObjectFormatter<IFormatter>;
+  total: IFormatter | IObjectFormatter<IFormatter>;
+  percentage: IFormatter | IObjectFormatter<IFormatter>;
+  duration: IFormatter | IObjectFormatter<IFormatter>;
+}
+
+export interface IDataProvider<IResult> {
+  (progress: IProgress, progresses: IProgress[]): IResult;
 }
 
 export interface IDataProviders {
-  [key: string]: (progress: IProgress, progresses: IProgress[]) => string;
+  // [key: string]: (progress: IProgress, progresses: IProgress[]) => string;
+  bars: IDataProvider<BarDataResult>;
+  bar: IDataProvider<BarDataResult>;
+  speed: IDataProvider<string>;
+  eta: IDataProvider<string>;
+  etaHumanReadable: IDataProvider<string>;
+  value: IDataProvider<string>;
+  total: IDataProvider<string>;
+  percentage: IDataProvider<string>;
+  duration: IDataProvider<string>;
 }
 
-export interface IParams {
+export interface IParams<ICustomFormatters, ICustomDataProvider> {
   tagDelimiter?: string;
-  template?: string;
+  template?: ITemplate<ICustomDataProvider>;
   options?: Partial<IBarOptions>;
-  formatters?: IFormatters;
-  dataProviders?: IDataProviders;
+  formatters?: Partial<IFormatters & ICustomFormatters>;
+  dataProviders?: Partial<IDataProviders & ICustomDataProvider>;
 }
 
-interface IProgressInfo {
-  size: number;
-  delta: number;
-  progress: IProgress;
-  index: number;
-}
+type IData<T> = {
+  [K in keyof T]: string;
+} & {
+  [K in keyof IDataProviders]: string;
+};
 
-export class BarItem implements IBarItem {
-  protected template!: string;
+export interface IFunctionTemplate<ICustomDataProvider> {
+  (dataProviders: IData<ICustomDataProvider>): string;
+}
+export type ITemplate<ICustomDataProvider> =
+  | string
+  | IFunctionTemplate<ICustomDataProvider>;
+
+export class BarItem<ICustomFormatters = never, ICustomDataProvider = never>
+  implements IBarItem
+{
+  protected template!: ITemplate<ICustomDataProvider>;
   protected tagDelimiter!: string;
   protected options: IBarOptions = {
     completeChar: '=',
@@ -38,17 +81,20 @@ export class BarItem implements IBarItem {
     width: 40,
     glue: '',
   };
-  protected formatters!: IFormatters;
-  protected dataProviders!: IDataProviders;
+  protected formatters!: Partial<IFormatters & ICustomFormatters>;
+  protected dataProviders!: IDataProviders & ICustomDataProvider;
   protected progresses: IProgress[];
 
-  public constructor(progresses: IProgress | IProgress[], params?: IParams) {
+  public constructor(
+    progresses: IProgress | IProgress[],
+    params?: IParams<ICustomFormatters, ICustomDataProvider>,
+  ) {
     this.progresses = Array.isArray(progresses) ? progresses : [progresses];
     this.tagDelimiter = params?.tagDelimiter ?? '_';
     this.template =
       params?.template ?? this.getDefaultTemplate(this.progresses);
     this.options = { ...this.options, ...params?.options };
-    this.formatters = params?.formatters ?? {};
+    this.formatters = params?.formatters ?? ({} as never);
     this.dataProviders = this.getDataProviders(params?.dataProviders);
   }
 
@@ -58,23 +104,60 @@ export class BarItem implements IBarItem {
 
   public render(): string {
     const next = this.getCounterByProperty(this.progresses.length);
+    if (typeof this.template !== 'string') {
+      const handler = this.proxyHandler;
+      const data = new Proxy(
+        {},
+        {
+          get(target, prop) {
+            return handler(prop as string, next);
+          },
+        },
+      );
+      return this.template(data as IData<ICustomDataProvider>);
+    }
     return this.template.replace(/{([^{}]+)}/g, (match, prop) => {
       const [property, tag] = prop.split(this.tagDelimiter).reverse();
       const index = tag
         ? this.progresses.findIndex(p => p.getTag() === tag)
         : next(property);
       if (index < 0) return match;
-      const progress = this.progresses[index];
-      const value = this.getDataValue(property, progress);
-      if (value === null) {
-        return match;
-      }
-      if (this.formatters[prop]) {
-        return this.formatters[prop](value, progress, this.progresses);
-      }
-      return value;
+      return this.getValue(property, index);
     });
   }
+
+  protected proxyHandler = (property: string, next) => {
+    if (!(property in this.dataProviders)) {
+      throw new Error(`unknown data provider: ${property}`);
+    }
+    const getValue = this.getValue;
+    const progresses = this.progresses; // FIXME: think about it
+    return new Proxy(
+      { key: property },
+      {
+        get(target, prop) {
+          let index = 0;
+          // toString
+          if (prop === Symbol.toPrimitive) {
+            return hint =>
+              hint === 'string'
+                ? getValue(property, next(target.key)).toString()
+                : null;
+          }
+          if (typeof prop === 'string') {
+            index = Number.parseInt(prop as string, 10);
+            if (Number.isFinite(index)) {
+              return getValue(property, index);
+            } else {
+              index = progresses.findIndex(p => p.getTag() === prop);
+            }
+          }
+          if (index < 0) return property;
+          return getValue(property, index);
+        },
+      },
+    );
+  };
 
   protected getCounterByProperty(max) {
     const map = new Map();
@@ -103,128 +186,20 @@ export class BarItem implements IBarItem {
     return '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}';
   }
 
-  protected bar(donePercent: number, progress: IProgress): string {
-    const done = donePercent * this.options.width;
-    const parts = this.getBarParts({
-      size: Math.round(done),
-      delta: done - Math.floor(done),
-      progress,
-      extraChar: true,
-    });
-    return `${parts.done}${this.options.glue}${parts.left}`;
-  }
-
-  protected renderBarsLine(params: {
-    size: number;
-    delta: number;
-    progress: IProgress<object>;
-    extraChar: boolean;
-  }): string {
-    const line = this.getBarParts(params).done;
-    const formatter =
-      this.formatters[`${params.progress.getTag()}${this.tagDelimiter}bar`] ??
-      this.formatters['bar'];
-    return formatter ? formatter(line, params.progress, this.progresses) : line;
-  }
-
-  private calculateProgressInfo(
-    progress: IProgress,
-    width,
-    index,
-  ): IProgressInfo {
-    const done = progress.getProgress() * width;
-    return {
-      size: Math.round(done),
-      delta: done - Math.floor(done),
-      progress,
-      index,
-    };
-  }
-
-  private isExtraCharRequired(
-    progresses: IProgress[],
-    index,
-    current: IProgressInfo,
-  ): boolean {
-    return (
-      index === progresses.length - 1 &&
-      this.options.completeChars?.length &&
-      this.progresses.length > 1 &&
-      current.size < current.progress.getProgress() * this.options.width
-    );
-  }
-
-  // eslint-disable-next-line max-lines-per-function
-  protected renderBars(progresses: IProgress[]): string {
-    const { resumeChar, width, glue } = this.options;
-    const lines = [];
-    const leftLength = progresses
-      .map((progress, index) =>
-        this.calculateProgressInfo(progress, width, index),
-      )
-      .sort((a, b) => Math.sign(a.size - b.size))
-      .reduce(
-        (prev, current, index) => {
-          const extraChar = this.isExtraCharRequired(
-            progresses,
-            index,
-            current,
-          );
-          const length = current.size - prev.size;
-          if (length > 0) {
-            lines.push(
-              this.renderBarsLine({ ...current, extraChar, size: length }),
-            );
-          }
-          return { size: current.size + (extraChar ? 1 : 0) };
-        },
-        { size: 0 },
+  protected getValue = (prop: string, index: number): string => {
+    if (index < 0 || index > this.progresses.length) return prop;
+    const progress = this.progresses[index];
+    const value = this.getDataValue(prop, progress);
+    const formatter = this.formatters[prop];
+    if (formatter) {
+      return (formatter?.formatter || formatter)(
+        value,
+        progress,
+        this.progresses,
       );
-
-    if (width - leftLength.size > 0) {
-      lines.push(resumeChar.repeat(width - leftLength.size));
     }
-    return lines.join(glue);
-  }
-
-  protected getBarParts(params: {
-    size: number;
-    delta: number;
-    extraChar: boolean;
-    progress: IProgress;
-  }): { left: string; done: string } {
-    const { size } = params;
-    if (!this.options.completeChars?.length) {
-      return {
-        done: this.options.completeChar.repeat(size),
-        left: this.options.resumeChar.repeat(this.options.width - size),
-      };
-    }
-    return this.getBarPartsWithCompleteChars(params);
-  }
-
-  protected getBarPartsWithCompleteChars(params: {
-    size: number;
-    delta: number;
-    extraChar: boolean;
-    progress: IProgress;
-  }): { left: string; done: string } {
-    const { size, delta, extraChar } = params;
-    // for multi bar line, lest handle round case, if delta >= 0.5 then render char
-    const criteria = extraChar ? 0 : 0.5 - 0.001;
-    const maxIndex = this.options.completeChars.length - 1;
-    const completeChar =
-      delta > criteria
-        ? this.options.completeChars[Math.round(delta * maxIndex)]
-        : '';
-    const repeatSize = size ? size - Math.round(delta) : size;
-    return {
-      done: this.options.completeChar.repeat(repeatSize) + completeChar,
-      left: this.options.resumeChar.repeat(
-        this.options.width - repeatSize - (completeChar ? 1 : 0),
-      ),
-    };
-  }
+    return value;
+  };
 
   protected getDataValue = (key: string, item: IProgress): string | null => {
     const payload = item.getPayload();
@@ -238,7 +213,9 @@ export class BarItem implements IBarItem {
   };
 
   // eslint-disable-next-line max-lines-per-function
-  protected getDataProviders(dataProviders?: IDataProviders) {
+  protected getDataProviders(
+    dataProviders?: Partial<IDataProviders>,
+  ): IDataProviders & ICustomDataProvider {
     const formatNumber = (num: number, suffix: string): string => {
       if (!Number.isFinite(num)) return '\u221E';
       return num + suffix;
@@ -260,8 +237,7 @@ export class BarItem implements IBarItem {
       ).str;
     };
     return {
-      bars: (progress, progresses) => this.renderBars(progresses),
-      bar: progress => this.bar(progress.getProgress(), progress),
+      ...new BarDataProvider(this.options).getProviders(),
       speed: progress =>
         formatNumber(Math.round(progress.getEta().getSpeed()), '/s'),
       eta: progress => formatNumber(progress.getEta().getEtaS(), 's'),
@@ -273,6 +249,6 @@ export class BarItem implements IBarItem {
       duration: progress =>
         Math.round(progress.getEta().getDurationMs() / 1000) + 's',
       ...dataProviders,
-    };
+    } as IDataProviders & ICustomDataProvider;
   }
 }

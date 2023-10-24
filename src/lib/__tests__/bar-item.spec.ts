@@ -1,6 +1,8 @@
 import { BarItem, Eta, presets, Progress } from '../../';
 import { IEta } from '../interfaces/eta.interface';
 import * as chalk from 'chalk';
+import { BarsFormatter } from '../formaters/bars-formatter';
+import { BarDataResult } from '../data-providers/bar/bar.data-provider';
 
 describe('Progress Bar Lib', () => {
   it('should construct with progress or array of progresses', () => {
@@ -93,13 +95,20 @@ describe('Progress Bar Lib', () => {
 
       progress1.increment(30);
       progress3.increment(70);
+      const progresses = [progress1, progress2, progress3];
 
-      const barItem = new BarItem([progress1, progress2, progress3], {
+      const barItem = new BarItem(progresses, {
         formatters: {
+          bars: new BarsFormatter(
+            progresses,
+            ['#', '=', '+'].map(char => {
+              return result => char.repeat(result.toString().length);
+            }),
+          ),
           bar: (str, progress, progresses) => {
             const index = progresses.findIndex(p => p === progress);
             const colors = ['#', '=', '+'];
-            return colors[index].repeat(str.length);
+            return colors[index].repeat(str.toString().length);
           },
         },
       });
