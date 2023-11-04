@@ -1,4 +1,4 @@
-import { Bar, BarItem, presets, Progress } from '../';
+import { Bar, BarItem, BarsFormatter, presets, Progress } from '../';
 import * as chalk from 'chalk';
 import { loopProgresses } from './helpers';
 
@@ -11,11 +11,7 @@ bar.add(
   new BarItem(progresses, {
     options: presets.shades,
     formatters: {
-      bar: (str, progress, progresses) => {
-        const index = progresses.findIndex(p => p === progress);
-        const colors = [chalk.green, chalk.yellowBright];
-        return colors[index](str);
-      },
+      bars: new BarsFormatter([chalk.green, chalk.yellowBright]),
     },
   }),
 );

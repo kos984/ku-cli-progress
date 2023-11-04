@@ -3,6 +3,8 @@ import { IProgress } from './interfaces/progress.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
 import { BarDataProvider } from './data-providers/bar/bar.data-provider';
 import { BarDataResult } from './data-providers/bar/bar.data-result';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface IBarFormatter {
   (
@@ -70,7 +72,7 @@ export type ITemplate<ICustomDataProvider> =
   | string
   | IFunctionTemplate<ICustomDataProvider>;
 
-export class BarItem<ICustomFormatters = never, ICustomDataProvider = never>
+export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
   implements IBarItem
 {
   protected template!: ITemplate<ICustomDataProvider>;
@@ -106,6 +108,7 @@ export class BarItem<ICustomFormatters = never, ICustomDataProvider = never>
     const next = this.getCounterByProperty(this.progresses.length);
     if (typeof this.template !== 'string') {
       const handler = this.proxyHandler;
+      // FIXME: it should be on top
       const data = new Proxy(
         {},
         {
@@ -136,24 +139,14 @@ export class BarItem<ICustomFormatters = never, ICustomDataProvider = never>
       { key: property },
       {
         get(target, prop) {
-          let index = 0;
-          // toString
-          if (prop === Symbol.toPrimitive) {
-            return hint =>
-              hint === 'string'
-                ? getValue(property, next(target.key)).toString()
-                : null;
+          if (typeof ''[prop] === 'function') {
+            return () => getValue(property, next(target.key))[prop]();
           }
-          if (typeof prop === 'string') {
-            index = Number.parseInt(prop as string, 10);
-            if (Number.isFinite(index)) {
-              return getValue(property, index);
-            } else {
-              index = progresses.findIndex(p => p.getTag() === prop);
-            }
-          }
-          if (index < 0) return property;
-          return getValue(property, index);
+          let index = Number.parseInt(prop.toString() as string, 10);
+          index = Number.isFinite(index)
+            ? index
+            : progresses.findIndex(p => p.getTag() === prop);
+          return index < 0 ? target[prop] : getValue(property, index);
         },
       },
     );
@@ -162,11 +155,11 @@ export class BarItem<ICustomFormatters = never, ICustomDataProvider = never>
   protected getCounterByProperty(max) {
     const map = new Map();
     return key => {
-      const index = map.get(key) ?? 0;
-      map.set(key, index + 1);
+      let index = map.get(key) ?? 0;
       if (index >= max) {
-        return -1;
+        index = 0;
       }
+      map.set(key, index + 1);
       return index;
     };
   }

@@ -45,6 +45,11 @@ export class Progress<IPayload extends object = object>
     return this;
   }
 
+  public setTotal(total: number) {
+    this.total = total;
+    return this;
+  }
+
   public on(
     type: 'update',
     listener: (e: IUpdateEvent<IPayload>) => void,
@@ -65,10 +70,10 @@ export class Progress<IPayload extends object = object>
       },
       total: this.total,
     };
-    this.emitter.emit('update', updatePayload);
     this.eta.update(count, this.total);
     this.count = count;
     this.payload = payload ?? this.payload;
+    this.emitter.emit('update', updatePayload);
     return this;
   }
 

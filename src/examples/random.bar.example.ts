@@ -325,17 +325,9 @@ function* rotate(
     new BarItem(progress, {
       options: {
         ...presets.braille,
-        // glue: '|',
       },
       formatters: {
-        bar: new BarsFormatter([progress], [chalk.yellowBright, chalk.yellow])
-          .formatter,
-            /*str => {
-          // FIXME: can be updated
-          const [done, left] = str.toString().split('|');
-          return chalk.yellowBright(done) + chalk.yellow(left);
-        },
-             */
+        bar: new BarsFormatter([chalk.yellowBright, chalk.yellow]),
       },
     }),
   );

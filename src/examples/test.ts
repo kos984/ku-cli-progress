@@ -54,7 +54,17 @@ const barItem2 = new BarItem<
     bars2: providers.getProviders().bars,
   },
   formatters: {
-    bars2: new BarsFormatter([chalk.green, chalk.yellowBright, chalk.blue]),
+    // bars2: new BarsFormatter([chalk.green, chalk.yellowBright, chalk.blue]),
+    bars2: (result, progress, progresses) => {
+      const colors = [chalk.green, chalk.yellowBright, chalk.blue];
+      const a = [...result];
+      a.forEach(
+        (value: { str: string; progress: IProgress }, index) => {
+          value.str = colors[index](value.str);
+        },
+      );
+      return result;
+    },
   },
 });
 bar.add(barItem2);
