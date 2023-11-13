@@ -23,7 +23,7 @@ describe('terminal tty', () => {
     terminal.write('some test');
     expect(mockStream.write).toBeCalled();
   });
-  it('should refresh when screen size updated', () => {
+  it('should reRender when screen size updated', () => {
     const listeners = [];
     mockStream.on.mockImplementation(
       (type: string, handler: (...params) => void) => {

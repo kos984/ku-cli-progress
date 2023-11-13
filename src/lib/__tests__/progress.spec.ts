@@ -117,4 +117,9 @@ describe('progress', () => {
     const progress = new Progress({ total: 100, start: 0, tag: 'RED' });
     expect(progress.getTag()).toBe('RED');
   });
+  it('setTotal', () => {
+    const progress = new Progress({ total: 100, start: 0, tag: 'RED' });
+    progress.setTotal(50);
+    expect(progress.getTotal()).toBe(50);
+  });
 });

@@ -73,11 +73,7 @@ bar.add(
     {
       options: presets.shades,
       formatters: {
-        bar: (str, progress, progresses) => {
-          const index = progresses.findIndex(p => p === progress);
-          const colors = [chalk.green, chalk.yellowBright];
-          return colors[index](str);
-        },
+        bars: new BarsFormatter([chalk.green, chalk.yellowBright]),
       },
     },
   ),
@@ -103,6 +99,32 @@ bar.add(
     -   **`dataProviders`** (`IDataProviders | undefined`): Functions to provide additional data.
 
 ### Template Format:
+
+```js
+// see src/examples/spinner.ts
+bar.add(
+  new BarItem(progress, {
+    template:
+      '[{bar}] {spinner} {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total} (task: {task})',
+    dataProviders: {
+      spinner: () => spinner.next().value,
+    },
+  }),
+);
+// or
+bar.add(
+  new BarItem<never, { spinner: () => string }>(progress, {
+    template: ({ bar, percentage, eta, speed, duration, value, total, spinner}) => {
+      const task = progress.getPayload().task;
+      return `[${bar}] ${spinner} ${percentage} ETA: ${eta} speed: ${speed} duration: ${duration} ${value}/${total} (task: ${task})`;
+    },
+    dataProviders: {
+      spinner: () => spinner.next().value,
+    },
+  }),
+);
+
+```
 
 In the `BarItem` class, the `template` represents a string template that defines how the progress bar will be displayed. In this template, you can use various placeholders that will substitute actual progress values into the resulting string.
 
@@ -231,6 +253,10 @@ bar.add(
 );
 ```
 
+# Spinners example
+[src/examples/spinner.ts](src/examples/spinner.ts)
+
+![spinner-example](docs/images/spinner-example.gif)
 
 # Some random examples
  see src/examples/random.bar.example.ts

@@ -24,6 +24,26 @@ bar.add(
     },
   }),
 );
+bar.add(
+  new BarItem<never, { spinner: () => string }>(progress, {
+    template: ({
+      bar,
+      percentage,
+      eta,
+      speed,
+      duration,
+      value,
+      total,
+      spinner,
+    }) => {
+      const task = progress.getPayload().task;
+      return `[${bar}] ${spinner} ${percentage} ETA: ${eta} speed: ${speed} duration: ${duration} ${value}/${total} (task: ${task})`;
+    },
+    dataProviders: {
+      spinner: () => spinner.next().value,
+    },
+  }),
+);
 progress.increment(1, { task: 'permission granting...' });
 
 bar.start();
