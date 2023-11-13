@@ -32,6 +32,14 @@ describe('Bar', () => {
     ]);
   });
 
+  it('should clear and refresh terminal', async () => {
+    const bar = new Bar(mockTerminal, barOptions);
+    bar.clean();
+    bar.refresh();
+    expect(mockTerminal.clear).toBeCalledTimes(1);
+    expect(mockTerminal.refresh).toBeCalledTimes(1);
+  });
+
   it('bar start with updates', async () => {
     const bar = new Bar(mockTerminal, barOptions);
     const progress = new Progress({ total: 100 });

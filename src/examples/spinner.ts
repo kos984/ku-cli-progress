@@ -16,7 +16,6 @@ const scan = new Progress({ total: 100 });
 const progresses = [progress, scan];
 
 const bar = new Bar();
-const b = bar;
 
 const barItem = new BarItem<
   never,
@@ -27,6 +26,7 @@ const barItem = new BarItem<
   }
 >(progresses, {
   options: presets.rect,
+  // eslint-disable-next-line max-lines-per-function
   template: ({
     bar,
     percentage,
@@ -38,10 +38,7 @@ const barItem = new BarItem<
     eta,
     duration,
   }) => {
-    const val = `number: ${5 * (value as never as number)} ; string ${value.toString()}; + ${JSON.stringify(value)}`;
-    b.logWrap(() => console.log('val', JSON.stringify(val)));
     let processing = '';
-    const p = percentage;
     if (progresses[0].getProgress() >= 1) {
       processing = 'DONE: processing';
     } else if (progresses[0].getProgress() > 0) {
@@ -55,7 +52,7 @@ const barItem = new BarItem<
     return `
       \r Files: ${value[0]} of ${totalString}
       \r Time:        ${duration[0]}, estimated ${eta[0]}
-      \r [${bar[0]}] ${percentage} ${percentage} ${p} ${p} ${percentage}
+      \r [${bar[0]}] ${percentage} ${percentage}
       \r ${scanningString} 
       \r ${processing}
     `;
@@ -94,6 +91,7 @@ scan.on('update', e => {
   }
 });
 progress.on('update', e => {
+  // eslint-disable-next-line no-console
   bar.logWrap(() => console.log('DONE', progress.getPayload().file));
   progress.getPayload().file = progress.getPayload().files[progress.getValue()];
   if (progress.getProgress() >= 1) {

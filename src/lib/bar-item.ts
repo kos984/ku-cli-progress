@@ -87,6 +87,9 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
   protected dataProviders!: IDataProviders & ICustomDataProvider;
   protected progresses: IProgress[];
 
+  protected proxyData: IData<ICustomDataProvider>;
+  protected nextIndexMap = new Map();
+
   public constructor(
     progresses: IProgress | IProgress[],
     params?: IParams<ICustomFormatters, ICustomDataProvider>,
@@ -98,6 +101,7 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
     this.options = { ...this.options, ...params?.options };
     this.formatters = params?.formatters ?? ({} as never);
     this.dataProviders = this.getDataProviders(params?.dataProviders);
+    this.proxyData = this.createDataProxy(this.progresses);
   }
 
   public getProgresses(): IProgress[] {
@@ -105,20 +109,11 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
   }
 
   public render(): string {
-    const next = this.getCounterByProperty(this.progresses.length);
+    this.nextIndexMap.clear();
     if (typeof this.template !== 'string') {
-      const handler = this.proxyHandler;
-      // FIXME: it should be on top
-      const data = new Proxy(
-        {},
-        {
-          get(target, prop) {
-            return handler(prop as string, next);
-          },
-        },
-      );
-      return this.template(data as IData<ICustomDataProvider>);
+      return this.template(this.proxyData);
     }
+    const next = this.getCounterByProperty;
     return this.template.replace(/{([^{}]+)}/g, (match, prop) => {
       const [property, tag] = prop.split(this.tagDelimiter).reverse();
       const index = tag
@@ -129,40 +124,57 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
     });
   }
 
-  protected proxyHandler = (property: string, next) => {
-    if (!(property in this.dataProviders)) {
-      throw new Error(`unknown data provider: ${property}`);
-    }
+  protected createDataProxy(progresses: IProgress[]) {
+    const createPropertyProxy = this.createPropertyProxy;
+    const map = new Map();
+    return new Proxy(this.dataProviders, {
+      get(target, property) {
+        if (typeof property === 'symbol') {
+          return;
+        }
+        if (!map.has(property)) {
+          map.set(property, createPropertyProxy(property, progresses));
+        }
+        return map.get(property);
+      },
+    }) as IData<ICustomDataProvider>;
+  }
+
+  protected createPropertyProxy = (
+    property: string,
+    progresses: IProgress[],
+  ) => {
+    const next = this.getCounterByProperty;
     const getValue = this.getValue;
-    const progresses = this.progresses; // FIXME: think about it
     return new Proxy(
       { key: property },
       {
         get(target, prop) {
+          if (prop === 'toJSON') {
+            return () => `[generated value for: [${target.key}] data provider]`;
+          }
           if (typeof ''[prop] === 'function') {
-            return () => getValue(property, next(target.key))[prop]();
+            return () => getValue(String(property), next(target.key))[prop]();
           }
           let index = Number.parseInt(prop.toString() as string, 10);
           index = Number.isFinite(index)
             ? index
             : progresses.findIndex(p => p.getTag() === prop);
-          return index < 0 ? target[prop] : getValue(property, index);
+          return index < 0 ? target[prop] : getValue(String(property), index);
         },
       },
     );
   };
 
-  protected getCounterByProperty(max) {
-    const map = new Map();
-    return key => {
-      let index = map.get(key) ?? 0;
-      if (index >= max) {
-        index = 0;
-      }
-      map.set(key, index + 1);
-      return index;
-    };
-  }
+  protected getCounterByProperty = (key: string): number => {
+    const map = this.nextIndexMap;
+    let index = map.get(key) ?? 0;
+    if (index >= this.progresses.length) {
+      index = 0;
+    }
+    map.set(key, index + 1);
+    return index;
+  };
 
   protected getDefaultTemplate(progresses) {
     if (progresses.length > 1) {
@@ -180,7 +192,7 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
   }
 
   protected getValue = (prop: string, index: number): string => {
-    if (index < 0 || index > this.progresses.length) return prop;
+    if (index < 0 || index > this.progresses.length) return `{${prop}}`;
     const progress = this.progresses[index];
     const value = this.getDataValue(prop, progress);
     const formatter = this.formatters[prop];
@@ -196,13 +208,11 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
 
   protected getDataValue = (key: string, item: IProgress): string | null => {
     const payload = item.getPayload();
-    let value = payload[key] ?? null;
-    value =
-      value === null && this.dataProviders[key]
-        ? this.dataProviders[key](item, this.progresses)
-        : value;
-    if (value === null) return value;
-    return value;
+    return Object.prototype.hasOwnProperty.call(payload, key)
+      ? payload[key]
+      : Object.prototype.hasOwnProperty.call(this.dataProviders, key)
+      ? this.dataProviders[key](item, this.progresses)
+      : `{${key}}`;
   };
 
   // eslint-disable-next-line max-lines-per-function
@@ -215,19 +225,21 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
     };
     const formatEtaHumanReadable = (num: number): string => {
       if (!Number.isFinite(num)) return '\u221E';
-      return [
-        { period: 3600 * 24, name: 'd' },
-        { period: 3600, name: 'h' },
-        { period: 60, name: 'm' },
-        { period: 1, name: 's' },
-      ].reduce(
-        ({ n, str }, { period, name }) => {
-          return n > period
-            ? { n: n % period, str: str + Math.floor(n / period) + name }
-            : { n, str };
-        },
-        { n: num, str: '' },
-      ).str;
+      return (
+        [
+          { period: 3600 * 24, name: 'd' },
+          { period: 3600, name: 'h' },
+          { period: 60, name: 'm' },
+          { period: 1, name: 's' },
+        ].reduce(
+          ({ n, str }, { period, name }) => {
+            return n > period
+              ? { n: n % period, str: str + Math.floor(n / period) + name }
+              : { n, str };
+          },
+          { n: num, str: '' },
+        ).str || '0s'
+      );
     };
     return {
       ...new BarDataProvider(this.options).getProviders(),

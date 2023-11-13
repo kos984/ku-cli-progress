@@ -1,6 +1,5 @@
 import { BarItem, Eta, presets, Progress } from '../../';
 import { IEta } from '../interfaces/eta.interface';
-import * as chalk from 'chalk';
 import { BarsFormatter } from '../formaters/bars-formatter';
 
 describe('Progress Bar Lib', () => {
@@ -24,6 +23,16 @@ describe('Progress Bar Lib', () => {
       const barItem = new BarItem(progress);
       expect(barItem.render()).toEqual(
         '[----------------------------------------] 0% ETA: 9s speed: 10/s duration: 1s 0/100',
+      );
+    });
+
+    it('should return match if tag not exists', () => {
+      const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
+      const barItem = new BarItem(progress, {
+        template: '[{bar}] {tag1_foo}',
+      });
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] {tag1_foo}',
       );
     });
 
@@ -72,6 +81,119 @@ describe('Progress Bar Lib', () => {
     });
   });
 
+  describe('eta formatEtaHumanReadable', () => {
+    it('should return human readable ETA', () => {
+      const eta = new Eta();
+      const spy = jest.spyOn(eta, 'getEtaS').mockReturnValue(1000000);
+      const progress = new Progress({ total: 100, tag: 'tag', eta });
+      const barItem = new BarItem(progress, {
+        template: ({ bar, etaHumanReadable }) =>
+          `[${bar['tag']}] ${etaHumanReadable}`,
+      });
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] 11d13h46m40s',
+      );
+    });
+    it('should return human readable ETA 0s', () => {
+      const eta = new Eta();
+      const spy = jest.spyOn(eta, 'getEtaS').mockReturnValue(0);
+      const progress = new Progress({ total: 100, tag: 'tag', eta });
+      const barItem = new BarItem(progress, {
+        template: ({ bar, etaHumanReadable }) =>
+          `[${bar['tag']}] ${etaHumanReadable}`,
+      });
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] 0s',
+      );
+    });
+  });
+
+  describe('template function', () => {
+    it('should return match if tag not exists', () => {
+      const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
+      const barItem = new BarItem(progress, {
+        template: ({ bar, foo }) =>
+          `[${bar['tag']}] ${foo['wrong_tag']}`,
+      });
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] undefined',
+      );
+    });
+    it('should return match if tag exists', () => {
+      const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
+      const barItem = new BarItem(progress, {
+        template: ({ bar, foo }) =>
+          `[${bar['tag']}] ${foo['tag']}`,
+      });
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] bar',
+      );
+    });
+    it('should return match by index', () => {
+      const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
+      const barItem = new BarItem(progress, {
+        template: ({ bar, foo }) =>
+          `[${bar['tag']}] ${foo[0]}`,
+      });
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] bar',
+      );
+    });
+    it('should return match by index', () => {
+      const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
+      const barItem = new BarItem(progress, {
+        template: ({ bar, foo }) => `[${bar['tag']}] ${foo[100]}`,
+      });
+      expect(barItem.render()).toEqual(
+        '[----------------------------------------] {foo}',
+      );
+    });
+    it('should support function template', () => {
+      const progress1 = new Progress({ total: 100 });
+      const progress2 = new Progress({ total: 100 });
+      const progress3 = new Progress({ total: 100 });
+
+      progress1.increment(30);
+      progress3.increment(70);
+
+      const barItem = new BarItem([progress1, progress2, progress3], {
+        template: ({ bar, value, total, eta }) => {
+          const etaString = JSON.stringify(eta);
+          return `
+            [${bar}] ${value}/${total} eta: ${etaString}
+            [${bar}] ${value}/${total} eta: ${etaString}
+            [${bar}] ${value}/${total} eta: ${etaString}
+            [${bar}] ${value}/${total} eta: ${etaString} // again first
+          `.trim();
+        },
+      });
+      expect(barItem.render()).toEqual(
+        `
+            [============----------------------------] 30/100 eta: "[generated value for: [eta] data provider]"
+            [----------------------------------------] 0/100 eta: "[generated value for: [eta] data provider]"
+            [============================------------] 70/100 eta: "[generated value for: [eta] data provider]"
+            [============----------------------------] 30/100 eta: "[generated value for: [eta] data provider]" // again first
+        `.trim(),
+      );
+    });
+    it('should throw error if data provider not exists', () => {
+      const progress = new Progress({ total: 100 });
+
+      const symbol = Symbol('mock for system symbols');
+      const barItem = new BarItem([progress], {
+        dataProviders: { [symbol as any]: () => 'test' },
+        template: data => {
+          expect(data[symbol as any]).toBeUndefined();
+          return `${(data as any).notExistsProperty}`.trim();
+        },
+      });
+      expect(barItem.render()).toEqual('{notExistsProperty}');
+      expect(() => barItem.render()).not.toThrowError(
+        'unknown data provider: notExistsProperty',
+      );
+    });
+  });
+
   describe('multicolor bar', () => {
     it('simple render', () => {
       const progress1 = new Progress({ total: 100 });
@@ -99,15 +221,8 @@ describe('Progress Bar Lib', () => {
       const barItem = new BarItem(progresses, {
         formatters: {
           bars: new BarsFormatter(
-            ['#', '=', '+'].map(char => {
-              return result => char.repeat(result.toString().length);
-            }),
+            ['#', '=', '+'].map(char => str => char.repeat(str.length)),
           ),
-          bar: (str, progress, progresses) => {
-            const index = progresses.findIndex(p => p === progress);
-            const colors = ['#', '=', '+'];
-            return colors[index].repeat(str.toString().length);
-          },
         },
       });
       expect(barItem.render()).toEqual(
@@ -115,7 +230,7 @@ describe('Progress Bar Lib', () => {
       );
     });
 
-    it('should not replace property if process not found', () => {
+    it('should replace property from the beginning', () => {
       const progress1 = new Progress({ total: 100 });
       const progress2 = new Progress({ total: 100 });
 
@@ -125,15 +240,13 @@ describe('Progress Bar Lib', () => {
       const barItem = new BarItem([progress1, progress2], {
         template: '[{bars}] {speed}/{speed}/{speed}',
         formatters: {
-          bar: (str, progress, progresses) => {
-            const index = progresses.findIndex(p => p === progress);
-            const colors = ['#', '=', '+'];
-            return ''; // colors[index].repeat(str.length);
-          },
+          bars: new BarsFormatter(
+            ['#', '=', '+'].map(char => str => char.repeat(str.length)),
+          ),
         },
       });
       expect(barItem.render()).toEqual(
-        '[############================------------] 0/s/0/s/{speed}',
+        '[############================------------] 0/s/0/s/0/s',
       );
     });
     it('tags', () => {
@@ -146,11 +259,9 @@ describe('Progress Bar Lib', () => {
       const barItem = new BarItem([progress1, progress2], {
         template: '[{bars}] value 1: {p1_value}; value 2: {p2_value}',
         formatters: {
-          bar: (str, progress, progresses) => {
-            const index = progresses.findIndex(p => p === progress);
-            const colors = ['#', '=', '+'];
-            return ''; // colors[index].repeat(str.length);
-          },
+          bars: new BarsFormatter(
+            ['#', '=', '+'].map(char => str => char.repeat(str.length)),
+          ),
         },
       });
       expect(barItem.render()).toEqual(
@@ -165,11 +276,9 @@ describe('Progress Bar Lib', () => {
       const barItem = new BarItem([progress1, progress2], {
         template: '[{bars}]',
         formatters: {
-          bar: (str, progress, progresses) => {
-            const index = progresses.findIndex(p => p === progress);
-            const colors = ['#', '=', '+'];
-            return ''; // colors[index].repeat(str.length);
-          },
+          bars: new BarsFormatter(
+            ['#', '=', '+'].map(char => str => char.repeat(str.length)),
+          ),
         },
       });
       const results = [];
@@ -242,14 +351,11 @@ describe('Progress Bar Lib', () => {
         options: presets.braille,
         template: '[{bars}]',
         formatters: {
-          bar: (str, progress, progresses) => {
-            const colors = [
-              (s: string) => `yellow${s}clearYellow`,
-              (s: string) => `blue${s}clearBlue`,
-            ];
-            const index = progresses.findIndex(p => p === progress);
-            return (colors[index] || chalk.yellow)(str);
-          },
+          // FIXME: update READMI
+          bars: new BarsFormatter([
+            (s: string) => `yellow${s}clearYellow`,
+            (s: string) => `blue${s}clearBlue`,
+          ]),
         },
       });
       const results = [];
