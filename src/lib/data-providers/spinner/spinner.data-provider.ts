@@ -1,4 +1,5 @@
 import { IProgress } from '../../interfaces/progress.interface';
+import { getTime } from '../../time';
 
 export class SpinnerDataProvider {
   public static presets = {
@@ -14,16 +15,14 @@ export class SpinnerDataProvider {
   public getProviders(): {
     spinner: (progress: IProgress, progresses: IProgress[]) => string;
   } {
-    let [index, char, lastUpdate] = [0, (this.chars || [''])[0], 0];
+    let [index, char, lastUpdate] = [0, this.chars[0], 0];
     return {
       spinner: (progress: IProgress): string => {
-        if (
-          progress.getProgress() < 1 &&
-          Date.now() - lastUpdate > this.delay
-        ) {
+        const time = getTime();
+        if (progress.getProgress() < 1 && time - lastUpdate > this.delay) {
           index = index + 1 >= this.chars.length ? 0 : index + 1;
-          char = this.chars.length ? this.chars[index] : '';
-          lastUpdate = Date.now();
+          char = this.chars[index];
+          lastUpdate = time;
         }
         return char;
       },

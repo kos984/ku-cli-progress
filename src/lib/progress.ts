@@ -46,7 +46,6 @@ export class Progress<IPayload extends object = object>
   }
 
   public setTotal(total: number) {
-    // FIXME: think about it
     this.total = total;
     return this;
   }

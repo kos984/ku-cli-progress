@@ -7,6 +7,7 @@ export * from './lib/terminals/terminal-tty';
 
 export * from './lib/data-providers/bar/bar.data-provider';
 export * from './lib/data-providers/bar/bar.data-result';
+export * from './lib/data-providers/spinner/spinner.data-provider';
 
 export * from './lib/formatters/bars-formatter';
 

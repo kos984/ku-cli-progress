@@ -1,12 +1,15 @@
 import { Eta } from '../../';
 
+jest.mock('../time');
+import { getTime } from '../time';
+const getTimeMock = getTime as jest.Mock;
+
 describe('Eta', () => {
   let eta;
-  let getTimeSpy;
 
   beforeEach(() => {
     eta = new Eta();
-    getTimeSpy = jest.spyOn(eta, 'getTime');
+    getTimeMock.mockReturnValue(0);
   });
 
   it('should initialize correctly', () => {
@@ -19,9 +22,9 @@ describe('Eta', () => {
 
   it('should update speed, eta and duration correctly', () => {
     const started = eta.started;
-    getTimeSpy.mockReturnValue(started + 1000);
+    getTimeMock.mockReturnValue(started + 1000);
     eta.update(10, 100);
-    getTimeSpy.mockReturnValue(started + 2000);
+    getTimeMock.mockReturnValue(started + 2000);
     eta.update(20, 100);
     expect(eta.getSpeed()).toBe(10);
     expect(eta.getEtaS()).toBe(8);
@@ -31,12 +34,12 @@ describe('Eta', () => {
   it('should correct handle set', () => {
     eta.set(10);
     const started = eta.started;
-    getTimeSpy.mockReturnValue(started);
+    getTimeMock.mockReturnValue(started);
     expect(eta.getSpeed()).toBe(0);
     expect(eta.getEtaS()).toBe(Infinity);
     expect(eta.getDurationMs(0));
 
-    getTimeSpy.mockReturnValue(started + 1000);
+    getTimeMock.mockReturnValue(started + 1000);
     eta.update(20, 100);
     expect(eta.getSpeed()).toBe(10);
     expect(eta.getEtaS()).toBe(8);
@@ -48,12 +51,9 @@ describe('Eta', () => {
     const etaDebounce = new Eta({ deps: 3, debounce: 0.1 });
     const etaDeps = new Eta({ deps: 5, debounce: 0.01 });
     const etas = [eta, etaDebounce, etaDeps];
-    const getTimeSpy = etas.map(eta =>
-      jest.spyOn(eta as Eta & { getTime: () => number }, 'getTime'),
-    );
 
     it('init', () => {
-      getTimeSpy.forEach(spy => spy.mockReturnValue(0));
+      getTimeMock.mockReturnValue(0);
       etas.forEach(eta => eta.set(0));
       expect(etas.map(eta => eta.getSpeed())).toEqual([0, 0, 0]);
       expect(etas.map(eta => eta.getEtaS())).toEqual([
@@ -65,7 +65,7 @@ describe('Eta', () => {
     });
 
     it('duration 1000, increment 10', () => {
-      getTimeSpy.forEach(spy => spy.mockReturnValue(1000));
+      getTimeMock.mockReturnValue(1000);
       etas.forEach(eta => eta.update(10, 1000));
       expect(etas.map(eta => eta.getSpeed())).toEqual([10, 10, 10]);
       expect(etas.map(eta => eta.getEtaS())).toEqual([99, 99, 99]);
@@ -73,7 +73,7 @@ describe('Eta', () => {
     });
 
     it('duration 1800, increment 10', () => {
-      getTimeSpy.forEach(spy => spy.mockReturnValue(1800));
+      getTimeMock.mockReturnValue(1800);
       etas.forEach(eta => eta.update(20, 1000));
       expect(etas.map(eta => eta.getSpeed())).toEqual([
         11.428571428571429, 11.428571428571429, 11.363636363636363,
@@ -83,7 +83,7 @@ describe('Eta', () => {
     });
 
     it('duration 2500, increment 10', () => {
-      getTimeSpy.forEach(spy => spy.mockReturnValue(2500));
+      getTimeMock.mockReturnValue(2500);
       etas.forEach(eta => eta.update(30, 1000));
       expect(etas.map(eta => eta.getSpeed())).toEqual([
         12.61904761904762, 12.61904761904762, 12.5,
@@ -93,7 +93,7 @@ describe('Eta', () => {
     });
 
     it('duration 2800, increment 10', () => {
-      getTimeSpy.forEach(spy => spy.mockReturnValue(2800));
+      getTimeMock.mockReturnValue(2800);
       etas.forEach(eta => eta.update(40, 1000));
       expect(etas.map(eta => eta.getSpeed())).toEqual([
         21.775793650793656, 21.775793650793656, 18.910256410256412,
@@ -103,7 +103,7 @@ describe('Eta', () => {
     });
 
     it('duration 3100, increment 10', () => {
-      getTimeSpy.forEach(spy => spy.mockReturnValue(3100));
+      getTimeMock.mockReturnValue(3100);
       etas.forEach(eta => eta.update(50, 1000));
       expect(etas.map(eta => eta.getSpeed())).toEqual([
         28.571428571428573, 28.571428571428573, 22.61904761904762,
@@ -113,7 +113,7 @@ describe('Eta', () => {
     });
 
     it('duration 3400, increment 10', () => {
-      getTimeSpy.forEach(spy => spy.mockReturnValue(3400));
+      getTimeMock.mockReturnValue(3400);
       etas.forEach(eta => eta.update(60, 1000));
       expect(etas.map(eta => eta.getSpeed())).toEqual([
         33.333333333333336, 33.333333333333336, 27.09183673469388,
@@ -123,7 +123,7 @@ describe('Eta', () => {
     });
 
     it('duration 3750, increment 10', () => {
-      getTimeSpy.forEach(spy => spy.mockReturnValue(3750));
+      getTimeMock.mockReturnValue(3750);
       etas.forEach(eta => eta.update(70, 1000));
       expect(etas.map(eta => eta.getSpeed())).toEqual([
         31.34920634920635, 33.333333333333336, 29.387755102040817,
@@ -133,7 +133,7 @@ describe('Eta', () => {
     });
 
     it('duration 5100, increment 10', () => {
-      getTimeSpy.forEach(spy => spy.mockReturnValue(5100));
+      getTimeMock.mockReturnValue(5100);
       etas.forEach(eta => eta.update(80, 1000));
       expect(etas.map(eta => eta.getSpeed())).toEqual([
         20.943562610229282, 20.943562610229282, 25.57823129251701,
@@ -147,20 +147,20 @@ describe('Eta', () => {
     beforeEach(async () => {
       eta.set(0);
       const started = eta.started;
-      getTimeSpy.mockReturnValue(started + 9900);
+      getTimeMock.mockReturnValue(started + 9900);
       eta.update(99, 100);
       expect(eta.getSpeed()).toBe(10);
       expect(eta.getEtaS()).toBe(0);
       expect(eta.getDurationMs(9900));
-      getTimeSpy.mockReturnValue(started + 10000);
+      getTimeMock.mockReturnValue(started + 10000);
       eta.update(100, 100);
-      getTimeSpy.mockReturnValue(started + 11000);
+      getTimeMock.mockReturnValue(started + 11000);
       expect(eta.getDurationMs()).toBe(10000);
     });
 
     it('should stop updating duration when total > count', () => {
       const started = eta.started;
-      getTimeSpy.mockReturnValue(started + 11000);
+      getTimeMock.mockReturnValue(started + 11000);
       expect(eta.getDurationMs()).toBe(10000);
     });
 
