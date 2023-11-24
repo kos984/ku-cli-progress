@@ -93,15 +93,16 @@ bar.add(
 
 2.  **`params`** (`IParams | undefined`):
    Additional parameters to customize the appearance and behavior of the progress bar.
-    -   **`template`** (`string | undefined`): Template for displaying the progress bar.
+    -   **`template`** (`string | function | undefined`): Template for displaying the progress bar.
     -   **`options`** (`Partial<IBarOptions> | undefined`): Configuration settings for displaying the progress bar.
     -   **`formatters`** (`IFormatters | undefined`): Formatting functions for each progress.
     -   **`dataProviders`** (`IDataProviders | undefined`): Functions to provide additional data.
 
 ### Template Format:
 
-```js
-// see src/examples/spinner.ts
+[src/examples/spinner.example.ts](src/examples/spinner.example.ts)
+
+```typescript
 bar.add(
   new BarItem(progress, {
     template:
@@ -254,11 +255,11 @@ bar.add(
 ```
 
 # Spinners example
-[src/examples/spinner.ts](src/examples/spinner.ts)
+[src/examples/spinner.example.ts](src/examples/spinner.example.ts)
 
 ![spinner-example](docs/images/spinner-example.gif)
 
 # Some random examples
- see src/examples/random.bar.example.ts
+[src/examples/random.bar.example.ts](src/examples/random.bar.example.ts)
 
 ![multi-files-processing](docs/images/random.bar.example.gif)
