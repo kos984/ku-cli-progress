@@ -4,17 +4,17 @@ import { IBarItem } from './interfaces/bar-item.interface';
 import { BarDataProvider } from './data-providers/bar/bar.data-provider';
 import { BarDataResult } from './data-providers/bar/bar.data-result';
 
-export interface IBarFormatter {
-  (
-    str: BarDataResult,
-    progress: IProgress,
-    progresses: IProgress[],
-  ): BarDataResult | string;
-}
+export type IBarFormatter = (
+  str: BarDataResult,
+  progress: IProgress,
+  progresses: IProgress[],
+) => BarDataResult | string;
 
-export interface IFormatter {
-  (str: string, progress: IProgress, progresses: IProgress[]): string;
-}
+export type IFormatter = (
+  str: string,
+  progress: IProgress,
+  progresses: IProgress[],
+) => string;
 
 export interface IObjectFormatter<IFormatter> {
   formatter: IFormatter;
@@ -32,9 +32,10 @@ export interface IFormatters {
   duration: IFormatter | IObjectFormatter<IFormatter>;
 }
 
-export interface IDataProvider<IResult> {
-  (progress: IProgress, progresses: IProgress[]): IResult;
-}
+export type IDataProvider<IResult> = (
+  progress: IProgress,
+  progresses: IProgress[],
+) => IResult;
 
 export interface IDataProviders {
   // [key: string]: (progress: IProgress, progresses: IProgress[]) => string;
@@ -63,9 +64,10 @@ type IData<T> = {
   [K in keyof IDataProviders]: string;
 };
 
-export interface IFunctionTemplate<ICustomDataProvider> {
-  (dataProviders: IData<ICustomDataProvider>): string;
-}
+export type IFunctionTemplate<ICustomDataProvider> = (
+  dataProviders: IData<ICustomDataProvider>,
+) => string;
+
 export type ITemplate<ICustomDataProvider> =
   | string
   | IFunctionTemplate<ICustomDataProvider>;
@@ -155,7 +157,7 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
           if (typeof ''[prop] === 'function') {
             return () => getValue(String(property), next(target.key))[prop]();
           }
-          let index = Number.parseInt(prop.toString() as string, 10);
+          let index = Number.parseInt(prop.toString(), 10);
           index = Number.isFinite(index)
             ? index
             : progresses.findIndex(p => p.getTag() === prop);
@@ -207,9 +209,10 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
 
   protected getDataValue = (key: string, item: IProgress): string | null => {
     const payload = item.getPayload();
-    return Object.prototype.hasOwnProperty.call(payload, key)
-      ? payload[key]
-      : Object.prototype.hasOwnProperty.call(this.dataProviders, key)
+    if (Object.prototype.hasOwnProperty.call(payload, key)) {
+      return payload[key];
+    }
+    return Object.prototype.hasOwnProperty.call(this.dataProviders, key)
       ? this.dataProviders[key](item, this.progresses)
       : `{${key}}`;
   };

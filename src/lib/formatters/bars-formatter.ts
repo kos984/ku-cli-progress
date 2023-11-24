@@ -9,10 +9,10 @@ export class BarsFormatter {
     _: IProgress,
     progresses: IProgress[],
   ): BarDataResult => {
-    const result = str;
-    if (!(result instanceof BarDataResult)) {
+    if (!(str instanceof BarDataResult)) {
       return str;
     }
+    const result = str;
     for (const item of result) {
       const index = progresses.findIndex(
         progress => progress === item.progress,
@@ -22,6 +22,6 @@ export class BarsFormatter {
         item.str = formatter(item.str);
       }
     }
-    return str;
+    return result;
   };
 }

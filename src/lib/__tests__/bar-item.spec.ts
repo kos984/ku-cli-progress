@@ -84,7 +84,7 @@ describe('Progress Bar Lib', () => {
   describe('eta formatEtaHumanReadable', () => {
     it('should return human readable ETA', () => {
       const eta = new Eta();
-      const spy = jest.spyOn(eta, 'getEtaS').mockReturnValue(1000000);
+      jest.spyOn(eta, 'getEtaS').mockReturnValue(1000000);
       const progress = new Progress({ total: 100, tag: 'tag', eta });
       const barItem = new BarItem(progress, {
         template: ({ bar, etaHumanReadable }) =>
@@ -96,7 +96,7 @@ describe('Progress Bar Lib', () => {
     });
     it('should return human readable ETA 0s', () => {
       const eta = new Eta();
-      const spy = jest.spyOn(eta, 'getEtaS').mockReturnValue(0);
+      jest.spyOn(eta, 'getEtaS').mockReturnValue(0);
       const progress = new Progress({ total: 100, tag: 'tag', eta });
       const barItem = new BarItem(progress, {
         template: ({ bar, etaHumanReadable }) =>
@@ -351,7 +351,6 @@ describe('Progress Bar Lib', () => {
         options: presets.braille,
         template: '[{bars}]',
         formatters: {
-          // FIXME: update READMI
           bars: new BarsFormatter([
             (s: string) => `yellow${s}clearYellow`,
             (s: string) => `blue${s}clearBlue`,

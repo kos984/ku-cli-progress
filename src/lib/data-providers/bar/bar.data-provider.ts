@@ -132,7 +132,6 @@ export class BarDataProvider {
   // eslint-disable-next-line max-lines-per-function
   protected renderBars(progresses: IProgress[]): BarDataResult {
     const { resumeChar, width } = this.options;
-    // const result = new BarDataResult(this.options.glue);
     const result: { str: string; progress: IProgress }[] = [];
     const leftLength = progresses
       .map((progress, index) =>
