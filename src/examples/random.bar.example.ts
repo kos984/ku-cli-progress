@@ -3,6 +3,7 @@ import { Bar, Progress, BarItem, presets, IProgress } from '../';
 import * as chalk from 'chalk';
 import { TextBarItem } from './text-bar-item';
 import { loopProgresses } from './helpers';
+import { BarsFormatter } from '../lib/formatters/bars-formatter';
 
 const progresses: IProgress[] = [];
 const bar = new Bar();
@@ -117,7 +118,8 @@ const bar = new Bar();
     new BarItem([textInBarProgress], {
       options: presets.rect,
       formatters: {
-        bar: (str, progress) => {
+        bar: (value, progress) => {
+          const str = value.toString();
           const percentage =
             ' ' +
             (Math.round(progress.getProgress() * 10000) / 100).toFixed(2) +
@@ -225,7 +227,8 @@ function* rotate(
         completeChar: ' ',
       },
       formatters: {
-        bar: (str, progress) => {
+        bar: (value, progress) => {
+          const str = value.toString();
           const percent = (progress.getProgress() * 100).toFixed(2) + '% >>>';
           const [start, end] = str.split('|');
           const text =
@@ -254,7 +257,8 @@ function* rotate(
         completeChar: ' ',
       },
       formatters: {
-        bar: (str, progress) => {
+        bar: (value, progress) => {
+          const str = value.toString();
           const percent =
             '<<< ' + (progress.getProgress() * 100).toFixed(2) + '%';
           const [end, start] = str.split('|');
@@ -307,7 +311,7 @@ function* rotate(
       options: { ...presets.shades, glue: '|' },
       formatters: {
         bar: str => {
-          const [start, end] = str.split('|');
+          const [start, end] = str.toString().split('|');
           return chalk.blueBright(start) + chalk.redBright(end);
         },
       },
@@ -321,13 +325,9 @@ function* rotate(
     new BarItem(progress, {
       options: {
         ...presets.braille,
-        glue: '|',
       },
       formatters: {
-        bar: str => {
-          const [done, left] = str.split('|');
-          return chalk.yellowBright(done) + chalk.yellow(left);
-        },
+        bar: new BarsFormatter([chalk.yellowBright, chalk.yellow]),
       },
     }),
   );

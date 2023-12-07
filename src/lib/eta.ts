@@ -1,4 +1,5 @@
 import { IEta } from './interfaces/eta.interface';
+import { getTime } from './time';
 
 const defaultParams: IEtaParams = {
   deps: 5,
@@ -45,7 +46,7 @@ export class Eta implements IEta {
 
   public set(count: number): IEta {
     this.left = Infinity;
-    const time = this.getTime();
+    const time = getTime();
     this.speedMoment = [];
     this.speed = 0;
     this.duration = 0;
@@ -59,7 +60,7 @@ export class Eta implements IEta {
     this.left = total - value;
     const current = {
       count: value,
-      time: this.getTime(),
+      time: getTime(),
     };
     if (this.updateSpeedMoments(this.last, current)) {
       this.last = current;
@@ -96,7 +97,7 @@ export class Eta implements IEta {
     if (!force && this.left <= 0) {
       return this.duration;
     }
-    this.duration = this.getTime() - this.started;
+    this.duration = getTime() - this.started;
   }
 
   protected updateSpeed(): void {
@@ -131,10 +132,5 @@ export class Eta implements IEta {
       this.speedMoment.shift();
     }
     return true;
-  }
-
-  protected getTime() {
-    const time = Date.now();
-    return time;
   }
 }

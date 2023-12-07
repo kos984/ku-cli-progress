@@ -46,7 +46,7 @@ export class Bar {
     this.items = this.items.filter(
       item => !item.getProgresses().find(p => p == progress),
     );
-    this.refresh();
+    this.reRender();
     return this;
   }
 
@@ -55,6 +55,16 @@ export class Bar {
       return bar.render();
     });
     this.terminal.write(lines.join('\n') + '\n');
+    return this;
+  }
+
+  public clean() {
+    this.terminal.clear();
+    return this;
+  }
+
+  public refresh() {
+    this.terminal.refresh();
     return this;
   }
 
@@ -82,17 +92,17 @@ export class Bar {
 
   protected addListenerToProgress(item: IBarItem) {
     item.getProgresses().forEach(progress => {
-      progress.on('update', this.refresh);
+      progress.on('update', this.reRender);
     });
   }
 
   protected removeListenersFromProgresses(item: IBarItem) {
     item.getProgresses().forEach(progress => {
-      progress.emitter.removeListener('update', this.refresh);
+      progress.emitter.removeListener('update', this.reRender);
     });
   }
 
-  protected refresh = () => {
+  protected reRender = () => {
     if (!this.isStarted || this.nextUpdate !== null) {
       return;
     }
