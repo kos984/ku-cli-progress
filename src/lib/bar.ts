@@ -9,8 +9,8 @@ export interface IOptions {
 }
 
 export class Bar {
-  protected items: IBarItem[] = [];
-  protected isStarted = false;
+  public items: IBarItem[] = [];
+  public isStarted = false;
   protected nextUpdate: null | Promise<never> = null;
   protected timeOutId: NodeJS.Timeout | undefined;
 
