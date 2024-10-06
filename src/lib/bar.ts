@@ -9,8 +9,8 @@ export interface IOptions {
 }
 
 export class Bar {
-  protected items: IBarItem[] = [];
-  protected isStarted = false;
+  public items: IBarItem[] = [];
+  public started = false;
   protected nextUpdate: null | Promise<never> = null;
   protected timeOutId: NodeJS.Timeout | undefined;
 
@@ -24,9 +24,13 @@ export class Bar {
     };
   }
 
+  public isStarted() {
+    return this.started;
+  }
+
   public add(bar: IBarItem) {
     this.items.push(bar);
-    if (this.isStarted) {
+    if (this.started) {
       this.addListenerToProgress(bar);
     }
     return this;
@@ -76,7 +80,7 @@ export class Bar {
   }
 
   public start() {
-    this.isStarted = true;
+    this.started = true;
     this.items.forEach(item => this.addListenerToProgress(item));
     this.render();
     return this;
@@ -86,7 +90,7 @@ export class Bar {
     this.items.forEach(item => this.removeListenersFromProgresses(item));
     clearTimeout(this.timeOutId);
     this.nextUpdate = null;
-    this.isStarted = false;
+    this.started = false;
     return this;
   }
 
@@ -103,7 +107,7 @@ export class Bar {
   }
 
   protected reRender = () => {
-    if (!this.isStarted || this.nextUpdate !== null) {
+    if (!this.started || this.nextUpdate !== null) {
       return;
     }
     this.nextUpdate = new Promise(resolve => {
