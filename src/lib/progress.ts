@@ -10,9 +10,7 @@ export interface IProgressParams {
   eta?: IEta;
 }
 
-export class Progress<IPayload extends object = object>
-  implements IProgress<IPayload>
-{
+export class Progress<IPayload = unknown> implements IProgress<IPayload> {
   public readonly emitter: EventEmitter = new EventEmitter();
   protected tag?: string;
   protected count: number;
@@ -35,12 +33,9 @@ export class Progress<IPayload extends object = object>
     return this.update(this.count + delta, payload);
   }
 
-  public set(
-    count: number,
-    payload: IPayload = {} as IPayload,
-  ): IProgress<IPayload> {
+  public set(count: number, payload?: IPayload): IProgress<IPayload> {
     this.count = count;
-    this.payload = payload;
+    if (payload) this.payload = payload;
     this.eta.set(count);
     return this;
   }

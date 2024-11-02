@@ -10,7 +10,7 @@ export interface IOptions {
 
 export class Bar {
   public items: IBarItem[] = [];
-  public started = false;
+  protected started = false;
   protected nextUpdate: null | Promise<never> = null;
   protected timeOutId: NodeJS.Timeout | undefined;
 

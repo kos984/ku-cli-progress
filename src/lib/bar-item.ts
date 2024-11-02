@@ -66,15 +66,20 @@ type IData<T> = {
 
 export type IFunctionTemplate<ICustomDataProvider> = (
   dataProviders: IData<ICustomDataProvider>,
+  progress: IProgress,
+  progresses: IProgress[],
 ) => string;
 
 export type ITemplate<ICustomDataProvider> =
   | string
   | IFunctionTemplate<ICustomDataProvider>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
-  implements IBarItem
+export class BarItem<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ICustomFormatters = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ICustomDataProvider = any,
+> implements IBarItem
 {
   protected template!: ITemplate<ICustomDataProvider>;
   protected tagDelimiter!: string;
@@ -112,7 +117,7 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
   public render(): string {
     this.nextIndexMap.clear();
     if (typeof this.template !== 'string') {
-      return this.template(this.proxyData);
+      return this.template(this.proxyData, this.progresses[0], this.progresses);
     }
     const next = this.getCounterByProperty;
     return this.template.replace(/{([^{}]+)}/g, (match, prop) => {
@@ -177,7 +182,7 @@ export class BarItem<ICustomFormatters = any, ICustomDataProvider = any>
     return index;
   };
 
-  protected getDefaultTemplate(progresses) {
+  protected getDefaultTemplate(progresses: IProgress[]): string {
     if (progresses.length > 1) {
       return `[{bars}] ${progresses
         .map(() => '{percentage}')

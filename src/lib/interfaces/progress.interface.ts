@@ -13,7 +13,7 @@ export interface IUpdateEvent<IPayload> {
   total: number;
 }
 
-export interface IProgress<IPayload extends object = object> {
+export interface IProgress<IPayload = unknown> {
   emitter: EventEmitter;
   getProgress(): number;
   increment(delta: number, payload?: IPayload): IProgress<IPayload>;
@@ -22,7 +22,7 @@ export interface IProgress<IPayload extends object = object> {
   getValue(): number;
   getTotal(): number;
   getPayload(): IPayload;
-  set(count: number, payload: IPayload): IProgress<IPayload>;
+  set(count: number, payload?: IPayload): IProgress<IPayload>;
   on(
     type: 'update',
     listener: (e: IUpdateEvent<IPayload>) => void,
