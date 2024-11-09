@@ -1,4 +1,4 @@
-import { Bar, Progress, BarItem, ITerminal } from '../../';
+import { Bar, Progress, BarItemLegacy, ITerminal } from '../../';
 
 describe('Bar', () => {
   const mockTerminal = {
@@ -22,7 +22,7 @@ describe('Bar', () => {
   it('bar start without updates', async () => {
     const bar = new Bar(mockTerminal);
     const progress = new Progress({ total: 100 });
-    bar.add(new BarItem(progress));
+    bar.add(new BarItemLegacy(progress));
     bar.start();
     bar.stop();
     expect(mockTerminal.write.mock.calls).toEqual([
@@ -43,7 +43,7 @@ describe('Bar', () => {
   it('bar start with updates', async () => {
     const bar = new Bar(mockTerminal, barOptions);
     const progress = new Progress({ total: 100 });
-    bar.add(new BarItem(progress));
+    bar.add(new BarItemLegacy(progress));
     bar.start();
     progress.increment();
     await new Promise(resolve => setTimeout(resolve, refreshTimeMs * 2));
@@ -62,7 +62,7 @@ describe('Bar', () => {
     const bar = new Bar(mockTerminal, barOptions);
     const progress = new Progress({ total: 100 });
     const progressToRemove = new Progress({ total: 200, start: 50 });
-    bar.add(new BarItem(progress)).add(new BarItem(progressToRemove)).start();
+    bar.add(new BarItemLegacy(progress)).add(new BarItemLegacy(progressToRemove)).start();
     progress.increment();
     await new Promise(resolve => setTimeout(resolve, refreshTimeMs * 2));
     bar.removeByProgress(progressToRemove);
@@ -87,8 +87,8 @@ describe('Bar', () => {
     const bar = new Bar(mockTerminal, barOptions);
     const progress = new Progress({ total: 100 });
     const progressToRemove = new Progress({ total: 200, start: 50 });
-    const barItemToRemove = new BarItem(progressToRemove);
-    const barItemToRemove2 = new BarItem([]);
+    const barItemToRemove = new BarItemLegacy(progressToRemove);
+    const barItemToRemove2 = new BarItemLegacy([]);
     bar.addProgress(progress).add(barItemToRemove).start();
     progress.increment();
     await new Promise(resolve => setTimeout(resolve, refreshTimeMs * 2));
@@ -115,10 +115,10 @@ describe('Bar', () => {
     const bar = new Bar(mockTerminal, barOptions);
     const progress = new Progress({ total: 100 });
     const progressToAdd = new Progress({ total: 200, start: 50 });
-    bar.add(new BarItem(progress)).start();
+    bar.add(new BarItemLegacy(progress)).start();
     progress.increment();
     await new Promise(resolve => setTimeout(resolve, refreshTimeMs * 2));
-    bar.add(new BarItem(progressToAdd));
+    bar.add(new BarItemLegacy(progressToAdd));
     progressToAdd.increment();
     await new Promise(resolve => setTimeout(resolve, refreshTimeMs * 2));
     bar.stop();
@@ -138,7 +138,7 @@ describe('Bar', () => {
   it('logWrap', async () => {
     const bar = new Bar(mockTerminal, barOptions);
     const progress = new Progress({ total: 100 });
-    bar.add(new BarItem(progress)).start();
+    bar.add(new BarItemLegacy(progress)).start();
     progress.increment();
     await new Promise(resolve => setTimeout(resolve, refreshTimeMs * 2));
     bar.logWrap(() => {
@@ -158,7 +158,7 @@ describe('Bar', () => {
   it('should not render bar if not started', async () => {
     const bar = new Bar(mockTerminal, barOptions);
     const progress = new Progress({ total: 100 });
-    bar.add(new BarItem(progress)).start();
+    bar.add(new BarItemLegacy(progress)).start();
     progress.increment();
     progress.increment();
     progress.increment();

@@ -1,4 +1,4 @@
-import { Progress, SpinnerDataProvider, BarItem, IDataProvider } from '../../';
+import { Progress, SpinnerDataProvider, BarItemLegacy, IDataProvider } from '../../';
 
 jest.mock('../time');
 import { getTime } from '../time';
@@ -17,7 +17,7 @@ describe('spinner.data-provider', () => {
       .mockReturnValueOnce(1302)
       .mockReturnValueOnce(1503)
       .mockReturnValueOnce(2004);
-    const barItem = new BarItem<never, { spinner: IDataProvider<string> }>(
+    const barItem = new BarItemLegacy<never, { spinner: IDataProvider<string> }>(
       progress,
       {
         template: ({ spinner }) => `[${spinner}]`,
@@ -44,7 +44,7 @@ describe('spinner.data-provider', () => {
       .mockReturnValueOnce(1002)
       .mockReturnValueOnce(1302)
       .mockReturnValueOnce(1503);
-    const barItem = new BarItem<never, { spinner: IDataProvider<string> }>(
+    const barItem = new BarItemLegacy<never, { spinner: IDataProvider<string> }>(
       progress,
       {
         template: ({ spinner }) => `[${spinner}]`,
@@ -68,7 +68,7 @@ describe('spinner.data-provider', () => {
       .mockReturnValueOnce(1002)
       .mockReturnValueOnce(1302)
       .mockReturnValueOnce(1503);
-    const barItem = new BarItem<never, { spinner: IDataProvider<string> }>(
+    const barItem = new BarItemLegacy<never, { spinner: IDataProvider<string> }>(
       progress,
       {
         template: ({ spinner }) => `[${spinner}]`,

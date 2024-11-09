@@ -1,5 +1,6 @@
-import { Bar, BarItemLegacy, presets, Progress } from '..';
+import { Bar, presets, Progress } from '../..';
 import { createReadStream, ReadStream } from 'fs';
+import { BarItem, ITemplateFunction } from '../../lib/bar-item';
 import * as chalk from 'chalk';
 
 // eslint-disable-next-line max-lines-per-function
@@ -65,12 +66,26 @@ function createReadFileStream(totalSize): ReadStream {
   return readStream;
 }
 
+const template: ITemplateFunction = ({
+  value,
+  bar,
+  percentage,
+  eta,
+  speed,
+  duration,
+  total,
+  progress,
+}) => {
+  const payload = progress.getPayload() as { name?: string };
+  const name = payload.name ? ` [${payload.name}]` : '';
+  return `[${bar}] ${percentage} ETA: ${eta} speed: ${speed}/s duration: ${duration}s ${value}/${total}${name}`;
+};
+
 async function loadFile(file: IFile, bar: Bar) {
   const progress = new Progress({ total: file.size }, { name: file.name });
   bar.add(
-    new BarItemLegacy(progress, {
-      template:
-        '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total} [{name}]',
+    new BarItem(progress, {
+      template,
       options: presets.rect,
       formatters: {
         bar: str => chalk.yellow(str),
@@ -91,7 +106,7 @@ async function run() {
   const bar = new Bar().start();
   const mainProgress = new Progress({ total: files.length });
   bar.add(
-    new BarItemLegacy(mainProgress, {
+    new BarItem(mainProgress, {
       formatters: {
         bar: str => chalk.magentaBright(str),
       },

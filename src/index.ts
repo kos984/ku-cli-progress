@@ -2,12 +2,13 @@ export * from './lib/bar';
 export * from './lib/progress';
 export * from './lib/eta';
 export * from './lib/presets';
-export * from './lib/bar-item';
+export * from './lib/bar-item-legacy';
 export * from './lib/terminals/terminal-tty';
 
 export * from './lib/data-providers/bar/bar.data-provider';
 export * from './lib/data-providers/bar/bar.data-result';
 export * from './lib/data-providers/spinner/spinner.data-provider';
+export * from './lib/data-providers/eta/eta.data-provider';
 
 export * from './lib/formatters/bars-formatter';
 

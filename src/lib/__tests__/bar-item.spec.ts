@@ -1,12 +1,12 @@
-import { BarItem, Eta, presets, Progress } from '../../';
+import { BarItemLegacy, Eta, presets, Progress } from '../../';
 import { IEta } from '../interfaces/eta.interface';
 import { BarsFormatter } from '../formatters/bars-formatter';
 
 describe('Progress Bar Lib', () => {
   it('should construct with progress or array of progresses', () => {
     const progress = new Progress({ total: 100 });
-    const barItem = new BarItem(progress);
-    const barItem2 = new BarItem([progress]);
+    const barItem = new BarItemLegacy(progress);
+    const barItem2 = new BarItemLegacy([progress]);
     expect(barItem.getProgresses()).toEqual(barItem2.getProgresses());
   });
 
@@ -20,7 +20,7 @@ describe('Progress Bar Lib', () => {
         getDurationMs: jest.fn(() => 1000),
       };
       const progress = new Progress({ total: 100, eta });
-      const barItem = new BarItem(progress);
+      const barItem = new BarItemLegacy(progress);
       expect(barItem.render()).toEqual(
         '[----------------------------------------] 0% ETA: 9s speed: 10/s duration: 1s 0/100',
       );
@@ -28,7 +28,7 @@ describe('Progress Bar Lib', () => {
 
     it('should return match if tag not exists', () => {
       const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: '[{bar}] {tag1_foo}',
       });
       expect(barItem.render()).toEqual(
@@ -38,7 +38,7 @@ describe('Progress Bar Lib', () => {
 
     it('should replace data from payload', () => {
       const progress = new Progress({ total: 100 }, { foo: 'bar' });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: '[{bar}] {foo}',
       });
       expect(barItem.render()).toEqual(
@@ -50,7 +50,7 @@ describe('Progress Bar Lib', () => {
         { total: 100 },
         { speed: '[speed override]' },
       );
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: '[{bar}] {speed}',
       });
       expect(barItem.render()).toEqual(
@@ -59,7 +59,7 @@ describe('Progress Bar Lib', () => {
     });
     it('should NOT replace data if not found any from defined & payload', () => {
       const progress = new Progress({ total: 100 });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: '[{bar}] {foo}',
       });
       expect(barItem.render()).toEqual(
@@ -69,7 +69,7 @@ describe('Progress Bar Lib', () => {
     it('formatters', () => {
       const progress = new Progress({ total: 100 });
       progress.increment(20);
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: '[{bar}] {value}',
         formatters: {
           value: str => 'done: ' + str,
@@ -86,7 +86,7 @@ describe('Progress Bar Lib', () => {
       const eta = new Eta();
       jest.spyOn(eta, 'getEtaS').mockReturnValue(1000000);
       const progress = new Progress({ total: 100, tag: 'tag', eta });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: ({ bar, etaHumanReadable }) =>
           `[${bar['tag']}] ${etaHumanReadable}`,
       });
@@ -98,7 +98,7 @@ describe('Progress Bar Lib', () => {
       const eta = new Eta();
       jest.spyOn(eta, 'getEtaS').mockReturnValue(0);
       const progress = new Progress({ total: 100, tag: 'tag', eta });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: ({ bar, etaHumanReadable }) =>
           `[${bar['tag']}] ${etaHumanReadable}`,
       });
@@ -111,7 +111,7 @@ describe('Progress Bar Lib', () => {
   describe('template function', () => {
     it('should return match if tag not exists', () => {
       const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: ({ bar, foo }) => `[${bar['tag']}] ${foo['wrong_tag']}`,
       });
       expect(barItem.render()).toEqual(
@@ -120,7 +120,7 @@ describe('Progress Bar Lib', () => {
     });
     it('should return match if tag exists', () => {
       const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: ({ bar, foo }) => `[${bar['tag']}] ${foo['tag']}`,
       });
       expect(barItem.render()).toEqual(
@@ -129,7 +129,7 @@ describe('Progress Bar Lib', () => {
     });
     it('should return match by index', () => {
       const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: ({ bar, foo }) => `[${bar['tag']}] ${foo[0]}`,
       });
       expect(barItem.render()).toEqual(
@@ -138,7 +138,7 @@ describe('Progress Bar Lib', () => {
     });
     it('should return match by index', () => {
       const progress = new Progress({ total: 100, tag: 'tag' }, { foo: 'bar' });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: ({ bar, foo }) => `[${bar['tag']}] ${foo[100]}`,
       });
       expect(barItem.render()).toEqual(
@@ -153,7 +153,7 @@ describe('Progress Bar Lib', () => {
       progress1.increment(30);
       progress3.increment(70);
 
-      const barItem = new BarItem([progress1, progress2, progress3], {
+      const barItem = new BarItemLegacy([progress1, progress2, progress3], {
         template: ({ bar, value, total, eta }) => {
           const etaString = JSON.stringify(eta);
           return `
@@ -177,7 +177,7 @@ describe('Progress Bar Lib', () => {
       const progress = new Progress({ total: 100 });
 
       const symbol = Symbol('mock for system symbols');
-      const barItem = new BarItem([progress], {
+      const barItem = new BarItemLegacy([progress], {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         dataProviders: { [symbol as any]: () => 'test' },
         template: data => {
@@ -203,7 +203,7 @@ describe('Progress Bar Lib', () => {
       progress1.increment(30);
       progress3.increment(70);
 
-      const barItem = new BarItem([progress1, progress2, progress3]);
+      const barItem = new BarItemLegacy([progress1, progress2, progress3]);
       expect(barItem.render()).toEqual(
         '[============================------------] 30%/0%/70% ETA: ∞/∞/∞ speed: 0/s/0/s/0/s duration: 0s/0s/0s 30/100 0/100 70/100',
       );
@@ -218,7 +218,7 @@ describe('Progress Bar Lib', () => {
       progress3.increment(70);
       const progresses = [progress1, progress2, progress3];
 
-      const barItem = new BarItem(progresses, {
+      const barItem = new BarItemLegacy(progresses, {
         formatters: {
           bars: new BarsFormatter(
             ['#', '=', '+'].map(char => str => char.repeat(str.length)),
@@ -237,7 +237,7 @@ describe('Progress Bar Lib', () => {
       progress1.increment(30);
       progress2.increment(70);
 
-      const barItem = new BarItem([progress1, progress2], {
+      const barItem = new BarItemLegacy([progress1, progress2], {
         template: '[{bars}] {speed}/{speed}/{speed}',
         formatters: {
           bars: new BarsFormatter(
@@ -256,7 +256,7 @@ describe('Progress Bar Lib', () => {
       progress1.increment(30);
       progress2.increment(70);
 
-      const barItem = new BarItem([progress1, progress2], {
+      const barItem = new BarItemLegacy([progress1, progress2], {
         template: '[{bars}] value 1: {p1_value}; value 2: {p2_value}',
         formatters: {
           bars: new BarsFormatter(
@@ -273,7 +273,7 @@ describe('Progress Bar Lib', () => {
       const progress1 = new Progress({ total: 100, tag: 'p1' });
       const progress2 = new Progress({ total: 100, start: 30, tag: 'p2' });
 
-      const barItem = new BarItem([progress1, progress2], {
+      const barItem = new BarItemLegacy([progress1, progress2], {
         template: '[{bars}]',
         formatters: {
           bars: new BarsFormatter(
@@ -313,7 +313,7 @@ describe('Progress Bar Lib', () => {
     it('should render single braille', () => {
       const progress = new Progress({ total: 300 });
 
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         options: presets.braille,
         template: '[{bar}]',
       });
@@ -347,7 +347,7 @@ describe('Progress Bar Lib', () => {
       const progress1 = new Progress({ total: 300 });
       const progress2 = new Progress({ total: 300, start: 30 });
 
-      const barItem = new BarItem([progress1, progress2], {
+      const barItem = new BarItemLegacy([progress1, progress2], {
         options: presets.braille,
         template: '[{bars}]',
         formatters: {
@@ -388,7 +388,7 @@ describe('Progress Bar Lib', () => {
       const getEtaS = jest.spyOn(eta, 'getEtaS');
       getEtaS.mockReturnValue(1e1 as never);
       const progress = new Progress({ total: 1e6, eta });
-      const barItem = new BarItem(progress, {
+      const barItem = new BarItemLegacy(progress, {
         template: '{eta} {etaHumanReadable}',
       });
       expect(barItem.render()).toEqual('10s 10s');

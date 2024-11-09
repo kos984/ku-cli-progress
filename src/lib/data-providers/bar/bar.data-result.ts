@@ -10,6 +10,10 @@ export class BarDataResult {
     return this.parts.map(a => a.str).join(this.glue);
   }
 
+  public getParts() {
+    return this.parts;
+  }
+
   public *[Symbol.iterator](): Generator<
     { str: string; progress: IProgress },
     void,

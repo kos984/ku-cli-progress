@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { Bar } from '../lib/bar';
-import { BarItem } from '../lib/bar-item';
+import { BarItemLegacy } from '../lib/bar-item-legacy';
 import { Progress } from '../lib/progress';
 
 interface IFile {
@@ -34,7 +34,7 @@ const next = (barsContainer: Bar, mainProgress: Progress): Promise<boolean> => {
   }
   return new Promise(r => {
     const progress = new Progress({ total: file.size });
-    barsContainer.add(new BarItem([progress]));
+    barsContainer.add(new BarItemLegacy([progress]));
     const emitter = process(file);
     emitter.on('data', size => progress.increment(size));
     emitter.on('end', () => {
@@ -51,7 +51,7 @@ const next = (barsContainer: Bar, mainProgress: Progress): Promise<boolean> => {
 const runner = async (files: IFile[], batchSize = 5) => {
   const mainProgress = new Progress({ total: files.length });
   const barsContainer = new Bar();
-  barsContainer.add(new BarItem([mainProgress]));
+  barsContainer.add(new BarItemLegacy([mainProgress]));
   barsContainer.start();
 
   const promises: Promise<boolean>[] = [];

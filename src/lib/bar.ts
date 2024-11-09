@@ -2,7 +2,7 @@ import { TerminalTty } from './terminals/terminal-tty';
 import { ITerminal } from './interfaces/terminal.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
 import { IProgress } from './interfaces/progress.interface';
-import { BarItem } from './bar-item';
+import { BarItemLegacy } from './bar-item-legacy';
 
 export interface IOptions {
   refreshTimeMs: number;
@@ -43,7 +43,7 @@ export class Bar {
   }
 
   public addProgress(progress: IProgress) {
-    return this.add(new BarItem(progress));
+    return this.add(new BarItemLegacy(progress));
   }
 
   public removeByProgress(progress: IProgress) {

@@ -1,4 +1,4 @@
-import { Bar, BarItem, presets, Progress } from '../';
+import { Bar, BarItemLegacy, presets, Progress } from '../';
 import { loopProgresses } from './helpers';
 
 const bar = new Bar();
@@ -10,7 +10,7 @@ const template = `[{bar}] {percentage} ETA: {etaHumanReadable} speed: {speed} du
 
 progresses.forEach(progress => {
   bar.add(
-    new BarItem(progress, {
+    new BarItemLegacy(progress, {
       template,
       options: presets.braille,
     }),

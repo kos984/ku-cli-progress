@@ -1,4 +1,4 @@
-import { Bar, BarItem, Progress } from '../';
+import { Bar, BarItemLegacy, Progress } from '../';
 import { loopProgresses } from './helpers';
 
 const bar = new Bar();
@@ -16,7 +16,7 @@ function* Spinner(chars: string[], delay = 500): Generator<string> {
 }
 const spinner = Spinner(['\\', '|', '/', '-']);
 bar.add(
-  new BarItem(progress, {
+  new BarItemLegacy(progress, {
     template:
       '[{bar}] {spinner} {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total} (task: {task})',
     dataProviders: {
@@ -25,7 +25,7 @@ bar.add(
   }),
 );
 bar.add(
-  new BarItem<never, { spinner: () => string }>(progress, {
+  new BarItemLegacy<never, { spinner: () => string }>(progress, {
     template: ({
       bar,
       percentage,

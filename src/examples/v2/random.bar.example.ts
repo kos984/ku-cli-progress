@@ -1,9 +1,11 @@
 /* eslint-disable max-classes-per-file */
-import { Bar, Progress, BarItemLegacy, presets, IProgress } from '../';
+import { Bar, Progress, presets, IProgress } from '../../';
 import * as chalk from 'chalk';
-import { TextBarItem } from './text-bar-item';
-import { loopProgresses } from './helpers';
-import { BarsFormatter } from '../lib/formatters/bars-formatter';
+import { TextBarItem } from '../text-bar-item';
+import { loopProgresses } from '../helpers';
+import { BarsFormatter } from '../../lib/formatters/bars-formatter';
+import { BarItem } from '../../lib/bar-item';
+import * as process from 'node:process';
 
 const progresses: IProgress[] = [];
 const bar = new Bar();
@@ -12,8 +14,8 @@ const bar = new Bar();
   // default bar
   bar.add(new TextBarItem('Default bar:'));
   const progress = new Progress({ total: 100 });
-  bar.add(new BarItemLegacy(progresses));
   progresses.push(progress);
+  bar.add(new BarItem(progresses));
 }
 
 {
@@ -22,16 +24,18 @@ const bar = new Bar();
   const progress = new Progress({ total: 100 });
   progresses.push(progress);
   bar.add(
-    new BarItemLegacy(
+    new BarItem(
       [progress, new Progress({ total: 100, start: 50, tag: 'red' })],
       {
         // override default template
-        template:
-          '[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {red:value} {value}/{total}',
-        tagDelimiter: ':',
+        template: (
+          { bars, percentage, eta, speed, duration, value, total },
+          red,
+        ) => {
+          return `[${bars}] ${percentage}% ETA: ${eta}s speed: ${speed}/s duration: ${duration}s ${red.value} ${value}/${total}`;
+        },
         formatters: {
-          'red:bar': str => chalk.red(str),
-          bar: str => chalk.green(str),
+          bars: new BarsFormatter([null, chalk.red]),
         },
       },
     ),
@@ -44,7 +48,7 @@ const bar = new Bar();
   const greenProgress = new Progress({ total: 100, start: 50, tag: 'green' });
   progresses.push(greenProgress);
   bar.add(
-    new BarItemLegacy(
+    new BarItem(
       [
         greenProgress,
         new Progress({ total: 100, start: 65, tag: 'red' }),
@@ -52,15 +56,25 @@ const bar = new Bar();
         new Progress({ total: 100, start: 90, tag: 'yellow' }),
       ],
       {
-        template:
-          '[{bars}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
+        template: ({
+          bars,
+          percentage,
+          eta,
+          speed,
+          duration,
+          value,
+          total,
+        }) => {
+          return `[${bars}] ${percentage}% ETA: ${eta}s speed: ${speed}/s duration: ${duration}s ${value}/${total}`;
+        },
         options: presets.shades,
         formatters: {
-          bar: (str, progress, progresses) => {
+          bars: (str, progress, progresses) => {
             const index = progresses.findIndex(p => p === progress);
             const colors = [chalk.green, chalk.red, chalk.blue, chalk.yellow];
             return colors[index](str);
           },
+          // OR bars: new BarsFormatter([chalk.green, chalk.red, chalk.blue, chalk.yellow]),
         },
       },
     ),
@@ -78,11 +92,11 @@ const bar = new Bar();
   );
   progresses.push(progressWithCustomPayload);
   bar.add(
-    new BarItemLegacy([progressWithCustomPayload], {
-      template: '[{bar}] {percentage} user: {user}',
-      formatters: {
-        // format custom payload
-        user: str => chalk.bold(str),
+    new BarItem([progressWithCustomPayload], {
+      template: ({ bar, percentage, progress }) => {
+        const payload = progress.getPayload() as { user: string };
+        const user = chalk.bold(payload.user);
+        return `[${bar}] ${percentage}% user: ${user}`;
       },
     }),
   );
@@ -91,22 +105,28 @@ const bar = new Bar();
 {
   // use presets
   bar.add(new TextBarItem('Presets:'));
-  const rectProgress = new Progress({ total: 100, start: 33 });
-  progresses.push(rectProgress);
-  bar.add(
-    new BarItemLegacy(rectProgress, {
-      options: presets.rect,
-    }),
-  );
-
-  const shadesProgress = new Progress({ total: 100, start: 77 });
-  progresses.push(shadesProgress);
-
-  bar.add(
-    new BarItemLegacy(shadesProgress, {
-      options: presets.shades,
-    }),
-  );
+  Object.keys(presets).forEach(presetKey => {
+    const presetProgress = new Progress({ total: 100, start: 33 }, { name: presetKey });
+    progresses.push(presetProgress);
+    bar.add(
+      new BarItem(presetProgress, {
+        template: ({
+          bar,
+          percentage,
+          eta,
+          speed,
+          duration,
+          value,
+          total,
+          progress,
+        }) => {
+          const payload = progress.getPayload() as { name: string };
+          return `[${bar}] ${percentage}% ETA: ${eta} speed: ${speed} duration: ${duration} ${value}/${total} [${payload.name}]`;
+        },
+        options: presets[presetKey],
+      }),
+    );
+  });
 }
 
 {
@@ -115,8 +135,25 @@ const bar = new Bar();
   const textInBarProgress = new Progress({ total: 100, start: 0 });
   progresses.push(textInBarProgress);
   bar.add(
-    new BarItemLegacy([textInBarProgress], {
+    new BarItem([textInBarProgress], {
       options: presets.rect,
+        /*
+      template: ({ bar, percentage }) => {
+        const percentageString = ` ${percentage} % `;
+        const buff = bar.toString().split('');
+        const startPosition = Math.round(
+          buff.length / 2 - percentageString.length / 2,
+        );
+        for (const [index, char] of percentageString.split('').entries()) {
+          buff[startPosition + index] = char;
+        }
+        const done = Math.round(textInBarProgress.getProgress() * buff.length);
+        const newBar =
+          chalk.yellowBright(buff.slice(0, done).join('')) +
+          buff.slice(done).join('');
+        return `[${bar}] ${percentage}% `;
+      },
+         */
       formatters: {
         bar: (value, progress) => {
           const str = value.toString();
@@ -166,14 +203,23 @@ function* rotate(
   progresses.push(textInBarRotation);
 
   bar.add(
-    new BarItemLegacy([textInBarRotation], {
-      template:
-        '[{bar}] {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total}',
+    new BarItem([textInBarRotation], {
+      template: ({
+        bar,
+        percentage,
+        eta,
+        speed,
+        duration,
+        value,
+        total,
+        progress,
+      }) => {
+        const spinText = spin.next(progress.getProgress() < 1).value;
+        return `[${bar}] ${spinText} ${percentage}% ETA: ${eta}s speed: ${speed}/s duration: ${duration}s ${value}/${total}`;
+      },
       options: presets.rect,
       formatters: {
         bar: str => chalk.yellowBright(str),
-        percentage: (str, progress) =>
-          spin.next(progress.getProgress() < 1).value + ' ' + str,
       },
     }),
   );
@@ -185,14 +231,28 @@ function* rotate(
   const textInBarProgress = new Progress({ total: 100, start: 0, tag: '0' });
   progresses.push(textInBarProgress);
   bar.add(
-    new BarItemLegacy([textInBarProgress], {
-      tagDelimiter: ':',
-      template:
-        chalk.yellowBright(
-          ' '.repeat(20) +
-            '{0:percentage} {0:spin} ETA: {0:eta} speed: {0:speed} duration: {0:duration} {0:value}/{0:total}\n',
-        ) +
-        '[{0:bar}][{0:spin}] {0:percentage} ETA: {0:eta} speed: {speed} duration: {0:duration} {0:value}/{0:total}',
+    new BarItem([textInBarProgress], {
+      template: ({
+        bar,
+        percentage,
+        eta,
+        speed,
+        duration,
+        value,
+        total,
+        progress,
+      }) => {
+        const spinText = spin.next(progress.getProgress() < 1).value;
+        return (
+          '='.repeat(20) + '\n' +
+          chalk.yellowBright(
+            ' '.repeat(20) +
+              `${percentage} ${spinText} ETA: ${eta}s speed: ${speed}/s duration: ${duration}s ${value}/${total}\n`,
+          ) +
+          `[${bar}][${spinText}] ${percentage} ETA: ${eta} speed: ${speed} duration: ${duration} ${value}/${total}\n` +
+          '='.repeat(20)
+        );
+      },
       options: {
         glue: '>>>>',
         width: 36,
@@ -200,16 +260,17 @@ function* rotate(
         completeChar: ' ',
       },
       formatters: {
-        '0:bar': str => chalk.yellowBright(str),
+        bar: str => chalk.yellowBright(str),
       },
+      // TODO: think again about dataProviders
       dataProviders: {
         spin: progress => spin.next(progress.getProgress() < 1).value,
-        longText: () =>
-          'this is a long text with multi lines\nline 2 with some text',
       },
     }),
   );
 }
+
+/*
 
 {
   bar.add(new TextBarItem('Custom progress >>>'));
@@ -334,6 +395,8 @@ function* rotate(
   progresses.push(progress);
 }
 
+
+ */
 bar.start();
 
 loopProgresses(progresses, () => 300);

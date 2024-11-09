@@ -1,4 +1,4 @@
-import { Bar, BarItem, presets, Progress } from '../';
+import { Bar, BarItemLegacy, presets, Progress } from '../';
 import * as chalk from 'chalk';
 import { TextBarItem } from './text-bar-item';
 import { loopProgresses } from './helpers';
@@ -17,7 +17,7 @@ const keyLength = Object.keys(presets).reduce(
 );
 Object.keys(presets).forEach(key => {
   bar.add(
-    new BarItem(progress, {
+    new BarItemLegacy(progress, {
       template: ' ' + key.padEnd(keyLength, ' ') + ': ' + template,
       options: presets[key],
     }),
@@ -28,7 +28,7 @@ bar.add(new TextBarItem(''));
 
 Object.keys(presets).forEach(key => {
   bar.add(
-    new BarItem([redProgress, blueProgress], {
+    new BarItemLegacy([redProgress, blueProgress], {
       options: presets[key],
       template: ` ${key.padEnd(
         keyLength,

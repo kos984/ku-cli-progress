@@ -6,13 +6,18 @@ $ npm install  ku-progress-bar
 
 ## Simple bar
 ```typescript
+// FIXME: see the example in the src/examples/v2/simple.example.ts
 const progress = new Progress({ total: 1000 });
 
-const bar = new Bar(progress);
+const bar = new Bar();
+
+bar.add(new BarItem(progress, {
+    template: () => `aaaa`;
+}));
 
 progress.increment(300);
 
-bar.renderBars();
+bar.render();
 ```
 
 ```console
@@ -23,13 +28,13 @@ bar.renderBars();
 ## Presets
 
 ```typescript
-import { Bar, BarItem, presets, Progress } from '../';
+import { Bar, BarItemLegacy, presets, Progress } from '../';
 import * as chalk from 'chalk';
 
 const bar = new Bar();
 const progress = new Progress({ total: 100 });
 
-bar.add(new BarItem(progress, {
+bar.add(new BarItemLegacy(progress, {
   options: presets.braille,
 }));
 
@@ -68,7 +73,7 @@ const progresses = [
   new Progress({ total: 1000 }),
 ];
 bar.add(
-  new BarItem(
+  new BarItemLegacy(
     progresses,
     {
       options: presets.shades,
@@ -86,7 +91,7 @@ bar.add(
 
 ![multi-files-processing](docs/images/multi-files-processing.example.gif)
 
-## Parameters of the `BarItem` class:
+## Parameters of the `BarItemLegacy` class:
 
 1.  **`progresses`** (`IProgress | IProgress[]`):
    An object or an array of objects of type `IProgress` representing the progress.
@@ -104,7 +109,7 @@ bar.add(
 
 ```typescript
 bar.add(
-  new BarItem(progress, {
+  new BarItemLegacy(progress, {
     template:
       '[{bar}] {spinner} {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total} (task: {task})',
     dataProviders: {
@@ -114,7 +119,7 @@ bar.add(
 );
 // or
 bar.add(
-  new BarItem<never, { spinner: () => string }>(progress, {
+  new BarItemLegacy<never, { spinner: () => string }>(progress, {
     template: ({ bar, percentage, eta, speed, duration, value, total, spinner}) => {
       const task = progress.getPayload().task;
       return `[${bar}] ${spinner} ${percentage} ETA: ${eta} speed: ${speed} duration: ${duration} ${value}/${total} (task: ${task})`;
@@ -127,7 +132,7 @@ bar.add(
 
 ```
 
-In the `BarItem` class, the `template` represents a string template that defines how the progress bar will be displayed. In this template, you can use various placeholders that will substitute actual progress values into the resulting string.
+In the `BarItemLegacy` class, the `template` represents a string template that defines how the progress bar will be displayed. In this template, you can use various placeholders that will substitute actual progress values into the resulting string.
 
 Let's review some key placeholders you can use in the template:
 
@@ -149,7 +154,7 @@ For instance, a template `"[{bar}] Progress: {percentage}%, ETA: {eta}"` will di
 
 Additionally, if you pass a custom payload to `Progress`, it is also possible to use it in the template by using the same approach: `{payload_object_key_name}`.
 
-Moreover, you can pass a `dataProviders` object as a parameter to `BarItem`. For example:
+Moreover, you can pass a `dataProviders` object as a parameter to `BarItemLegacy`. For example:
 
 ```typescript
 const dataProviders = {
@@ -181,7 +186,7 @@ function * Spinner(chars: string[], delay = 500): Generator<string> {
    }
 }
 const spinner = Spinner([ '\\', '|', '/', '-']);
-bar.add(new BarItem(progress, {
+bar.add(new BarItemLegacy(progress, {
    template: '[{bar}] {spinner} {percentage} ETA: {eta} speed: {speed} duration: {duration} {value}/{total} (task: {task})',
    dataProviders: {
       spinner: () => spinner.next().value,
@@ -239,7 +244,7 @@ It is possible use tags in templates and formatters
 const progress = new Progress({ total: 100 });
 progresses.push(progress);
 bar.add(
-  new BarItem(
+  new BarItemLegacy(
     [progress, new Progress({ total: 100, start: 50, tag: 'red' })],
     {
       template:

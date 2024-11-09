@@ -1,4 +1,4 @@
-import { Bar, BarItem, BarsFormatter, presets, Progress } from '../';
+import { Bar, BarItemLegacy, BarsFormatter, presets, Progress } from '../';
 import * as chalk from 'chalk';
 import { loopProgresses } from './helpers';
 
@@ -8,7 +8,7 @@ const progresses = [
   new Progress({ total: 1000 }),
 ];
 bar.add(
-  new BarItem(progresses, {
+  new BarItemLegacy(progresses, {
     options: presets.shades,
     formatters: {
       bars: new BarsFormatter([chalk.green, chalk.yellowBright]),

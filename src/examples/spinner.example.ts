@@ -2,7 +2,7 @@ import {
   Bar,
   BarDataProvider,
   BarDataResult,
-  BarItem,
+  BarItemLegacy,
   IProgress,
   presets,
   Progress,
@@ -17,7 +17,7 @@ const progresses = [progress, scan];
 
 const bar = new Bar();
 
-const barItem = new BarItem<
+const barItem = new BarItemLegacy<
   never,
   {
     spinner: (progress: IProgress, progresses: IProgress[]) => string;
@@ -52,8 +52,8 @@ const barItem = new BarItem<
     return `
       \r Files: ${value[0]} of ${totalString}
       \r Time:        ${duration[0]}, estimated ${eta[0]}
-      \r [${bar[0]}] ${percentage} ${percentage}
-      \r ${scanningString} 
+      \r [${bar[0]}] ${percentage[0]} 
+      \r ${scanningString} ${percentage[1]}
       \r ${processing}
     `;
   },
@@ -95,7 +95,7 @@ progress.on('update', () => {
   bar.logWrap(() => console.log('DONE', progress.getPayload().file));
   progress.getPayload().file = progress.getPayload().files[progress.getValue()];
   if (progress.getProgress() >= 1) {
-    bar.logWrap(() => 'clear');
+    bar.logWrap(() => console.log('PROCESSING COMPLETE'));
     clearInterval(interval);
     clearInterval(intervals[1]);
   }
