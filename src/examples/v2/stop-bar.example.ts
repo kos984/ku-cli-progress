@@ -18,6 +18,5 @@ logger.assert(false, 'test assert');
 
 setTimeout(() => {
   bar.stop();
-  bar.log('stopping');
-  // FIXME: stop is not nothing, so it does not make sense to call it
+  console.log('stopping');
 }, 3000);

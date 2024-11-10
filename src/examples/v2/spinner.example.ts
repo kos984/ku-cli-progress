@@ -4,7 +4,9 @@ import { SpinnerDataProvider } from '../../lib/data-providers/spinner/spinner.da
 import { BarItem } from '../../lib/bar-item';
 import * as fs from 'fs';
 
-const mainProgress = new Progress<{ files: string[]; file: string }>({ total: 1 });
+const mainProgress = new Progress<{ files: string[]; file: string }>({
+  total: 1,
+});
 const scanProgress = new Progress({ total: 100 });
 const progresses = [mainProgress, scanProgress];
 

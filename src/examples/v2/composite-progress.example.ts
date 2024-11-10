@@ -19,7 +19,7 @@ const progresses = [
 
 bar.add(
   new BarItem<{
-    dataProviders: { etaHumanReadable2: string; etaHumanReadable3: string }
+    dataProviders: { etaHumanReadable2: string; etaHumanReadable3: string };
   }>(progresses, {
     options: presets.shades,
     template: ({
