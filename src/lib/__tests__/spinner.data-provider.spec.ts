@@ -1,4 +1,9 @@
-import { Progress, SpinnerDataProvider, BarItemLegacy, IDataProvider } from '../../';
+import {
+  Progress,
+  SpinnerDataProvider,
+  BarItemLegacy,
+  IDataProviderLegacy,
+} from '../../';
 
 jest.mock('../time');
 import { getTime } from '../time';
@@ -17,15 +22,15 @@ describe('spinner.data-provider', () => {
       .mockReturnValueOnce(1302)
       .mockReturnValueOnce(1503)
       .mockReturnValueOnce(2004);
-    const barItem = new BarItemLegacy<never, { spinner: IDataProvider<string> }>(
-      progress,
-      {
-        template: ({ spinner }) => `[${spinner}]`,
-        dataProviders: {
-          spinner: spinnerDataProvider.getProviders().spinner,
-        },
+    const barItem = new BarItemLegacy<
+      never,
+      { spinner: IDataProviderLegacy<string> }
+    >(progress, {
+      template: ({ spinner }) => `[${spinner}]`,
+      dataProviders: {
+        spinner: spinnerDataProvider.getProviders().spinner,
       },
-    );
+    });
     expect(barItem.render()).toEqual('[\\]');
     expect(barItem.render()).toEqual('[|]');
     expect(barItem.render()).toEqual('[/]');
@@ -44,15 +49,15 @@ describe('spinner.data-provider', () => {
       .mockReturnValueOnce(1002)
       .mockReturnValueOnce(1302)
       .mockReturnValueOnce(1503);
-    const barItem = new BarItemLegacy<never, { spinner: IDataProvider<string> }>(
-      progress,
-      {
-        template: ({ spinner }) => `[${spinner}]`,
-        dataProviders: {
-          spinner: spinnerDataProvider.getProviders().spinner,
-        },
+    const barItem = new BarItemLegacy<
+      never,
+      { spinner: IDataProviderLegacy<string> }
+    >(progress, {
+      template: ({ spinner }) => `[${spinner}]`,
+      dataProviders: {
+        spinner: spinnerDataProvider.getProviders().spinner,
       },
-    );
+    });
     expect(barItem.render()).toEqual('[⠹]');
     expect(barItem.render()).toEqual('[⠸]');
     expect(barItem.render()).toEqual('[⠼]');
@@ -68,15 +73,15 @@ describe('spinner.data-provider', () => {
       .mockReturnValueOnce(1002)
       .mockReturnValueOnce(1302)
       .mockReturnValueOnce(1503);
-    const barItem = new BarItemLegacy<never, { spinner: IDataProvider<string> }>(
-      progress,
-      {
-        template: ({ spinner }) => `[${spinner}]`,
-        dataProviders: {
-          spinner: spinnerDataProvider.getProviders().spinner,
-        },
+    const barItem = new BarItemLegacy<
+      never,
+      { spinner: IDataProviderLegacy<string> }
+    >(progress, {
+      template: ({ spinner }) => `[${spinner}]`,
+      dataProviders: {
+        spinner: spinnerDataProvider.getProviders().spinner,
       },
-    );
+    });
     expect(barItem.render()).toEqual('[.  ]');
     expect(barItem.render()).toEqual('[.. ]');
     expect(barItem.render()).toEqual('[...]');

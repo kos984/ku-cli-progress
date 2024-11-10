@@ -3,6 +3,7 @@ export * from './lib/progress';
 export * from './lib/eta';
 export * from './lib/presets';
 export * from './lib/bar-item-legacy';
+export * from './lib/bar-item';
 export * from './lib/terminals/terminal-tty';
 
 export * from './lib/data-providers/bar/bar.data-provider';

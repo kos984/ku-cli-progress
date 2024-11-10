@@ -55,7 +55,7 @@ export interface IDataProviders {
 export interface IParams<ICustomInterfaces extends ICustomInterfacesExtends> {
   template?: ITemplateFunction<ICustomInterfaces['dataProviders']>;
   options?: Partial<IBarOptions>;
-  formatters?: Partial<IFormatter & ICustomInterfaces['formatters']>; // FIXME: looks not correct
+  formatters?: Partial<IFormatter & ICustomInterfaces['formatters']>;
   dataProviders?: Record<string, IDataProvider<unknown>>;
 }
 
@@ -64,8 +64,9 @@ export interface ICustomInterfacesExtends {
   dataProviders?: unknown;
 }
 
-export class BarItem<ICustomInterfaces extends ICustomInterfacesExtends>
-  implements IBarItem
+export class BarItem<
+  ICustomInterfaces extends Partial<ICustomInterfacesExtends>,
+> implements IBarItem
 {
   protected template!: ITemplateFunction<ICustomInterfaces['formatters']>;
   protected options: IBarOptions = {

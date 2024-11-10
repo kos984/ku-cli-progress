@@ -5,7 +5,6 @@ import { TextBarItem } from '../text-bar-item';
 import { loopProgresses } from '../helpers';
 import { BarsFormatter } from '../../lib/formatters/bars-formatter';
 import { BarItem } from '../../lib/bar-item';
-import * as process from 'node:process';
 
 const progresses: IProgress[] = [];
 const bar = new Bar();
@@ -106,7 +105,10 @@ const bar = new Bar();
   // use presets
   bar.add(new TextBarItem('Presets:'));
   Object.keys(presets).forEach(presetKey => {
-    const presetProgress = new Progress({ total: 100, start: 33 }, { name: presetKey });
+    const presetProgress = new Progress(
+      { total: 100, start: 33 },
+      { name: presetKey },
+    );
     progresses.push(presetProgress);
     bar.add(
       new BarItem(presetProgress, {
@@ -137,7 +139,7 @@ const bar = new Bar();
   bar.add(
     new BarItem([textInBarProgress], {
       options: presets.rect,
-        /*
+      /*
       template: ({ bar, percentage }) => {
         const percentageString = ` ${percentage} % `;
         const buff = bar.toString().split('');
@@ -244,7 +246,8 @@ function* rotate(
       }) => {
         const spinText = spin.next(progress.getProgress() < 1).value;
         return (
-          '='.repeat(20) + '\n' +
+          '='.repeat(20) +
+          '\n' +
           chalk.yellowBright(
             ' '.repeat(20) +
               `${percentage} ${spinText} ETA: ${eta}s speed: ${speed}/s duration: ${duration}s ${value}/${total}\n`,

@@ -29,6 +29,9 @@ describe('Bar', () => {
       [
         '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n',
       ],
+      [
+        '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n',
+      ],
     ]);
   });
 
@@ -55,6 +58,9 @@ describe('Bar', () => {
       [
         '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
       ],
+      [
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
+      ],
     ]);
   });
 
@@ -62,7 +68,10 @@ describe('Bar', () => {
     const bar = new Bar(mockTerminal, barOptions);
     const progress = new Progress({ total: 100 });
     const progressToRemove = new Progress({ total: 200, start: 50 });
-    bar.add(new BarItemLegacy(progress)).add(new BarItemLegacy(progressToRemove)).start();
+    bar
+      .add(new BarItemLegacy(progress))
+      .add(new BarItemLegacy(progressToRemove))
+      .start();
     progress.increment();
     await new Promise(resolve => setTimeout(resolve, refreshTimeMs * 2));
     bar.removeByProgress(progressToRemove);
@@ -76,6 +85,9 @@ describe('Bar', () => {
       [
         '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n' +
           '[==========------------------------------] 25% ETA: ∞ speed: 0/s duration: 0s 50/200\n',
+      ],
+      [
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
       ],
       [
         '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
@@ -108,6 +120,9 @@ describe('Bar', () => {
       [
         '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
       ],
+      [
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
+      ],
     ]);
   });
 
@@ -133,6 +148,10 @@ describe('Bar', () => {
         '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n' +
           '[==========------------------------------] 26% ETA: ∞ speed: 0/s duration: 0s 51/200\n',
       ],
+      [
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n' +
+          '[==========------------------------------] 26% ETA: ∞ speed: 0/s duration: 0s 51/200\n',
+      ],
     ]);
   });
   it('logWrap', async () => {
@@ -153,6 +172,9 @@ describe('Bar', () => {
         '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
       ],
       ['some log'],
+      [
+        '[----------------------------------------] 1% ETA: ∞ speed: 0/s duration: 0s 1/100\n',
+      ],
     ]);
   });
   it('should not render bar if not started', async () => {
@@ -167,6 +189,9 @@ describe('Bar', () => {
     expect(mockTerminal.write.mock.calls).toEqual([
       [
         '[----------------------------------------] 0% ETA: ∞ speed: 0/s duration: 0s 0/100\n',
+      ],
+      [
+        '[=---------------------------------------] 3% ETA: ∞ speed: 0/s duration: 0s 3/100\n',
       ],
       [
         '[=---------------------------------------] 3% ETA: ∞ speed: 0/s duration: 0s 3/100\n',

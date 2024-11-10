@@ -12,8 +12,8 @@ export const defaultTemplate: ITemplateFunction<unknown> = (...args) => {
     .map(arg => formatNumber(arg?.percentage, '%'))
     .join('/');
   const eta = args.map(arg => formatNumber(arg?.eta, 's')).join('/');
-  const speed = args.map(arg => formatNumber(arg?.speed, 's')).join('/');
+  const speed = args.map(arg => formatNumber(arg?.speed, '/s')).join('/');
   const duration = args.map(arg => formatNumber(arg?.duration, 's')).join('/');
   const valueOfTotal = args.map(arg => arg?.value + '/' + arg?.total).join(' ');
-  return `[${bars}] ${percentage} ETA ${eta} speed: ${speed} duration: ${duration} ${valueOfTotal}`;
+  return `[${bars}] ${percentage} ETA: ${eta} speed: ${speed} duration: ${duration} ${valueOfTotal}`;
 };

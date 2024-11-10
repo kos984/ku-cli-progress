@@ -4,75 +4,75 @@ import { IBarItem } from './interfaces/bar-item.interface';
 import { BarDataProvider } from './data-providers/bar/bar.data-provider';
 import { BarDataResult } from './data-providers/bar/bar.data-result';
 
-export type IBarFormatter = (
+export type IBarFormatterLegacy = (
   str: BarDataResult,
   progress: IProgress,
   progresses: IProgress[],
 ) => BarDataResult | string;
 
-export type IFormatter = (
+export type IFormatterLegacy = (
   str: string,
   progress: IProgress,
   progresses: IProgress[],
 ) => string;
 
-export interface IObjectFormatter<IFormatter> {
+export interface IObjectFormatterLegacy<IFormatter> {
   formatter: IFormatter;
 }
 
-export interface IFormatters {
-  bars: IBarFormatter | IObjectFormatter<IBarFormatter>;
-  bar: IBarFormatter | IObjectFormatter<IBarFormatter>;
-  speed: IFormatter | IObjectFormatter<IFormatter>;
-  eta: IFormatter | IObjectFormatter<IFormatter>;
-  etaHumanReadable: IFormatter | IObjectFormatter<IFormatter>;
-  value: IFormatter | IObjectFormatter<IFormatter>;
-  total: IFormatter | IObjectFormatter<IFormatter>;
-  percentage: IFormatter | IObjectFormatter<IFormatter>;
-  duration: IFormatter | IObjectFormatter<IFormatter>;
+export interface IFormattersLegacy {
+  bars: IBarFormatterLegacy | IObjectFormatterLegacy<IBarFormatterLegacy>;
+  bar: IBarFormatterLegacy | IObjectFormatterLegacy<IBarFormatterLegacy>;
+  speed: IFormatterLegacy | IObjectFormatterLegacy<IFormatterLegacy>;
+  eta: IFormatterLegacy | IObjectFormatterLegacy<IFormatterLegacy>;
+  etaHumanReadable: IFormatterLegacy | IObjectFormatterLegacy<IFormatterLegacy>;
+  value: IFormatterLegacy | IObjectFormatterLegacy<IFormatterLegacy>;
+  total: IFormatterLegacy | IObjectFormatterLegacy<IFormatterLegacy>;
+  percentage: IFormatterLegacy | IObjectFormatterLegacy<IFormatterLegacy>;
+  duration: IFormatterLegacy | IObjectFormatterLegacy<IFormatterLegacy>;
 }
 
-export type IDataProvider<IResult> = (
+export type IDataProviderLegacy<IResult> = (
   progress: IProgress,
   progresses: IProgress[],
 ) => IResult;
 
-export interface IDataProviders {
+export interface IDataProvidersLegacy {
   // [key: string]: (progress: IProgress, progresses: IProgress[]) => string;
-  bars: IDataProvider<BarDataResult>;
-  bar: IDataProvider<BarDataResult>;
-  speed: IDataProvider<string>;
-  eta: IDataProvider<string>;
-  etaHumanReadable: IDataProvider<string>;
-  value: IDataProvider<string>;
-  total: IDataProvider<string>;
-  percentage: IDataProvider<string>;
-  duration: IDataProvider<string>;
+  bars: IDataProviderLegacy<BarDataResult>;
+  bar: IDataProviderLegacy<BarDataResult>;
+  speed: IDataProviderLegacy<string>;
+  eta: IDataProviderLegacy<string>;
+  etaHumanReadable: IDataProviderLegacy<string>;
+  value: IDataProviderLegacy<string>;
+  total: IDataProviderLegacy<string>;
+  percentage: IDataProviderLegacy<string>;
+  duration: IDataProviderLegacy<string>;
 }
 
-export interface IParams<ICustomFormatters, ICustomDataProvider> {
+export interface IParamsLegacy<ICustomFormatters, ICustomDataProvider> {
   tagDelimiter?: string;
-  template?: ITemplate<ICustomDataProvider>;
+  template?: ITemplateLegacy<ICustomDataProvider>;
   options?: Partial<IBarOptions>;
-  formatters?: Partial<IFormatters & ICustomFormatters>;
-  dataProviders?: Partial<IDataProviders & ICustomDataProvider>;
+  formatters?: Partial<IFormattersLegacy & ICustomFormatters>;
+  dataProviders?: Partial<IDataProvidersLegacy & ICustomDataProvider>;
 }
 
 type IData<T> = {
   [K in keyof T]: string;
 } & {
-  [K in keyof IDataProviders]: string;
+  [K in keyof IDataProvidersLegacy]: string;
 };
 
-export type IFunctionTemplate<ICustomDataProvider> = (
+export type IFunctionTemplateLegacy<ICustomDataProvider> = (
   dataProviders: IData<ICustomDataProvider>,
   progress: IProgress,
   progresses: IProgress[],
 ) => string;
 
-export type ITemplate<ICustomDataProvider> =
+export type ITemplateLegacy<ICustomDataProvider> =
   | string
-  | IFunctionTemplate<ICustomDataProvider>;
+  | IFunctionTemplateLegacy<ICustomDataProvider>;
 
 export class BarItemLegacy<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -81,7 +81,7 @@ export class BarItemLegacy<
   ICustomDataProvider = any,
 > implements IBarItem
 {
-  protected template!: ITemplate<ICustomDataProvider>;
+  protected template!: ITemplateLegacy<ICustomDataProvider>;
   protected tagDelimiter!: string;
   protected options: IBarOptions = {
     completeChar: '=',
@@ -89,8 +89,8 @@ export class BarItemLegacy<
     width: 40,
     glue: '',
   };
-  protected formatters!: Partial<IFormatters & ICustomFormatters>;
-  protected dataProviders!: IDataProviders & ICustomDataProvider;
+  protected formatters!: Partial<IFormattersLegacy & ICustomFormatters>;
+  protected dataProviders!: IDataProvidersLegacy & ICustomDataProvider;
   protected progresses: IProgress[];
 
   protected proxyData: IData<ICustomDataProvider>;
@@ -98,7 +98,7 @@ export class BarItemLegacy<
 
   public constructor(
     progresses: IProgress | IProgress[],
-    params?: IParams<ICustomFormatters, ICustomDataProvider>,
+    params?: IParamsLegacy<ICustomFormatters, ICustomDataProvider>,
   ) {
     this.progresses = Array.isArray(progresses) ? progresses : [progresses];
     this.tagDelimiter = params?.tagDelimiter ?? '_';
@@ -224,8 +224,8 @@ export class BarItemLegacy<
 
   // eslint-disable-next-line max-lines-per-function
   protected getDataProviders(
-    dataProviders?: Partial<IDataProviders>,
-  ): IDataProviders & ICustomDataProvider {
+    dataProviders?: Partial<IDataProvidersLegacy>,
+  ): IDataProvidersLegacy & ICustomDataProvider {
     const formatNumber = (num: number, suffix: string): string => {
       if (!Number.isFinite(num)) return '\u221E';
       return num + suffix;
@@ -261,6 +261,6 @@ export class BarItemLegacy<
       duration: progress =>
         Math.round(progress.getEta().getDurationMs() / 1000) + 's',
       ...dataProviders,
-    } as IDataProviders & ICustomDataProvider;
+    } as IDataProvidersLegacy & ICustomDataProvider;
   }
 }
