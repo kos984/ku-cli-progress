@@ -195,4 +195,55 @@ describe('Bar', () => {
       ],
     ]);
   });
+  it('isStarted', () => {
+    const bar = new Bar();
+    expect(bar.isStarted()).toBeFalsy();
+    bar.start();
+    expect(bar.isStarted()).toBeTruthy();
+  });
+  it('start with refresh', async () => {
+    const bar = new Bar();
+    expect(
+      (bar as never as { refreshInterval: unknown }).refreshInterval,
+    ).toBeUndefined();
+    const spy = jest.spyOn(bar, 'render');
+    bar.start(10);
+    await new Promise(resolve => setTimeout(resolve, 20));
+    expect(
+      (bar as never as { refreshInterval: unknown }).refreshInterval,
+    ).toBeDefined();
+    bar.stop();
+    const calls = spy.mock.calls.length;
+    expect(calls).toBeGreaterThanOrEqual(2);
+    await new Promise(resolve => setTimeout(resolve, 20));
+    expect(spy.mock.calls.length).toEqual(calls);
+    expect(
+      (bar as never as { refreshInterval: unknown }).refreshInterval,
+    ).toMatchObject({
+      _destroyed: true,
+    });
+  });
+  it('wrap logger', () => {
+    const logger = {
+      level: 'info',
+      info: jest.fn(),
+    };
+    const terminalMock = {
+      clear: jest.fn(),
+      refresh: jest.fn(),
+      write: jest.fn(),
+    };
+    const bar = new Bar(terminalMock);
+    const clear = jest.spyOn(bar, 'clean');
+    const refresh = jest.spyOn(bar, 'refresh');
+    const wrappedLogger = bar.loggerWrap(logger);
+    expect(terminalMock.clear).toBeCalledTimes(0);
+    expect(terminalMock.refresh).toBeCalledTimes(0);
+    wrappedLogger.info('test');
+    expect(wrappedLogger.level).toEqual('info');
+    expect(wrappedLogger[Symbol('test')]).toBeUndefined();
+    expect(logger.info).toBeCalledWith('test');
+    expect(terminalMock.clear).toBeCalledTimes(1);
+    expect(terminalMock.refresh).toBeCalledTimes(1);
+  });
 });

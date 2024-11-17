@@ -84,7 +84,7 @@ export class Bar {
         if (typeof target[prop] === 'function') {
           return (...params) => {
             this.terminal.clear();
-            return target[prop](...params);
+            target[prop](...params);
             this.terminal.refresh();
           };
         }
@@ -100,12 +100,12 @@ export class Bar {
     return this;
   }
 
-  public start(autoRefresh = false) {
+  public start(autoRefresh = 0) {
     this.started = true;
     this.items.forEach(item => this.addListenerToProgress(item));
     this.render();
     if (autoRefresh) {
-      this.refreshInterval = setInterval(() => this.render(), 1000);
+      this.refreshInterval = setInterval(() => this.render(), autoRefresh);
     }
     return this;
   }

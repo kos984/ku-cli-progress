@@ -32,13 +32,14 @@ describe('Progress Bar Lib', () => {
         { foo_: 'bar' },
       );
       const barItem = new BarItem(progress, {
-        template: ({ bar, progress }) =>
+        template: ({ bar, progress, progresses }) =>
           `[${bar}] ${
-            (progress.getPayload() as { foo: string }).foo ?? '{tag1_foo}'
+            (progress.getPayload() as { foo: string }).foo ??
+            `{tag1_foo} [${progresses.length}]`
           }`,
       });
       expect(barItem.render()).toEqual(
-        '[----------------------------------------] {tag1_foo}',
+        '[----------------------------------------] {tag1_foo} 1',
       );
     });
 
@@ -94,13 +95,8 @@ describe('Progress Bar Lib', () => {
       const eta = new Eta();
       jest.spyOn(eta, 'getEtaS').mockReturnValue(1000000);
       const progress = new Progress({ total: 100, tag: 'tag', eta });
-      const barItem = new BarItem<{
-        dataProviders: { etaHumanReadable: string };
-      }>(progress, {
+      const barItem = new BarItem(progress, {
         template: ({ bar, etaHumanReadable }) => `[${bar}] ${etaHumanReadable}`,
-        dataProviders: {
-          ...new EtaDataProvider(),
-        },
       });
       expect(barItem.render()).toEqual(
         '[----------------------------------------] 11d13h46m40s',
@@ -110,13 +106,8 @@ describe('Progress Bar Lib', () => {
       const eta = new Eta();
       jest.spyOn(eta, 'getEtaS').mockReturnValue(0);
       const progress = new Progress({ total: 100, tag: 'tag', eta });
-      const barItem = new BarItem<{
-        dataProviders: { etaHumanReadable: string };
-      }>(progress, {
+      const barItem = new BarItem(progress, {
         template: ({ bar, etaHumanReadable }) => `[${bar}] ${etaHumanReadable}`,
-        dataProviders: {
-          ...new EtaDataProvider(),
-        },
       });
       expect(barItem.render()).toEqual(
         '[----------------------------------------] 0s',
@@ -327,15 +318,9 @@ describe('Progress Bar Lib', () => {
       const getEtaS = jest.spyOn(eta, 'getEtaS');
       getEtaS.mockReturnValue(1e1 as never);
       const progress = new Progress({ total: 1e6, eta });
-      const barItem = new BarItem<{
-        dataProviders: { etaHumanReadable: string };
-      }>(progress, {
-        // template: '{eta} {etaHumanReadable}',
+      const barItem = new BarItem(progress, {
         template: ({ eta, etaHumanReadable }) =>
           `${Number.isFinite(eta) ? eta + 's' : '∞'} ${etaHumanReadable}`,
-        dataProviders: {
-          ...new EtaDataProvider(),
-        },
       });
       expect(barItem.render()).toEqual('10s 10s');
       getEtaS.mockReturnValue(1e2 as never);

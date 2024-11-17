@@ -6,6 +6,7 @@ export interface IDataProviders {
   bar: BarDataResult;
   speed: number;
   eta: number;
+  etaHumanReadable: string;
   value: number;
   total: number;
   percentage: number;

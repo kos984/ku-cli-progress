@@ -1,9 +1,4 @@
-import {
-  Progress,
-  SpinnerDataProvider,
-  BarItem,
-  IDataProviderLegacy,
-} from '../../';
+import { Progress, SpinnerDataProvider, BarItem } from '../../';
 
 jest.mock('../time');
 import { getTime } from '../time';
