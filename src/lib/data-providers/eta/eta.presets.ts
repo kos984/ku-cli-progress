@@ -1,14 +1,16 @@
-import { IFormatPayload } from './eta.data-provider';
+import { IFormatPayload } from './types';
 
 export const etaFormatFunctionShort = (...args: IFormatPayload[]): string => {
   const format = (value: number, str: string, forceAdd: boolean = false) =>
     value || forceAdd ? `${value}${str}` : '';
-  return args
-    .reverse()
-    .reduce(
-      (str, { value, name }) => str + format(value, name, str.length !== 0),
-      '',
-    );
+  return (
+    args
+      .reverse()
+      .reduce(
+        (str, { value, name }) => str + format(value, name, str.length !== 0),
+        '',
+      ) || '0s'
+  );
 };
 
 export const etaFormatFunctionLong = (...args: IFormatPayload[]): string => {

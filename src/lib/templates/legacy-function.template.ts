@@ -1,7 +1,6 @@
-// FIXME: think about folder name, it is not looks great to me, something like bit-item-template???
 import { ITemplateFunction } from '../bar-items/bar-item';
 
-export const defaultTemplate: ITemplateFunction<unknown> = (...args) => {
+export const legacyFunctionTemplate: ITemplateFunction<unknown> = (...args) => {
   const formatNumber = (num: number, suffix: string): string => {
     if (!Number.isFinite(num)) return '\u221E';
     return num + suffix;

@@ -45,7 +45,7 @@ export class EtaDataProvider {
   }
 
   protected formatEtaHumanReadable = (num: number): string => {
-    // if (!Number.isFinite(num)) return '\u221E'; // FIXME: think about it
+    if (!Number.isFinite(num)) return '\u221E'; // FIXME: think about it
     const data: IFormatPayload[] = [
       { period: 3600 * 24, name: ETimePeriodKey.days },
       { period: 3600, name: ETimePeriodKey.hours },

@@ -2,7 +2,7 @@ import { TerminalTty } from './terminals/terminal-tty';
 import { ITerminal } from './interfaces/terminal.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
 import { IProgress } from './interfaces/progress.interface';
-import { BarItem } from './bar-item';
+import { BarItem } from './bar-items/bar-item/bar-item';
 
 // TODO: add logger and update documentation
 export interface IOptions {

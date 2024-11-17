@@ -31,12 +31,26 @@ export class BarDataProvider {
     };
   }
 
-  protected bar(progress: IProgress): BarDataResult {
-    return this.renderBar(progress.getProgress(), progress);
+  protected bar(progress: IProgress, progresses: IProgress[]): BarDataResult {
+    return this.format(
+      this.renderBar(progress.getProgress(), progress),
+      progress,
+      progresses,
+    );
   }
 
   protected bars(progress: IProgress, progresses: IProgress[]): BarDataResult {
-    return this.renderBars(progresses);
+    return this.format(this.renderBars(progresses), progress, progresses);
+  }
+
+  protected format(
+    barDataResult: BarDataResult,
+    progress: IProgress,
+    progresses: IProgress[],
+  ): BarDataResult {
+    return this.options.formatter?.formatter
+      ? this.options.formatter.formatter(barDataResult, progress, progresses)
+      : barDataResult;
   }
 
   protected renderBar(donePercent: number, progress: IProgress): BarDataResult {
