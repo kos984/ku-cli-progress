@@ -70,7 +70,16 @@
       "clover",
       "html"
     ],
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": -10
+      }
+    }
   },
   "lint-staged": {
     "src/**/*.ts": "npm run lint -- --fix",

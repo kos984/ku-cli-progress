@@ -330,7 +330,7 @@ describe('Progress Bar Lib', () => {
       getEtaS.mockReturnValue(1e4 as never);
       expect(barItem.render()).toEqual('10000s 2h46m40s');
       getEtaS.mockReturnValue(1e5 as never);
-      expect(barItem.render()).toEqual('100000s 1d3h46m40s');
+      expect(barItem.render()).toEqual('100000s 1d03h46m40s');
       getEtaS.mockReturnValue(1e6 as never);
       expect(barItem.render()).toEqual('1000000s 11d13h46m40s');
       getEtaS.mockReturnValue(NaN as never);

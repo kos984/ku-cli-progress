@@ -28,10 +28,22 @@ export const etaFunctionPresets = {
   etaFormatFunctionTime,
 };
 
+export interface IEtaDataProviderParams {
+  infinitySymbol?: string;
+  formatFunction?: IFormatFunction;
+}
+
 export class EtaDataProvider {
-  public constructor(
-    protected formatFunction: IFormatFunction = etaFormatFunctionShort,
-  ) {}
+  protected formatFunction!: IFormatFunction;
+  protected infinitySymbol!: string;
+
+  public constructor(protected params: IEtaDataProviderParams = {}) {
+    this.formatFunction = params.formatFunction || etaFormatFunctionShort;
+    this.infinitySymbol =
+      typeof params.infinitySymbol === 'string'
+        ? params.infinitySymbol
+        : '\u221E';
+  }
 
   public getProviders(): {
     etaHumanReadable: (progress: IProgress, progresses: IProgress[]) => string;
@@ -45,7 +57,7 @@ export class EtaDataProvider {
   }
 
   protected formatEtaHumanReadable = (num: number): string => {
-    if (!Number.isFinite(num)) return '\u221E'; // FIXME: think about it
+    if (!Number.isFinite(num)) return this.infinitySymbol;
     const data: IFormatPayload[] = [
       { period: 3600 * 24, name: ETimePeriodKey.days },
       { period: 3600, name: ETimePeriodKey.hours },
@@ -53,8 +65,7 @@ export class EtaDataProvider {
       { period: 1, name: ETimePeriodKey.seconds },
     ].reduce(
       ({ n, result }, { period, name }) => {
-        const value = Number.isFinite(n) ? Math.floor(n / period) : n;
-        result.push({ period, name, value });
+        result.push({ period, name, value: Math.floor(n / period) });
         return { n: n % period, result };
       },
       { n: num, result: [] },

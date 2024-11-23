@@ -42,7 +42,7 @@ export class BarItem<ICustomInterfaces extends ICustomInterfacesExtends>
           etaDataProvider,
           params?.dataProviders,
         ].filter(Boolean),
-      }) as never as IDataProviders & ICustomInterfaces['dataProviders']; // FIXME: need to double check
+      }) as never as IDataProviders & ICustomInterfaces['dataProviders'];
     });
   }
 
