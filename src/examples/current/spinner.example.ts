@@ -1,5 +1,5 @@
 import { Bar, BarDataProvider, presets, Progress } from '../../';
-import { loopProgresses } from '../legacy/helpers';
+import { loopProgresses } from '../helpers/loop-progresses';
 import { SpinnerDataProvider } from '../../lib/data-providers/spinner/spinner.data-provider';
 import { BarItem } from '../../lib/bar-items/bar-item/bar-item';
 import * as fs from 'fs';

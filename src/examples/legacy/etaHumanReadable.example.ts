@@ -1,5 +1,5 @@
 import { Bar, BarItemLegacy, presets, Progress } from '../../index';
-import { loopProgresses } from './helpers';
+import { loopProgresses } from '../helpers/loop-progresses';
 
 const bar = new Bar();
 const progresses = [1e2, 1e3, 1e4, 1e5, 1e6, 1e7].map(

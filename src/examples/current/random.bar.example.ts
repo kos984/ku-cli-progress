@@ -2,7 +2,7 @@
 import { Bar, Progress, presets, IProgress, BarDataResult } from '../../';
 import * as chalk from 'chalk';
 import { TextBarItem } from '../legacy/text-bar-item';
-import { loopProgresses } from '../legacy/helpers';
+import { loopProgresses } from '../helpers/loop-progresses';
 import { BarsFormatter } from '../../lib/formatters/bars-formatter';
 import { BarItem } from '../../lib/bar-items/bar-item/bar-item';
 

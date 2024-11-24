@@ -1,5 +1,5 @@
 import { Bar, presets, Progress } from '../../../index';
-import { loopProgresses } from '../../legacy/helpers';
+import { loopProgresses } from '../../helpers/loop-progresses';
 import { BarItem } from '../../../lib/bar-items/bar-item/bar-item';
 
 const bar = new Bar();

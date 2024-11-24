@@ -42,7 +42,7 @@ export class BarItemLegacy<
       params?.template ?? this.getDefaultTemplate(this.progresses);
     this.options = { ...this.options, ...params?.options };
     this.formatters = params?.formatters ?? ({} as never);
-    this.dataProviders = this.getDataProviders(params?.dataProviders);
+    this.dataProviders = this.getLegacyDataProviders(params?.dataProviders);
     this.proxyData = this.createDataProxy(this.progresses);
   }
 
@@ -159,7 +159,7 @@ export class BarItemLegacy<
   };
 
   // eslint-disable-next-line max-lines-per-function
-  protected getDataProviders(
+  protected getLegacyDataProviders(
     dataProviders?: Partial<IDataProvidersLegacy>,
   ): IDataProvidersLegacy & ICustomDataProvider {
     const formatNumber = (num: number, suffix: string): string => {

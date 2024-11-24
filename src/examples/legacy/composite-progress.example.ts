@@ -6,7 +6,7 @@ import {
   Progress,
 } from '../../index';
 import * as chalk from 'chalk';
-import { loopProgresses } from './helpers';
+import { loopProgresses } from '../helpers/loop-progresses';
 
 const bar = new Bar().start();
 const progresses = [

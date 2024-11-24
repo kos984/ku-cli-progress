@@ -1,5 +1,5 @@
 import { Bar, BarItemLegacy, Progress } from '../../index';
-import { loopProgresses } from './helpers';
+import { loopProgresses } from '../helpers/loop-progresses';
 
 const bar = new Bar();
 const progress = new Progress({ total: 100 }, { task: 'users creating...' });

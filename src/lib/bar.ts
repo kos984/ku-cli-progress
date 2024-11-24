@@ -26,6 +26,11 @@ export class Bar {
     };
   }
 
+  public setTerminal(terminal: ITerminal) {
+    this.terminal = terminal;
+    return this;
+  }
+
   public isStarted() {
     return this.started;
   }
@@ -36,6 +41,10 @@ export class Bar {
       this.addListenerToProgress(bar);
     }
     return this;
+  }
+
+  public getItems(): IBarItem[] {
+    return this.items;
   }
 
   public remove(bar: IBarItem) {

@@ -3,19 +3,20 @@ import {
   BarsFormatter,
   EtaDataProvider,
   etaFunctionPresets,
-  IProgress,
   presets,
   Progress,
 } from '../../../index';
-import { BarItem } from '../../../lib/bar-items/bar-item/bar-item';
+import { BarItem } from '../../../lib/bar-items/bar-item';
 import * as chalk from 'chalk';
-import { loopProgresses } from '../../legacy/helpers';
+import { loopProgresses } from '../../helpers/loop-progresses';
 
-const bar = new Bar().start();
-const progresses = [
+export const bar = new Bar().start();
+export const progresses = [
   new Progress({ total: 10000, start: 300 }),
   new Progress({ total: 10000 }),
 ];
+
+export const formatter = new BarsFormatter([chalk.green, chalk.yellowBright]);
 
 bar.add(
   new BarItem<{
@@ -23,26 +24,26 @@ bar.add(
   }>(progresses, {
     options: {
       ...presets.shades,
-      formatter: new BarsFormatter([chalk.green, chalk.yellowBright]),
+      formatter,
     },
-    template: ({
-      value,
-      bars,
-      etaHumanReadable,
-      etaHumanReadable3,
-      etaHumanReadable2,
-      eta,
-    }) => {
-      return `[${bars}] ${value} ${eta} ${etaHumanReadable} ${etaHumanReadable2} ${etaHumanReadable3}`;
+    template: (
+      {
+        value,
+        bars,
+        etaHumanReadable,
+        etaHumanReadable3,
+        etaHumanReadable2,
+        eta,
+      },
+      data,
+    ) => {
+      return `[${bars}] value: ${value} | value2: ${data.value} ETA: ${eta} etaString: ${etaHumanReadable} etaString2: ${etaHumanReadable2} etaString3:${etaHumanReadable3}`;
     },
     dataProviders: {
-      value: (progress: IProgress) => {
-        return progress.getValue() * 100 + '';
-      },
       etaHumanReadable2: new EtaDataProvider().getProviders().etaHumanReadable,
-      etaHumanReadable3: new EtaDataProvider(
-        etaFunctionPresets.etaFormatFunctionTime,
-      ).getProviders().etaHumanReadable,
+      etaHumanReadable3: new EtaDataProvider({
+        formatFunction: etaFunctionPresets.etaFormatFunctionTime,
+      }).getProviders().etaHumanReadable,
     },
   }),
 );

@@ -22,7 +22,7 @@
   ],
   "scripts": {
     "prebuild": "rimraf dist",
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "lint": "rimraf '{.eslintcache}' && eslint src --quiet",
@@ -58,6 +58,9 @@
       "ts"
     ],
     "rootDir": "src",
+    "coveragePathIgnorePatterns": [
+      "__tests__"
+    ],
     "testRegex": "\\.spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
@@ -71,7 +74,6 @@
       "html"
     ],
     "testEnvironment": "node",
-    "collectCoverage": true,
     "coverageThreshold": {
       "global": {
         "branches": 100,

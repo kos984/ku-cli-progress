@@ -1,7 +1,7 @@
 import { Bar, BarItemLegacy, presets, Progress } from '../../index';
 import * as chalk from 'chalk';
 import { TextBarItem } from './text-bar-item';
-import { loopProgresses } from './helpers';
+import { loopProgresses } from '../helpers/loop-progresses';
 
 const bar = new Bar();
 const progress = new Progress({ total: 100 });

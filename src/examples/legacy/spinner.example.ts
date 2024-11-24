@@ -7,7 +7,7 @@ import {
   presets,
   Progress,
 } from '../../index';
-import { loopProgresses } from './helpers';
+import { loopProgresses } from '../helpers/loop-progresses';
 import { SpinnerDataProvider } from '../../lib/data-providers/spinner/spinner.data-provider';
 import * as fs from 'fs';
 

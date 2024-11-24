@@ -1,5 +1,5 @@
 import { Bar, Progress } from '../../index';
-import { loopProgresses } from './helpers';
+import { loopProgresses } from '../helpers/loop-progresses';
 
 const progress = new Progress({ total: 1000 });
 

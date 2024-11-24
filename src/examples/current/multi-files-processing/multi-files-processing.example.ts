@@ -1,4 +1,4 @@
-import { Bar, presets, Progress } from '../../../index';
+import { Bar, BarsFormatter, presets, Progress } from '../../../index';
 import { createReadStream, ReadStream } from 'fs';
 import { BarItem, ITemplateFunction } from '../../../lib/bar-items/bar-item';
 import * as chalk from 'chalk';
@@ -86,9 +86,9 @@ async function loadFile(file: IFile, bar: Bar) {
   bar.add(
     new BarItem(progress, {
       template,
-      options: presets.rect,
-      formatters: {
-        bar: str => chalk.yellow(str),
+      options: {
+        ...presets.rect,
+        formatter: new BarsFormatter([chalk.yellow]),
       },
     }),
   );
@@ -107,10 +107,10 @@ async function run() {
   const mainProgress = new Progress({ total: files.length });
   bar.add(
     new BarItem(mainProgress, {
-      formatters: {
-        bar: str => chalk.magentaBright(str),
+      options: {
+        ...presets.rect,
+        formatter: new BarsFormatter([chalk.magentaBright]),
       },
-      options: presets.rect,
     }),
   );
   const concurrent = 5;

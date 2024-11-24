@@ -7,7 +7,7 @@ const bar = new Bar();
 bar.add(new BarItem(progress, { options: presets.rect }));
 
 console.log('start');
-bar.start(true);
+bar.start(1000);
 progress.increment();
 
 const logger = bar.loggerWrap<typeof console>(console);
