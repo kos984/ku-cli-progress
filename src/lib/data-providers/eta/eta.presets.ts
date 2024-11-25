@@ -1,6 +1,18 @@
 import { IFormatPayload } from './types';
 
 // 2d07h33m20s
+export const etaFormatFunctionSeconds = (
+  s: IFormatPayload,
+  m: IFormatPayload,
+  h: IFormatPayload,
+  d: IFormatPayload,
+) => {
+  return `${d.value * 24 + h.value}:${m.value < 10 ? '0' + m.value : m.value}:${
+    s.value < 10 ? '0' + s.value : s.value
+  }`;
+};
+
+// 2d07h33m20s
 export const etaFormatFunctionShort = (...args: IFormatPayload[]): string => {
   const format = (value: number, str: string, forceAdd: boolean) =>
     value || forceAdd

@@ -11,12 +11,11 @@ import * as chalk from 'chalk';
 import { loopProgresses } from '../../helpers/loop-progresses';
 
 export const bar = new Bar().start();
-export const progresses = [
+
+const progresses = [
   new Progress({ total: 10000, start: 300 }),
   new Progress({ total: 10000 }),
 ];
-
-export const formatter = new BarsFormatter([chalk.green, chalk.yellowBright]);
 
 bar.add(
   new BarItem<{
@@ -24,7 +23,7 @@ bar.add(
   }>(progresses, {
     options: {
       ...presets.shades,
-      formatter,
+      formatter: new BarsFormatter([chalk.green, chalk.yellowBright]),
     },
     template: (
       {

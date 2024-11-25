@@ -34,6 +34,12 @@ export interface IEtaDataProviderParams {
 }
 
 export class EtaDataProvider {
+  public static presets = {
+    short: etaFormatFunctionShort,
+    long: etaFormatFunctionLong,
+    time: etaFormatFunctionTime,
+  };
+
   protected formatFunction!: IFormatFunction;
   protected infinitySymbol!: string;
 

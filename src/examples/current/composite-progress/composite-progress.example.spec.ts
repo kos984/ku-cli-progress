@@ -3,22 +3,25 @@ jest.mock('../../helpers/loop-progresses');
 jest.mock('../../../lib/formatters/bars-formatter');
 
 import { TerminalTty } from '../../../lib/terminals/terminal-tty';
-import { bar, progresses } from './composite-progress.example';
-import { test } from '../../__tests__/helpers';
+import { bar } from './composite-progress.example';
+import { ExampleBarTestHelper } from '../../__tests__/example-bar-test-helper';
 
 describe('CompositeProgressComponent', () => {
-  const STEPS = 10;
+  const MAX_STEPS = 10;
   const terminalMock = new TerminalTty() as jest.Mocked<TerminalTty>;
 
-  const { beforeEach: beforeEachHelper, iterate } = test(bar, STEPS);
+  const exampleBarTestHelper = new ExampleBarTestHelper({
+    bar,
+    maxSteps: MAX_STEPS,
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    beforeEachHelper();
+    exampleBarTestHelper.beforeEach();
   });
 
   it('one by one', () => {
-    iterate(progress => progress.getTotal() / STEPS);
+    exampleBarTestHelper.iterate(progress => progress.getTotal() / MAX_STEPS);
     expect(
       terminalMock.write.mock.calls.map(call => call[0]),
     ).not.toMatchObject([
@@ -38,7 +41,9 @@ describe('CompositeProgressComponent', () => {
   });
 
   it('one by few', () => {
-    iterate((progress, index) => (progress.getTotal() * (index + 1)) / STEPS);
+    exampleBarTestHelper.iterate(
+      (progress, index) => (progress.getTotal() * (index + 1)) / MAX_STEPS,
+    );
     expect(
       terminalMock.write.mock.calls.map(call => call[0]),
     ).not.toMatchObject([
@@ -58,9 +63,11 @@ describe('CompositeProgressComponent', () => {
   });
 
   it('one by few2', () => {
-    iterate(
+    exampleBarTestHelper.iterate(
       (progress, index) =>
-        (progress.getTotal() * (progresses.length - index)) / STEPS,
+        (progress.getTotal() *
+          (exampleBarTestHelper.progresses.length - index)) /
+        MAX_STEPS,
     );
     expect(
       terminalMock.write.mock.calls.map(call => call[0]),
