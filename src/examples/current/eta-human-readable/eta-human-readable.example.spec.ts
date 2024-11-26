@@ -36,7 +36,7 @@ describe('eta-human-readable.example', () => {
       '[0000000000000000000000000000000000001░░░] 9300 (9000) total: 10000 93% (90%) ETA: 10s (10s)\n',
       '[0000000000000000000000000000000000000000] 10000 (10000) total: 10000 100% (100%) ETA: 0s (0s)\n',
     ]);
-    console.log(calls);
+    // console.log(calls);
   });
 
   it.skip('one by few', () => {
