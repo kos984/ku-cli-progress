@@ -1,19 +1,10 @@
-import { IFormatPayload } from './types';
+import { etaParser } from './eta-parser';
+
+export const etaFormatFunctionSimple = (value: number) => value + 's';
 
 // 2d07h33m20s
-export const etaFormatFunctionSeconds = (
-  s: IFormatPayload,
-  m: IFormatPayload,
-  h: IFormatPayload,
-  d: IFormatPayload,
-) => {
-  return `${d.value * 24 + h.value}:${m.value < 10 ? '0' + m.value : m.value}:${
-    s.value < 10 ? '0' + s.value : s.value
-  }`;
-};
-
-// 2d07h33m20s
-export const etaFormatFunctionShort = (...args: IFormatPayload[]): string => {
+export const etaFormatFunctionShort = (value: number): string => {
+  const args = etaParser(value);
   const format = (value: number, str: string, forceAdd: boolean) =>
     value || forceAdd
       ? `${value < 10 && forceAdd ? '0' + value : value}${str}`
@@ -28,7 +19,8 @@ export const etaFormatFunctionShort = (...args: IFormatPayload[]): string => {
   );
 };
 
-export const etaFormatFunctionLong = (...args: IFormatPayload[]): string => {
+export const etaFormatFunctionLong = (value: number): string => {
+  const args = etaParser(value);
   const map = { s: 'second', d: 'day', h: 'hour', m: 'minute' };
   const format = (value: number, str: string, forceAdd: boolean) =>
     value || forceAdd
@@ -47,12 +39,8 @@ export const etaFormatFunctionLong = (...args: IFormatPayload[]): string => {
 };
 
 // 55:33:20
-export const etaFormatFunctionTime = (
-  s: IFormatPayload,
-  m: IFormatPayload,
-  h: IFormatPayload,
-  d: IFormatPayload,
-) => {
+export const etaFormatFunctionTime = (value: number) => {
+  const [s, m, h, d] = etaParser(value);
   return `${d.value * 24 + h.value}:${m.value < 10 ? '0' + m.value : m.value}:${
     s.value < 10 ? '0' + s.value : s.value
   }`;

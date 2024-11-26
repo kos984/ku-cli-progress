@@ -1,6 +1,6 @@
 export * from './lib/bar';
 export * from './lib/progress';
-export * from './lib/eta';
+export * from './lib/eta/eta';
 export * from './lib/presets';
 export * from './lib/bar-items/bar-item-legacy';
 export * from './lib/bar-items/bar-item';

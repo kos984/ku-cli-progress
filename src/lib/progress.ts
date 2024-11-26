@@ -1,7 +1,7 @@
 import * as EventEmitter from 'events';
 import { IProgress, IUpdateEvent } from './interfaces/progress.interface';
 import { IEta } from './interfaces/eta.interface';
-import { Eta } from './eta';
+import { Eta } from './eta/eta';
 
 export interface IProgressParams {
   total: number;

@@ -8,5 +8,8 @@ export interface IBarItemParams<
 > {
   template?: ITemplateFunction<ICustomInterfaces['dataProviders']>;
   options?: Partial<IBarOptions>;
-  dataProviders?: Record<string, IDataProvider<unknown>>;
+  dataProviders?: Record<
+    string,
+    IDataProvider<unknown> | { getData: IDataProvider<unknown> }
+  >;
 }

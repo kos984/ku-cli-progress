@@ -34,13 +34,13 @@ export class BarItem<ICustomInterfaces extends ICustomInterfacesExtends>
     const barDataProvider = new BarDataProvider(this.options).getProviders();
     const etaDataProvider = new EtaDataProvider().getProviders();
     this.dataProviders = this.progresses.map(progress => {
-      return new DataProviders({
+      return DataProviders.build({
         progress,
         progresses: this.progresses,
         customDataProviders: [
+          params?.dataProviders,
           barDataProvider,
           etaDataProvider,
-          params?.dataProviders,
         ].filter(Boolean),
       }) as never as IDataProviders & ICustomInterfaces['dataProviders'];
     });

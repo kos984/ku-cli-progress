@@ -1,8 +1,6 @@
-import {
-  EtaDataProvider,
-  etaFunctionPresets,
-} from '../data-providers/eta/eta.data-provider';
+import { EtaDataProvider } from '../data-providers/eta/eta.data-provider';
 import { Progress } from '../progress';
+const etaFunctionPresets = EtaDataProvider.presets;
 import { etaFormatFunctionLong } from '../data-providers/eta/eta.presets';
 
 describe('eta.presets', () => {
@@ -31,44 +29,41 @@ describe('eta.presets', () => {
   const describeTests = [
     {
       name: 'etaFormatFunctionTime',
-      formatFunction: etaFunctionPresets.etaFormatFunctionTime,
+      formatFunction: etaFunctionPresets.time,
     },
     {
       name: 'etaFormatFunctionShort',
-      formatFunction: etaFunctionPresets.etaFormatFunctionShort,
+      formatFunction: etaFunctionPresets.short,
     },
     {
       name: 'etaFormatFunctionLong',
-      formatFunction: etaFunctionPresets.etaFormatFunctionLong,
+      formatFunction: etaFunctionPresets.long,
     },
   ];
   const tests = [
     {
       eta: 0,
-      [etaFunctionPresets.etaFormatFunctionTime.name]: '0:00:00',
-      [etaFunctionPresets.etaFormatFunctionShort.name]: '0s',
-      [etaFunctionPresets.etaFormatFunctionLong.name]: '0 seconds',
+      [etaFunctionPresets.time.name]: '0:00:00',
+      [etaFunctionPresets.short.name]: '0s',
+      [etaFunctionPresets.long.name]: '0 seconds',
     },
     {
       eta: 200000,
-      [etaFunctionPresets.etaFormatFunctionTime.name]: '55:33:20',
-      [etaFunctionPresets.etaFormatFunctionShort.name]: '2d07h33m20s',
-      [etaFunctionPresets.etaFormatFunctionLong.name]:
-        '2 days 7 hours 33 minutes 20 seconds',
+      [etaFunctionPresets.time.name]: '55:33:20',
+      [etaFunctionPresets.short.name]: '2d07h33m20s',
+      [etaFunctionPresets.long.name]: '2 days 7 hours 33 minutes 20 seconds',
     },
     {
       eta: 7200,
-      [etaFunctionPresets.etaFormatFunctionTime.name]: '2:00:00',
-      [etaFunctionPresets.etaFormatFunctionShort.name]: '2h00m00s',
-      [etaFunctionPresets.etaFormatFunctionLong.name]:
-        '2 hours 0 minutes 0 seconds',
+      [etaFunctionPresets.time.name]: '2:00:00',
+      [etaFunctionPresets.short.name]: '2h00m00s',
+      [etaFunctionPresets.long.name]: '2 hours 0 minutes 0 seconds',
     },
     {
       eta: 7260,
-      [etaFunctionPresets.etaFormatFunctionTime.name]: '2:01:00',
-      [etaFunctionPresets.etaFormatFunctionShort.name]: '2h01m00s',
-      [etaFunctionPresets.etaFormatFunctionLong.name]:
-        '2 hours 1 minute 0 seconds',
+      [etaFunctionPresets.time.name]: '2:01:00',
+      [etaFunctionPresets.short.name]: '2h01m00s',
+      [etaFunctionPresets.long.name]: '2 hours 1 minute 0 seconds',
     },
   ];
 

@@ -6,6 +6,7 @@ import { IEta } from '../../lib/interfaces/eta.interface';
 export interface IExampleBarTestHelperParams {
   bar: Bar;
   maxSteps: number;
+  etaMultiplier?: number;
 }
 
 export class ExampleBarTestHelper {
@@ -15,11 +16,13 @@ export class ExampleBarTestHelper {
   public etas!: IEta[];
   public initialValues!: number[];
   public etaMockValue: number = 0;
+  public etaMultiplier!: number;
 
   public constructor(params: IExampleBarTestHelperParams) {
     const { bar, maxSteps } = params;
     this.bar = bar;
     this.maxSteps = maxSteps;
+    this.etaMultiplier = params.etaMultiplier || 10;
     this.progresses = this.extractProgresses(bar);
     this.initialValues = this.progresses.map(progress => progress.getValue());
     this.etas = this.progresses.map(progress => progress.getEta());
@@ -39,7 +42,11 @@ export class ExampleBarTestHelper {
   }
 
   public iterate(nextValueF: (progress: IProgress, index: number) => number) {
-    while (this.progresses.some(progress => progress.getProgress() < 1)) {
+    let step = this.maxSteps;
+    while (
+      this.progresses.some(progress => progress.getProgress() < 1) &&
+      step--
+    ) {
       this.nextStep(nextValueF);
     }
   }
@@ -49,7 +56,7 @@ export class ExampleBarTestHelper {
     const etaMockValue = this.etaMockValue;
     this.etas.forEach(eta => {
       spyOn(eta, 'getEtaS').mockImplementation(
-        () => (this.maxSteps - etaMockValue) * 10,
+        () => (this.maxSteps - etaMockValue) * this.etaMultiplier,
       );
       spyOn(eta, 'getSpeed').mockImplementation(() => 10 + etaMockValue);
       spyOn(eta, 'getDurationMs').mockReturnValue(etaMockValue * 1000);

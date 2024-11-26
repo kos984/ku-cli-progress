@@ -1,5 +1,5 @@
-import { IEta } from './interfaces/eta.interface';
-import { getTime } from './time';
+import { IEta } from '../interfaces/eta.interface';
+import { getTime } from '../time';
 
 const defaultParams: IEtaParams = {
   deps: 5,

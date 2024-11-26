@@ -1,32 +1,72 @@
 import { IProgress } from '../interfaces/progress.interface';
+import { IDataProvider } from '../bar-items/bar-item';
 
 export class DataProviders {
   protected _progress!: IProgress;
   protected _progresses!: IProgress[];
 
-  public constructor(params: {
+  public static build(params: {
     progress: IProgress;
     progresses: IProgress[];
     customDataProviders?: Record<
       string,
-      (progress: IProgress, progresses: IProgress[]) => unknown
+      IDataProvider<unknown> | { getData: IDataProvider<unknown> }
     >[];
   }) {
-    this._progress = params.progress;
-    this._progresses = params.progresses;
+    const dataProviders = new DataProviders(params);
+    DataProviders.defineProperties(dataProviders, params.customDataProviders);
+    return dataProviders;
+  }
 
-    const dataProviders = (params.customDataProviders || []).filter(Boolean);
+  protected static defineProperties(
+    obj: DataProviders,
+    customDataProviders: Record<
+      string,
+      IDataProvider<unknown> | { getData: IDataProvider<unknown> }
+    >[],
+  ) {
+    const dataProviders = (customDataProviders || []).filter(Boolean);
     for (const dataProvider of dataProviders) {
       Object.keys(dataProvider).forEach(key => {
-        Object.defineProperty(this, key, {
+        if (!DataProviders.isAllowedKey(obj, key)) {
+          return;
+        }
+        Object.defineProperty(obj, key, {
           get() {
-            return dataProvider[key](params.progress, params.progresses);
+            const provider = DataProviders.getProvider(dataProvider[key]);
+            return provider(obj.progress, obj.progresses);
           },
           enumerable: true,
           configurable: false,
         });
       });
     }
+  }
+
+  protected static getProvider(
+    provider: IDataProvider<unknown> | { getData: IDataProvider<unknown> },
+  ): IDataProvider<unknown> {
+    if (
+      typeof (provider as { getData: IDataProvider<unknown> }).getData ===
+      'function'
+    ) {
+      return (provider as { getData: IDataProvider<unknown> }).getData.bind(
+        provider,
+      );
+    }
+    return provider as IDataProvider<unknown>;
+  }
+
+  protected static isAllowedKey(obj: unknown, key: string): boolean {
+    return !(key in (obj as Record<string, unknown>));
+  }
+
+  protected constructor(params: {
+    progress: IProgress;
+    progresses: IProgress[];
+  }) {
+    this._progress = params.progress;
+    this._progresses = params.progresses;
   }
 
   get value() {
