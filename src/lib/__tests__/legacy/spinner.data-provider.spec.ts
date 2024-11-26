@@ -5,8 +5,8 @@ import {
   IDataProviderLegacy,
 } from '../../../';
 
-jest.mock('../../time');
-import { getTime } from '../../time';
+jest.mock('../../time/time');
+import { getTime } from '../../time/time';
 const getTimeMock = getTime as jest.Mock;
 
 describe('spinner.data-provider', () => {

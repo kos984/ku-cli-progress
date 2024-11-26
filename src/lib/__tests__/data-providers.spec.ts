@@ -8,7 +8,7 @@ describe('data-providers', () => {
 
   it('custom data provider should be optional', () => {
     const progress = new Progress({ total: 100 });
-    const dataProvider = new DataProviders({
+    const dataProvider = DataProviders.build({
       progress,
       progresses: [progress],
     });

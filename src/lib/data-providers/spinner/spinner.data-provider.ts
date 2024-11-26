@@ -1,5 +1,5 @@
 import { IProgress } from '../../interfaces/progress.interface';
-import { getTime } from '../../time';
+import { getTime } from '../../time/time';
 
 export class SpinnerDataProvider {
   public static presets = {

@@ -1,4 +1,4 @@
-import { getTime } from '../time';
+import { getTime } from '../time/time';
 
 describe('time', () => {
   it('should return time', () => {
