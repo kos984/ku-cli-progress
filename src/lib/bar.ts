@@ -26,11 +26,6 @@ export class Bar {
     };
   }
 
-  public setTerminal(terminal: ITerminal) {
-    this.terminal = terminal;
-    return this;
-  }
-
   public isStarted() {
     return this.started;
   }

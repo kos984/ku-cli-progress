@@ -1,5 +1,5 @@
 import { IEta } from '../interfaces/eta.interface';
-import { getTime } from '../time/time';
+import { Time } from '../time/time';
 
 const defaultParams: IEtaParams = {
   deps: 5,
@@ -14,7 +14,7 @@ export interface IEtaParams {
    * speeds. This helps to smooth out potential rapid speed changes and
    * makes the calculations more robust.
    */
-  deps: number;
+  deps?: number;
   /**
    * debounce - a parameter utilized to filter out minor speed fluctuations.
    * It defines the threshold at which a speed change becomes significant
@@ -22,7 +22,8 @@ export interface IEtaParams {
    * relatively large debounce value, small speed oscillations resulting
    * from noise or measurement inaccuracies won't affect the ETA calculations.
    */
-  debounce: number;
+  debounce?: number;
+  time?: Time;
 }
 
 export class Eta implements IEta {
@@ -33,6 +34,7 @@ export class Eta implements IEta {
   protected speedMoment = [];
   protected speed!: number;
   protected eta!: number;
+  protected time!: Time;
 
   protected params: IEtaParams;
 
@@ -41,12 +43,13 @@ export class Eta implements IEta {
       ...defaultParams,
       ...params,
     };
+    this.time = this.params.time || new Time();
     this.set(0);
   }
 
   public set(count: number): IEta {
     this.left = Infinity;
-    const time = getTime();
+    const time = this.time.getTime();
     this.speedMoment = [];
     this.speed = 0;
     this.duration = 0;
@@ -60,7 +63,7 @@ export class Eta implements IEta {
     this.left = total - value;
     const current = {
       count: value,
-      time: getTime(),
+      time: this.time.getTime(),
     };
     if (this.updateSpeedMoments(this.last, current)) {
       this.last = current;
@@ -97,7 +100,7 @@ export class Eta implements IEta {
     if (!force && this.left <= 0) {
       return this.duration;
     }
-    this.duration = getTime() - this.started;
+    this.duration = this.time.getTime() - this.started;
   }
 
   protected updateSpeed(): void {

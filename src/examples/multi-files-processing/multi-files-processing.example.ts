@@ -1,7 +1,11 @@
-import { Bar, BarsFormatter, presets, Progress } from '../../../index';
+import { Bar, BarsFormatter, presets, Progress } from '../../index';
 import { createReadStream, ReadStream } from 'fs';
-import { BarItem, ITemplateFunction } from '../../../lib/bar-items/bar-item';
+import { BarItem, ITemplateFunction } from '../../lib/bar-items/bar-item';
 import * as chalk from 'chalk';
+import { SeededRandom } from '../helpers/seed-random';
+import { start } from '../helpers/loop-progresses';
+
+const rnd = new SeededRandom(2342);
 
 // eslint-disable-next-line max-lines-per-function
 function* PromiseConcurrent<T>(max: number, arr: Array<() => Promise<T>>) {
@@ -50,7 +54,7 @@ const files: IFile[] = [];
 for (let i = 0; i < 30; i++) {
   files.push({
     name: `file_${i}.log`,
-    size: Math.round(Math.random() * 297215488),
+    size: Math.round(rnd.next() * 297215488), // 297215488
   });
 }
 
@@ -66,6 +70,15 @@ function createReadFileStream(totalSize): ReadStream {
   return readStream;
 }
 
+const formatBytes = (bytes, decimals = 2) => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+};
+
 const template: ITemplateFunction = ({
   value,
   bar,
@@ -78,7 +91,9 @@ const template: ITemplateFunction = ({
 }) => {
   const payload = progress.getPayload() as { name?: string };
   const name = payload.name ? ` [${payload.name}]` : '';
-  return `[${bar}] ${percentage} ETA: ${eta} speed: ${speed}/s duration: ${duration}s ${value}/${total}${name}`;
+  return `[${bar}] ${percentage} ETA: ${eta} speed: ${speed}/s duration: ${duration}s ${formatBytes(
+    value,
+  )}/${formatBytes(total)}${name}`;
 };
 
 async function loadFile(file: IFile, bar: Bar) {
@@ -102,14 +117,42 @@ async function loadFile(file: IFile, bar: Bar) {
   });
 }
 
-async function run() {
-  const bar = new Bar().start();
-  const mainProgress = new Progress({ total: files.length });
+export const bar = new Bar().start();
+
+// eslint-disable-next-line max-lines-per-function
+export async function run() {
+  const mainProgress = new Progress(
+    { total: files.length },
+    {
+      done: 0,
+      total: files.reduce((sum: number, file) => sum + file.size, 0),
+    },
+  );
   bar.add(
-    new BarItem(mainProgress, {
+    new BarItem<{
+      dataProviders: { dataProcessed: string; dataTotal: string };
+      payload: { done: number; total: number };
+    }>(mainProgress, {
+      template: ({
+        value,
+        bar,
+        percentage,
+        speed,
+        duration,
+        etaHumanReadable,
+        total,
+        dataProcessed,
+        dataTotal,
+      }) =>
+        `[${bar}] ${percentage}% ETA: ${etaHumanReadable} speed: ${speed}/s duration: ${duration}s ${value}/${total} [${dataProcessed}/${dataTotal}]`,
       options: {
         ...presets.rect,
         formatter: new BarsFormatter([chalk.magentaBright]),
+      },
+      dataProviders: {
+        // TODO: add setPayload method to progress
+        dataProcessed: progress => formatBytes(progress.getPayload().done),
+        dataTotal: progress => formatBytes(progress.getPayload().total),
       },
     }),
   );
@@ -120,11 +163,12 @@ async function run() {
       files.map(file => {
         return async () => {
           await loadFile(file, bar);
-          mainProgress.increment();
+          mainProgress.getPayload().done += file.size;
+          mainProgress.increment(1);
         };
       }),
     ),
   );
 }
 
-run().catch(err => console.error(err));
+start(run);

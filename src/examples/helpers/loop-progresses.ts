@@ -9,3 +9,8 @@ export function loopProgresses(progresses, delay = () => 100) {
     return interval;
   });
 }
+
+export function start(f: () => Promise<void>) {
+  // eslint-disable-next-line no-console
+  f().catch(err => console.error(err));
+}

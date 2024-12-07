@@ -22,7 +22,7 @@ export class BarItem<ICustomInterfaces extends ICustomInterfacesExtends>
   };
   protected dataProviders!: (IDataProviders &
     ICustomInterfaces['dataProviders'])[];
-  protected progresses: IProgress[];
+  protected progresses: IProgress<ICustomInterfaces['payload']>[];
 
   public constructor(
     progresses: IProgress | IProgress[],

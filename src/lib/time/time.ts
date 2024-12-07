@@ -1,3 +1,5 @@
-export function getTime() {
-  return Date.now();
+export class Time {
+  public getTime(): number {
+    return Date.now();
+  }
 }

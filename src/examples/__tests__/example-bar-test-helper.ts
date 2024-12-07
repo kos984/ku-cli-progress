@@ -1,10 +1,13 @@
+jest.mock('../../lib/time/time');
+
 import { Bar } from '../../lib/bar';
 import { IProgress } from '../../lib/interfaces/progress.interface';
-import { getTime } from '../../lib/time/time';
+import { Time } from '../../lib/time/time';
 
 export interface IExampleBarTestHelperParams {
   bar: Bar;
   maxSteps: number;
+  stopBarOnStart?: boolean;
 }
 
 export class ExampleBarTestHelper {
@@ -12,20 +15,31 @@ export class ExampleBarTestHelper {
   public maxSteps!: number;
   public progresses!: IProgress[];
   public initialValues!: number[];
-  public timeMock!: jest.Mock;
+  public time = new Time() as jest.Mocked<Time>;
+  // public timeMock!: jest.Mock;
 
   public constructor(params: IExampleBarTestHelperParams) {
     const { bar, maxSteps } = params;
     this.bar = bar;
     this.maxSteps = maxSteps;
-    this.timeMock = getTime as jest.Mock;
+    // this.timeMock = getTime as jest.Mock;
     this.progresses = this.extractProgresses(bar);
     this.initialValues = this.progresses.map(progress => progress.getValue());
-    bar.stop();
+    if (params.stopBarOnStart || params.stopBarOnStart === undefined) {
+      bar.stop();
+    }
+  }
+
+  public setMockReturnValue(value: number) {
+    const TimeMock = Time as never as { instances: jest.Mocked<Time>[] };
+    for (const instance of TimeMock.instances) {
+      instance.getTime.mockReturnValue(value);
+    }
   }
 
   public beforeEach() {
-    this.timeMock.mockReturnValue(0);
+    this.time.getTime.mockReturnValue(0);
+    this.setMockReturnValue(0);
     this.progresses.forEach((progress, index) =>
       progress.set(this.initialValues[index]),
     );
@@ -37,7 +51,7 @@ export class ExampleBarTestHelper {
       this.progresses.some(progress => progress.getProgress() < 1) &&
       step < this.maxSteps
     ) {
-      this.timeMock.mockReturnValue(step * 1000);
+      this.setMockReturnValue(step * 1000);
       this.nextStep(nextValueF);
       step++;
     }

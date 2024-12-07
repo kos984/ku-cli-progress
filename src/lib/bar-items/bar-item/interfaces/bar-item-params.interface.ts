@@ -10,6 +10,7 @@ export interface IBarItemParams<
   options?: Partial<IBarOptions>;
   dataProviders?: Record<
     string,
-    IDataProvider<unknown> | { getData: IDataProvider<unknown> }
+    | IDataProvider<unknown, ICustomInterfaces['payload']>
+    | { getData: IDataProvider<unknown, ICustomInterfaces['payload']> }
   >;
 }

@@ -1,3 +1,4 @@
 export interface ICustomInterfacesExtends {
-  dataProviders: unknown;
+  dataProviders?: unknown;
+  payload?: unknown;
 }
