@@ -26,12 +26,12 @@ export class BarDataProvider {
     bars: (progress: IProgress, progresses: IProgress[]) => BarDataResult;
   } {
     return {
-      bar: this.bar.bind(this),
+      bar: this.getData.bind(this),
       bars: this.bars.bind(this),
     };
   }
 
-  protected bar(progress: IProgress, progresses: IProgress[]): BarDataResult {
+  public getData(progress: IProgress, progresses: IProgress[]): BarDataResult {
     return this.format(
       this.renderBar(progress.getProgress(), progress),
       progress,

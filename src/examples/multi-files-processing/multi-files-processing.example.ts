@@ -150,9 +150,12 @@ export async function run() {
         formatter: new BarsFormatter([chalk.magentaBright]),
       },
       dataProviders: {
-        // TODO: add setPayload method to progress
-        dataProcessed: progress => formatBytes(progress.getPayload().done),
-        dataTotal: progress => formatBytes(progress.getPayload().total),
+        dataProcessed: {
+          getData: progress => formatBytes(progress.getPayload().done),
+        },
+        dataTotal: {
+          getData: progress => formatBytes(progress.getPayload().total),
+        },
       },
     }),
   );

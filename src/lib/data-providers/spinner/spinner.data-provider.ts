@@ -21,6 +21,9 @@ export class SpinnerDataProvider {
   protected chars: string[];
   protected delay: number;
 
+  protected index: number = 0;
+  protected lastUpdate: number = 0;
+
   public constructor(params?: ISpinnerDataProviderParams) {
     this.chars = params?.chars || SpinnerDataProvider.presets.SLASH.chars;
     this.delay = params?.delay || 500;
@@ -30,17 +33,19 @@ export class SpinnerDataProvider {
   public getProviders(): {
     spinner: (progress: IProgress, progresses: IProgress[]) => string;
   } {
-    let [index, char, lastUpdate] = [0, this.chars[0], 0];
     return {
-      spinner: (progress: IProgress): string => {
-        const time = this.time.getTime();
-        if (progress.getProgress() < 1 && time - lastUpdate > this.delay) {
-          index = index + 1 >= this.chars.length ? 0 : index + 1;
-          char = this.chars[index];
-          lastUpdate = time;
-        }
-        return char;
-      },
+      spinner: this.getData.bind(this),
     };
+  }
+
+  public getData(progress: IProgress): string {
+    let index = this.index;
+    const time = this.time.getTime();
+    if (progress.getProgress() < 1 && time - this.lastUpdate > this.delay) {
+      index = index + 1 >= this.chars.length ? 0 : index + 1;
+      this.index = index;
+      this.lastUpdate = time;
+    }
+    return this.chars[index];
   }
 }

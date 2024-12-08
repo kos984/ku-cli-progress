@@ -14,7 +14,7 @@ describe('spinner.data-provider', () => {
       .mockReturnValueOnce(1503)
       .mockReturnValueOnce(2004);
     const progress = new Progress({ total: 100 });
-    const spinnerDataProvider = new SpinnerDataProvider({
+    const spinner = new SpinnerDataProvider({
       ...SpinnerDataProvider.presets.SLASH,
       time,
     });
@@ -23,7 +23,7 @@ describe('spinner.data-provider', () => {
     }>(progress, {
       template: ({ spinner }) => `[${spinner}]`,
       dataProviders: {
-        spinner: spinnerDataProvider.getProviders().spinner,
+        spinner,
       },
     });
     expect(barItem.render()).toEqual('[\\]');
@@ -43,7 +43,7 @@ describe('spinner.data-provider', () => {
       .mockReturnValueOnce(1302)
       .mockReturnValueOnce(1503)
       .mockReturnValueOnce(2004);
-    const spinnerDataProvider = new SpinnerDataProvider({
+    const spinner = new SpinnerDataProvider({
       ...SpinnerDataProvider.presets.BRAILLE,
       time,
     });
@@ -52,7 +52,7 @@ describe('spinner.data-provider', () => {
     }>(progress, {
       template: ({ spinner }) => `[${spinner}]`,
       dataProviders: {
-        spinner: spinnerDataProvider.getProviders().spinner,
+        spinner,
       },
     });
     expect(barItem.render()).toEqual('[⠹]');
@@ -71,7 +71,7 @@ describe('spinner.data-provider', () => {
       .mockReturnValueOnce(1302)
       .mockReturnValueOnce(1503)
       .mockReturnValueOnce(2004);
-    const spinnerDataProvider = new SpinnerDataProvider({
+    const spinner = new SpinnerDataProvider({
       chars: ['.  ', '.. ', '...'],
       time,
     });
@@ -80,7 +80,7 @@ describe('spinner.data-provider', () => {
     }>(progress, {
       template: ({ spinner }) => `[${spinner}]`,
       dataProviders: {
-        spinner: spinnerDataProvider.getProviders().spinner,
+        spinner,
       },
     });
     expect(barItem.render()).toEqual('[.  ]');

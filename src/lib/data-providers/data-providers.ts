@@ -10,8 +10,7 @@ export class DataProviders {
     progresses: IProgress[];
     customDataProviders?: Record<
       string,
-      | IDataProvider<unknown, unknown>
-      | { getData: IDataProvider<unknown, unknown> }
+      { getData: IDataProvider<unknown, unknown> }
     >[];
   }) {
     const dataProviders = new DataProviders(params);
@@ -23,8 +22,7 @@ export class DataProviders {
     obj: DataProviders,
     customDataProviders: Record<
       string,
-      | IDataProvider<unknown, unknown>
-      | { getData: IDataProvider<unknown, unknown> }
+      { getData: IDataProvider<unknown, unknown> }
     >[],
   ) {
     const dataProviders = (customDataProviders || []).filter(Boolean);
@@ -35,30 +33,13 @@ export class DataProviders {
         }
         Object.defineProperty(obj, key, {
           get() {
-            const provider = DataProviders.getProvider(dataProvider[key]);
-            return provider(obj.progress, obj.progresses);
+            return dataProvider[key].getData(obj.progress, obj.progresses);
           },
           enumerable: true,
           configurable: false,
         });
       });
     }
-  }
-
-  protected static getProvider(
-    provider:
-      | IDataProvider<unknown, unknown>
-      | { getData: IDataProvider<unknown, unknown> },
-  ): IDataProvider<unknown, unknown> {
-    if (
-      typeof (provider as { getData: IDataProvider<unknown, unknown> })
-        .getData === 'function'
-    ) {
-      return (
-        provider as { getData: IDataProvider<unknown, unknown> }
-      ).getData.bind(provider);
-    }
-    return provider as IDataProvider<unknown, unknown>;
   }
 
   protected static isAllowedKey(obj: unknown, key: string): boolean {

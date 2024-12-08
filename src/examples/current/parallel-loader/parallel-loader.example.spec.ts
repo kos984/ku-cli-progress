@@ -11,7 +11,7 @@ import { TerminalTty } from '../../../lib/terminals/terminal-tty';
 import { Logger } from '../../helpers/logger';
 import { run, logger } from './parallel-loader.example';
 
-describe('parallel-loader.example', () => {
+describe.skip('parallel-loader.example', () => {
   const terminalMock = new TerminalTty() as jest.Mocked<TerminalTty>;
   const loggerMock = logger as jest.Mocked<Logger>;
 

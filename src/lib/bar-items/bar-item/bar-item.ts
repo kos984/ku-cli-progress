@@ -9,6 +9,7 @@ import { ITemplateFunction } from './interfaces/template-function.interface';
 import { ICustomInterfacesExtends } from './interfaces/custom-interfaces-extends.interface';
 import { IBarItemParams } from './interfaces/bar-item-params.interface';
 import { DataProviders } from '../../data-providers/data-providers';
+import { BarsDataProvider } from '../../data-providers/bar/bars.data-provider';
 
 export class BarItem<ICustomInterfaces extends ICustomInterfacesExtends>
   implements IBarItem
@@ -31,16 +32,18 @@ export class BarItem<ICustomInterfaces extends ICustomInterfacesExtends>
     this.progresses = Array.isArray(progresses) ? progresses : [progresses];
     this.template = params?.template ?? defaultTemplate;
     this.options = { ...this.options, ...params?.options };
-    const barDataProvider = new BarDataProvider(this.options).getProviders();
-    const etaDataProvider = new EtaDataProvider().getProviders();
+    const barDataProvider = new BarDataProvider(this.options);
+    const barsDataProvider = new BarsDataProvider(this.options);
+    const etaDataProvider = new EtaDataProvider();
     this.dataProviders = this.progresses.map(progress => {
       return DataProviders.build({
         progress,
         progresses: this.progresses,
         customDataProviders: [
           params?.dataProviders,
-          barDataProvider,
-          etaDataProvider,
+          { bar: barDataProvider },
+          { bars: barsDataProvider },
+          { etaHumanReadable: etaDataProvider },
         ].filter(Boolean),
       }) as never as IDataProviders & ICustomInterfaces['dataProviders'];
     });
