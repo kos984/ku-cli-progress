@@ -1,7 +1,7 @@
-import { Bar, BarDataProvider, presets, Progress } from '../../';
-import { loopProgresses } from '../helpers/loop-progresses';
-import { SpinnerDataProvider } from '../../lib/data-providers/spinner/spinner.data-provider';
-import { BarItem } from '../../lib/bar-items/bar-item/bar-item';
+import { Bar, BarDataProvider, presets, Progress } from '../../../index';
+import { loopProgresses } from '../../helpers/loop-progresses';
+import { SpinnerDataProvider } from '../../../lib/data-providers/spinner/spinner.data-provider';
+import { BarItem } from '../../../lib/bar-items/bar-item/bar-item';
 import * as fs from 'fs';
 
 const mainProgress = new Progress<{ files: string[]; file: string }>({
@@ -47,14 +47,14 @@ const barItem = new BarItem<{
     `;
   },
   dataProviders: {
-    spinner: new SpinnerDataProvider(
-      SpinnerDataProvider.presets.BRAILLE,
-      50,
-    ).getProviders().spinner,
-    spinnerQuestions: new SpinnerDataProvider(
-      ['?', '??', '???'],
-      500,
-    ).getProviders().spinner,
+    spinner: new SpinnerDataProvider({
+      ...SpinnerDataProvider.presets.BRAILLE,
+      delay: 50,
+    }).getProviders().spinner,
+    spinnerQuestions: new SpinnerDataProvider({
+      chars: ['?', '??', '???'],
+      delay: 500,
+    }).getProviders().spinner,
     barDots: new BarDataProvider({
       ...presets.classic,
       completeChar: '.',

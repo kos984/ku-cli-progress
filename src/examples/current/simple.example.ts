@@ -1,21 +1,8 @@
 import { Progress, Bar } from '../..';
-import { BarItem } from '../../lib/bar-items/bar-item/bar-item';
+import { loopProgresses } from '../helpers/loop-progresses';
 
 const progress = new Progress({ total: 1000 });
 
-const bar = new Bar();
+new Bar().addProgress(progress).start();
 
-bar.add(
-  new BarItem(progress, {
-    template: ({ value, bar }) => `[${bar}] ${value}`,
-  }),
-);
-
-// progress.increment(300);
-
-// bar.render();
-bar.start();
-
-setInterval(() => {
-  progress.increment(1);
-}, 5);
+loopProgresses([progress], () => 5);

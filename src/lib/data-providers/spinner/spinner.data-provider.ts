@@ -24,7 +24,7 @@ export class SpinnerDataProvider {
   public constructor(params?: ISpinnerDataProviderParams) {
     this.chars = params?.chars || SpinnerDataProvider.presets.SLASH.chars;
     this.delay = params?.delay || 500;
-    this.time = params?.time || this.time;
+    this.time = params?.time || new Time();
   }
 
   public getProviders(): {

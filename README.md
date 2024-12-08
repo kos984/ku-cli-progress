@@ -6,29 +6,25 @@ $ npm install  ku-progress-bar
 
 ## Simple bar
 ```typescript
-// FIXME: see the example in the src/examples/current/simple.example.ts
+import { Progress, Bar } from 'ku-progress-bar';
+import { loopProgresses } from '../helpers/loop-progresses';
+
 const progress = new Progress({ total: 1000 });
 
-const bar = new Bar();
+new Bar().addProgress(progress).start();
 
-bar.add(new BarItem(progress, {
-    template: () => `aaaa`;
-}));
-
-progress.increment(300);
-
-bar.render();
+loopProgresses([progress], () => 5);
 ```
 
 ```console
-✗ ts-node ./src/examples/simple-start.ts
-[============----------------------------] 30% ETA: 71s speed: 10/s duration: 30s 300/1000
+✗ ts-node src/examples/current/simple.example.ts
+[===============================---------] 78% ETA: 1s speed: 178/s duration: 4s 777/1000
 ```
 
-## Presets
+## Bar Presets
 
 ```typescript
-import { Bar, BarItemLegacy, presets, Progress } from '../';
+import { Bar, BarItemLegacy, presets, Progress } from 'ku-progress-bar';
 import * as chalk from 'chalk';
 
 const bar = new Bar();
@@ -91,7 +87,7 @@ bar.add(
 
 ![multi-files-processing](docs/images/multi-files-processing.example.gif)
 
-## Parameters of the `BarItemLegacy` class:
+## Parameters of the `BarItem` class:
 
 1.  **`progresses`** (`IProgress | IProgress[]`):
    An object or an array of objects of type `IProgress` representing the progress.
@@ -263,8 +259,3 @@ bar.add(
 [src/examples/spinner.example.ts](src/examples/legacy/spinner.example.ts)
 
 ![spinner-example](docs/images/spinner-example.gif)
-
-# Some random examples
-[src/examples/random.bar.example.ts](src/examples/legacy/random.bar.example.ts)
-
-![multi-files-processing](docs/images/random.bar.example.gif)
