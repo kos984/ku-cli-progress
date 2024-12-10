@@ -4,7 +4,7 @@
 $ npm install  ku-progress-bar
 ```
 
-## Simple bar
+# Simple bar
 ```typescript
 import { Progress, Bar } from 'ku-progress-bar';
 import { loopProgresses } from '../helpers/loop-progresses';
@@ -21,7 +21,7 @@ loopProgresses([progress], () => 5);
 [===============================---------] 78% ETA: 1s speed: 178/s duration: 4s 777/1000
 ```
 
-## Bar Presets
+# Bar Presets
 
 ```typescript
 import { Bar, BarItemLegacy, presets, Progress } from 'ku-progress-bar';
@@ -46,9 +46,12 @@ bar.start();
  braille [⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀⣀] 31% ETA: 7s speed: 10/s duration: 3s 31/100
 ```
 
-![img.png](docs/images/presets.png)
+```html
+$${\color{red}Red}$$
+```
+<span style="color:orange;">Word up</span>
 
-![braille-progress](docs/images/braille.svg)
+![img.png](docs/images/presets.png)
 
 # Multi bars
 
@@ -94,10 +97,9 @@ bar.add(
 
 2.  **`params`** (`IParams | undefined`):
    Additional parameters to customize the appearance and behavior of the progress bar.
-    -   **`template`** (`string | function | undefined`): Template for displaying the progress bar.
+    -   **`template`** (`function | undefined`): Template for displaying the progress bar.
     -   **`options`** (`Partial<IBarOptions> | undefined`): Configuration settings for displaying the progress bar.
-    -   **`formatters`** (`IFormatters | undefined`): Formatting functions for each progress.
-    -   **`dataProviders`** (`IDataProviders | undefined`): Functions to provide additional data.
+    -   **`dataProviders`** (`Record<string, { getData:  ( progress: IProgress, progresses: IProgress[], ) => unknown } > | undefined`)
 
 ### Template Format:
 
