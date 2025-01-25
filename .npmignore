@@ -15,3 +15,4 @@ dist/lib/__tests__
 .prettierrc.json
 tsconfig.build.json
 tsconfig.json
+tsdocs

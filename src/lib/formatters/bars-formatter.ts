@@ -29,7 +29,7 @@ export class BarsFormatter {
     for (const item of result) {
       const formatter = item.progress
         ? this.getFormatterByProgress(progresses, item)
-        : this.getFormatterForLeftProgressString(result);
+        : this.getFormatterForLeftProgressString(result, progresses);
       if (formatter) {
         item.str = formatter(item.str);
       }
@@ -47,10 +47,14 @@ export class BarsFormatter {
 
   protected getFormatterForLeftProgressString(
     result: BarDataResult,
+    progresses: IProgress[],
   ): IFormatter | undefined {
-    if (this.formatters.length == result.getParts().length) {
+    if (this.formatters.length === progresses.length + 1) {
       return this.formatters[this.formatters.length - 1];
     }
+    // if (this.formatters.length == result.getParts().length) {
+    //  return this.formatters[this.formatters.length - 1];
+    // }
     return undefined;
   }
 }

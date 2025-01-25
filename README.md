@@ -30,7 +30,7 @@ see [simple-start.example.ts](src/examples/current/simple-start.example.ts)
 
 ```typescript
 import { Bar, BarItem, presets, Progress } from 'ku-progress-bar';
-import { loopProgresses } from '../../helpers/loop-progresses';
+import { loopProgresses } from '../helpers/loop-progresses';
 
 const bar = new Bar();
 const progress = new Progress({ total: 100 });
