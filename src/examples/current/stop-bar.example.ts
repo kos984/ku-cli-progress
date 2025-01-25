@@ -10,7 +10,7 @@ console.log('start');
 bar.start(1000);
 progress.increment();
 
-const logger = bar.loggerWrap<typeof console>(console);
+const logger = bar.wrapLogger<typeof console>(console);
 
 logger.log('test log');
 // logger.dir(bar);

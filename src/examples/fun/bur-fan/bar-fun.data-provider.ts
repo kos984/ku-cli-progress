@@ -21,15 +21,7 @@ export class BarFunDataProvider {
       : this.options.completeChar;
   }
 
-  public getProviders(): {
-    bar: (progress: IProgress, progresses: IProgress[]) => BarDataResult;
-  } {
-    return {
-      bar: this.bar.bind(this),
-    };
-  }
-
-  protected bar(progress: IProgress, progresses: IProgress[]): BarDataResult {
+  public getData(progress: IProgress, progresses: IProgress[]): BarDataResult {
     return this.format(
       this.renderBar(progress.getProgress(), progress),
       progress,
@@ -76,7 +68,7 @@ export class BarFunDataProvider {
       delta: done - Math.floor(done),
       extraChar: true,
     });
-    if (extraChar) {
+    if (extraChar && this.buffer[doneInt].filled === false) {
       this.buffer[doneInt] = { char: extraChar, filled: true };
     }
   }

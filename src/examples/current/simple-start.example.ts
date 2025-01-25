@@ -1,4 +1,4 @@
-import { Bar, Progress } from '../../';
+import { Bar, Progress } from 'ku-progress-bar';
 import { loopProgresses } from '../helpers/loop-progresses';
 
 const progress = new Progress({ total: 1000 });
@@ -7,9 +7,4 @@ const bar = new Bar().addProgress(progress);
 
 bar.start();
 
-const intervals = loopProgresses([progress]);
-progress.on('update', e => {
-  if (e.new.value >= 300) {
-    clearInterval(intervals[0]);
-  }
-});
+loopProgresses([progress], { getDelay: () => 5 });

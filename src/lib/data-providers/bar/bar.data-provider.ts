@@ -1,6 +1,7 @@
 import { IProgress } from '../../interfaces/progress.interface';
 import { IBarOptions } from '../../interfaces/bar-options.interface';
 import { BarDataResult } from './bar.data-result';
+import { presets } from './presets';
 
 interface IProgressInfo {
   size: number;
@@ -10,6 +11,8 @@ interface IProgressInfo {
 }
 
 export class BarDataProvider {
+  public static readonly presets = presets;
+
   protected options: IBarOptions = {
     completeChar: '=',
     resumeChar: '-',

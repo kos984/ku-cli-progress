@@ -1,47 +1,34 @@
 import {
   Bar,
   BarsFormatter,
-  EtaDataProvider,
+  BarItem,
   presets,
   Progress,
-} from '../../index';
-import { BarItem } from '../../lib/bar-items/bar-item';
+} from 'ku-progress-bar';
 import * as chalk from 'chalk';
 import { loopProgresses } from '../helpers/loop-progresses';
 
 export const bar = new Bar().start();
 
 const progresses = [
-  new Progress({ total: 10000, start: 300 }),
-  new Progress({ total: 10000 }),
+  new Progress({ total: 1000, start: 100 }),
+  new Progress({ total: 1000 }),
 ];
 
 bar.add(
-  new BarItem<{
-    dataProviders: { etaHumanReadable2: string; etaHumanReadable3: string };
-  }>(progresses, {
+  new BarItem(progresses, {
     options: {
       ...presets.shades,
       formatter: new BarsFormatter([chalk.green, chalk.yellowBright]),
     },
-    template: (
-      {
-        value: v1,
-        bars,
-        etaHumanReadable: eta1,
-        total,
-        percentage: percentage1,
-      },
-      { value: v2, etaHumanReadable: eta2, percentage: percentage2 },
-    ) => {
-      return `[${bars}] ${v1} (${v2}) total: ${total} ${percentage1}% (${percentage2}%) ETA: ${eta1} (${eta2})`;
-    },
-    dataProviders: {
-      etaHumanReadable: new EtaDataProvider({
-        formatFunction: EtaDataProvider.presets.simple,
-      }),
+    template: (read, write) => {
+      const readString = `read: ${read.value}/${read.total} ( ${read.percentage}% eta: ${read.etaHumanReadable})`;
+      const writeString = `write: ${write.value}/${write.total} ( ${write.percentage}% eta: ${write.etaHumanReadable})`;
+      return `[${read.bars}] ${chalk.green(readString)} ${chalk.yellowBright(
+        writeString,
+      )}`;
     },
   }),
 );
 
-loopProgresses(progresses, () => Math.random() * 10);
+loopProgresses(progresses);

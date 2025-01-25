@@ -1,11 +1,21 @@
-export function loopProgresses(progresses, delay = () => 100) {
+import { IProgress } from 'ku-progress-bar';
+
+const delay = 100;
+
+export function loopProgresses(
+  progresses: IProgress[],
+  params?: { getDelay?: () => number },
+) {
   return progresses.map(progress => {
-    const interval = setInterval(() => {
-      progress.increment();
-      if (progress.getProgress() >= 1) {
-        clearInterval(interval);
-      }
-    }, delay());
+    const interval = setInterval(
+      () => {
+        progress.increment();
+        if (progress.getProgress() >= 1) {
+          clearInterval(interval);
+        }
+      },
+      params?.getDelay ? params.getDelay() : delay,
+    );
     return interval;
   });
 }

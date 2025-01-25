@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events';
-import { Bar, BarItem, Progress } from '../../../index';
-import { SeededRandom } from '../../helpers/seed-random';
-import { Interval } from '../../helpers/interval';
-import { Logger } from '../../helpers/logger';
-import { start } from '../../helpers/loop-progresses';
+import { Bar, BarItem, Progress } from '../../index';
+import { SeededRandom } from '../helpers/seed-random';
+import { Interval } from '../helpers/interval';
+import { Logger } from '../helpers/logger';
+import { start } from '../helpers/loop-progresses';
 
 interface IFile {
   size: number;

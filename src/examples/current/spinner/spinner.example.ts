@@ -50,17 +50,17 @@ const barItem = new BarItem<{
     spinner: new SpinnerDataProvider({
       ...SpinnerDataProvider.presets.BRAILLE,
       delay: 50,
-    }).getProviders().spinner,
+    }),
     spinnerQuestions: new SpinnerDataProvider({
       chars: ['?', '??', '???'],
       delay: 500,
-    }).getProviders().spinner,
+    }),
     barDots: new BarDataProvider({
       ...presets.classic,
       completeChar: '.',
       resumeChar: ' ',
       width: 30,
-    }).getProviders().bar,
+    }),
   },
 });
 

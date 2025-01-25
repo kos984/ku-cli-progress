@@ -236,7 +236,7 @@ describe('Bar', () => {
     const bar = new Bar(terminalMock);
     const clear = jest.spyOn(bar, 'clean');
     const refresh = jest.spyOn(bar, 'refresh');
-    const wrappedLogger = bar.loggerWrap(logger);
+    const wrappedLogger = bar.wrapLogger(logger);
     expect(terminalMock.clear).toBeCalledTimes(0);
     expect(terminalMock.refresh).toBeCalledTimes(0);
     wrappedLogger.info('test');

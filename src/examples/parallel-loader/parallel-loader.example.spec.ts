@@ -1,14 +1,14 @@
-import { bar } from '../../multi-files-processing/multi-files-processing.example';
+import { bar } from '../multi-files-processing/multi-files-processing.example';
 
-jest.mock('../../../lib/terminals/terminal-tty');
-jest.mock('../../helpers/loop-progresses');
-jest.mock('../../helpers/logger');
-jest.mock('../../helpers/interval');
-jest.mock('../../../lib/formatters/bars-formatter');
-jest.mock('../../../lib/time/time');
+jest.mock('../../lib/terminals/terminal-tty');
+jest.mock('../helpers/loop-progresses');
+jest.mock('../helpers/logger');
+jest.mock('../helpers/interval');
+jest.mock('../../lib/formatters/bars-formatter');
+jest.mock('../../lib/time/time');
 
-import { TerminalTty } from '../../../lib/terminals/terminal-tty';
-import { Logger } from '../../helpers/logger';
+import { TerminalTty } from '../../lib/terminals/terminal-tty';
+import { Logger } from '../helpers/logger';
 import { run, logger } from './parallel-loader.example';
 
 describe.skip('parallel-loader.example', () => {

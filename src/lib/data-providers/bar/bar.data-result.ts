@@ -1,8 +1,13 @@
 import { IProgress } from '../../interfaces/progress.interface';
 
+export interface IBarDataResultPart {
+  str: string;
+  progress: IProgress | undefined;
+}
+
 export class BarDataResult {
   public constructor(
-    protected parts: { str: string; progress: IProgress | undefined }[],
+    protected parts: IBarDataResultPart[],
     protected glue: string = '',
   ) {}
 
@@ -10,7 +15,7 @@ export class BarDataResult {
     return this.parts.map(a => a.str).join(this.glue);
   }
 
-  public getParts() {
+  public getParts(): IBarDataResultPart[] {
     return this.parts;
   }
 

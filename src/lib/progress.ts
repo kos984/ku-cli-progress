@@ -1,4 +1,4 @@
-import * as EventEmitter from 'events';
+import { EventEmitter } from 'events';
 import { IProgress, IUpdateEvent } from './interfaces/progress.interface';
 import { IEta } from './interfaces/eta.interface';
 import { Eta } from './eta/eta';
@@ -82,6 +82,11 @@ export class Progress<IPayload = unknown> implements IProgress<IPayload> {
 
   public getPayload(): IPayload {
     return this.payload;
+  }
+
+  public setPayload(payload: IPayload): IProgress<IPayload> {
+    this.payload = payload;
+    return this;
   }
 
   public getProgress(): number {

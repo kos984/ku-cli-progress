@@ -16,12 +16,13 @@ export interface IUpdateEvent<IPayload> {
 export interface IProgress<IPayload = unknown> {
   emitter: EventEmitter;
   getProgress(): number;
-  increment(delta: number, payload?: IPayload): IProgress<IPayload>;
+  increment(delta?: number, payload?: IPayload): IProgress<IPayload>;
   getEta(): IEta;
   getTag(): string | undefined;
   getValue(): number;
   getTotal(): number;
   getPayload(): IPayload;
+  setPayload(payload: IPayload): IProgress<IPayload>;
   set(count: number, payload?: IPayload): IProgress<IPayload>;
   on(
     type: 'update',

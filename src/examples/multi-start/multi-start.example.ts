@@ -1,6 +1,6 @@
-import { Bar, Progress } from '../../../index';
-import { start } from '../../helpers/loop-progresses';
-import { SeededRandom } from '../../helpers/seed-random';
+import { Bar, Progress } from '../../index';
+import { start } from '../helpers/loop-progresses';
+import { SeededRandom } from '../helpers/seed-random';
 
 const rnd = new SeededRandom(2342);
 

@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "paths": {
+      "ku-progress-bar": ["src/index.ts"]
+    },
     "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "declaration": true,

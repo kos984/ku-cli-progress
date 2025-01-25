@@ -1,8 +1,14 @@
-import { Bar, BarItem, BarsFormatter, presets, Progress } from '../../../index';
+import {
+  Bar,
+  BarItem,
+  BarsFormatter,
+  presets,
+  Progress,
+} from 'ku-progress-bar';
 import * as chalk from 'chalk';
-import { TextBarItem } from '../../legacy/text-bar-item';
-import { loopProgresses } from '../../helpers/loop-progresses';
-import { stringTemplate } from '../../../lib/templates/string.template';
+import { TextBarItem } from '../legacy/text-bar-item';
+import { loopProgresses } from '../helpers/loop-progresses';
+import { stringTemplate } from '../../lib/templates/string.template';
 
 const bar = new Bar();
 const progress = new Progress({ total: 100 });

@@ -2,15 +2,14 @@ import { TerminalTty } from './terminals/terminal-tty';
 import { ITerminal } from './interfaces/terminal.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
 import { IProgress } from './interfaces/progress.interface';
-import { BarItem } from './bar-items/bar-item/bar-item';
+import { BarItem } from './bar-items/bar-item';
 
-// TODO: add logger and update documentation
 export interface IOptions {
   refreshTimeMs: number;
 }
 
 export class Bar {
-  public items: IBarItem[] = [];
+  protected items: IBarItem[] = [];
   protected started = false;
   protected nextUpdate: null | Promise<never> = null;
   protected timeOutId: NodeJS.Timeout | undefined;
@@ -38,6 +37,10 @@ export class Bar {
     return this;
   }
 
+  public addProgress(progress: IProgress) {
+    return this.add(new BarItem(progress));
+  }
+
   public getItems(): IBarItem[] {
     return this.items;
   }
@@ -46,10 +49,6 @@ export class Bar {
     const progresses = bar.getProgresses();
     if (!progresses.length) return;
     return this.removeByProgress(progresses[0]);
-  }
-
-  public addProgress(progress: IProgress) {
-    return this.add(new BarItem(progress));
   }
 
   public removeByProgress(progress: IProgress) {
@@ -79,7 +78,7 @@ export class Bar {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public loggerWrap<T extends Record<string, any>>(logger: T): T {
+  public wrapLogger<T extends Record<string, any>>(logger: T): T {
     return new Proxy(logger, {
       get: (target, prop) => {
         if (typeof prop === 'symbol') {

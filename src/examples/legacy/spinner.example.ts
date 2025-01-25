@@ -58,14 +58,14 @@ const barItem = new BarItemLegacy<
     `;
   },
   dataProviders: {
-    spinner: new SpinnerDataProvider(
-      SpinnerDataProvider.presets.BRAILLE,
-      50,
-    ).getProviders().spinner,
-    spinnerQuestions: new SpinnerDataProvider(
-      ['?', '??', '???'],
-      500,
-    ).getProviders().spinner,
+    spinner: new SpinnerDataProvider({
+      ...SpinnerDataProvider.presets.BRAILLE,
+      delay: 50,
+    }).getProviders().spinner,
+    spinnerQuestions: new SpinnerDataProvider({
+      chars: ['?', '??', '???'],
+      delay: 500,
+    }).getProviders().spinner,
     barDots: new BarDataProvider({
       ...presets.classic,
       completeChar: '.',

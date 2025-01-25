@@ -101,7 +101,7 @@ const barItem = new BarItem(progresses, {
 bar.add(barItem);
 bar.start();
 
-const intervals = loopProgresses([scanProgress], () => 50);
+const intervals = loopProgresses([scanProgress], { getDelay: () => 50 });
 const interval: NodeJS.Timer = setInterval(() => bar.render(), 50);
 
 scanProgress.on('update', e => {
@@ -110,7 +110,7 @@ scanProgress.on('update', e => {
     const files = fs.readdirSync(__dirname);
     mainProgress.setTotal(files.length);
     mainProgress.set(0, { files, file: files[0] });
-    intervals[1] = loopProgresses([mainProgress], () => 1000)[0];
+    intervals[1] = loopProgresses([mainProgress], { getDelay: () => 1000 })[0];
   }
 });
 mainProgress.on('update', () => {
