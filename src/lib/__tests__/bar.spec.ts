@@ -4,6 +4,7 @@ describe('Bar', () => {
   const mockTerminal = {
     clear: jest.fn(),
     refresh: jest.fn(),
+    cursor: jest.fn(),
     write: jest.fn((str: string) => undefined),
   };
 
@@ -230,6 +231,7 @@ describe('Bar', () => {
     };
     const terminalMock = {
       clear: jest.fn(),
+      cursor: jest.fn(),
       refresh: jest.fn(),
       write: jest.fn(),
     };

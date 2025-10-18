@@ -5,6 +5,7 @@ import { WriteStream } from 'tty';
 export class TerminalTty implements ITerminal {
   protected y = 0;
   protected prev = '';
+  protected updateCursor: boolean = true;
 
   public constructor(protected stream: WriteStream = process.stderr) {
     stream.on('resize', () => {
@@ -14,11 +15,8 @@ export class TerminalTty implements ITerminal {
   }
 
   public cursor(enabled: boolean) {
-    if (enabled) {
-      this.stream.write('\x1B[?25h');
-    } else {
-      this.stream.write('\x1B[?25l');
-    }
+    this.updateCursor = false;
+    this.writeCursor(enabled, true);
   }
 
   public resetCursor(lines: number) {
@@ -28,7 +26,7 @@ export class TerminalTty implements ITerminal {
 
   public write(s: string) {
     const lines = s.split('\n');
-    this.cursor(false);
+    this.writeCursor(false);
     this.resetCursor(this.y);
     const maxLength = Math.min(this.stream.rows, lines.length) - 1;
     lines.forEach((l, i) => {
@@ -42,7 +40,7 @@ export class TerminalTty implements ITerminal {
       }
     });
     readline.clearScreenDown(this.stream);
-    this.cursor(true);
+    this.writeCursor(true);
     this.y = maxLength;
     this.prev = s;
   }
@@ -56,5 +54,12 @@ export class TerminalTty implements ITerminal {
 
   public refresh() {
     this.write(this.prev);
+  }
+
+  public writeCursor(enabled: boolean, force: boolean = false) {
+    if (!this.updateCursor && !force) {
+      return;
+    }
+    this.stream.write(enabled ? '\x1B[?25h' : '\x1B[?25l');
   }
 }

@@ -3,9 +3,15 @@ import { ITerminal } from './interfaces/terminal.interface';
 import { IBarItem } from './interfaces/bar-item.interface';
 import { IProgress } from './interfaces/progress.interface';
 import { BarItem } from './bar-items/bar-item';
+import { ShutdownListener } from './shutdown-listener/shutdown-listener';
+import { IShutdownListener } from './shutdown-listener/shutdown-listener.interface';
 
 export interface IOptions {
   refreshTimeMs: number;
+  disableCursor?: boolean;
+  addNewLineAfterProgress?: boolean;
+  enableCursorOnShutdown?: boolean;
+  shutdownListener?: IShutdownListener;
 }
 
 export class Bar {
@@ -13,16 +19,29 @@ export class Bar {
   protected started = false;
   protected nextUpdate: null | Promise<never> = null;
   protected timeOutId: NodeJS.Timeout | undefined;
-  protected refreshInterval: NodeJS.Timeout | undefined;
+  protected refreshInterval?: NodeJS.Timeout | undefined;
+  protected shutdownListener?: ShutdownListener | undefined;
 
   public constructor(
     protected terminal: ITerminal = new TerminalTty(),
     protected options?: IOptions,
   ) {
     this.options = {
-      refreshTimeMs: 50,
+      refreshTimeMs: 300,
+      disableCursor: false,
+      addNewLineAfterProgress: true,
+      enableCursorOnShutdown: true,
       ...options,
     };
+    if (this.options.shutdownListener) {
+      this.shutdownListener = this.options.shutdownListener as ShutdownListener;
+    } else if (this.options.enableCursorOnShutdown === true) {
+      this.shutdownListener = new ShutdownListener({
+        cleanupFunction: () => {
+          this.terminal.cursor(true);
+        },
+      }).attach();
+    }
   }
 
   public isStarted() {
@@ -63,7 +82,8 @@ export class Bar {
     const lines = this.items.map(bar => {
       return bar.render();
     });
-    this.terminal.write(lines.join('\n') + '\n');
+    const newLine = this.options.addNewLineAfterProgress ? '\n' : '';
+    this.terminal.write(lines.join('\n') + newLine);
     return this;
   }
 
@@ -110,6 +130,7 @@ export class Bar {
     if (autoRefresh) {
       this.refreshInterval = setInterval(() => this.render(), autoRefresh);
     }
+    if (this.options.disableCursor) this.terminal.cursor(false);
     return this;
   }
 
@@ -117,7 +138,9 @@ export class Bar {
     this.render();
     this.items.forEach(item => this.removeListenersFromProgresses(item));
     clearTimeout(this.timeOutId);
-    clearInterval(this.refreshInterval);
+    if (this.refreshInterval) clearInterval(this.refreshInterval);
+    if (this.options.disableCursor) this.terminal.cursor(true);
+    this.shutdownListener?.detach();
     this.nextUpdate = null;
     this.started = false;
     return this;
