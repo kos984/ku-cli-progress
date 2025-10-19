@@ -37,4 +37,30 @@ describe('MultiStartExample', () => {
       ],
     ]);
   });
+
+  it('should test the async function passed to start', async () => {
+    // Import the start function to test it directly
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { start } = require('../helpers/loop-progresses');
+
+    // Mock the start function to capture the async function
+    const mockStart = jest.fn();
+    jest.doMock('../helpers/loop-progresses', () => ({
+      start: mockStart,
+    }));
+
+    // Re-import the module to trigger the start call
+    jest.resetModules();
+    require('./multi-start.example');
+
+    // Verify that start was called with an async function
+    expect(mockStart).toHaveBeenCalledWith(expect.any(Function));
+
+    // Test the async function directly
+    const asyncFunction = mockStart.mock.calls[0][0];
+    expect(typeof asyncFunction).toBe('function');
+
+    // Call the async function to ensure it doesn't throw
+    await expect(asyncFunction()).resolves.toBeUndefined();
+  });
 });

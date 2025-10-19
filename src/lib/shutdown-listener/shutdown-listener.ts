@@ -1,9 +1,9 @@
 import { IShutdownListener } from './shutdown-listener.interface';
 
-type ICleanupFunction = () => void | Promise<void>;
-type IShutdownListenerProcess = Pick<
+export type ICleanupFunction = () => void | Promise<void>;
+export type IShutdownListenerProcess = Pick<
   NodeJS.Process,
-  'on' | 'removeListener' | 'kill' | 'pid'
+  'on' | 'removeListener' | 'kill' | 'pid' | 'emit'
 >;
 
 export class ShutdownListener implements IShutdownListener {
@@ -27,10 +27,10 @@ export class ShutdownListener implements IShutdownListener {
 
   protected handlerTemplate(signal: string) {
     if (this.isSignalReceived) {
-      return;
+      return Promise.resolve();
     }
     this.isSignalReceived = true;
-    Promise.resolve(
+    return Promise.resolve(
       (async () => {
         // force function to be async
         return this.cleanupFunction();
