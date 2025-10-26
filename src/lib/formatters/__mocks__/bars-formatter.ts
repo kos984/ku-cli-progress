@@ -20,7 +20,7 @@ export class BarsFormatter {
       );
       const formatter = this.formatters[index];
       if (formatter) {
-        item.str = i.toString().repeat(item.str.length); // formatter(item.str);
+        item.str = i.toString().repeat(item.str.length);
       }
       i++;
     }
