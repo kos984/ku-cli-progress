@@ -24,13 +24,13 @@ export class Bar {
 
   public constructor(
     protected terminal: ITerminal = new TerminalTty(),
-    protected options?: IOptions,
+    protected options?: Partial<IOptions>,
   ) {
     this.options = {
       refreshTimeMs: 300,
       disableCursor: false,
       addNewLineAfterProgress: true,
-      enableCursorOnShutdown: true,
+      enableCursorOnShutdown: false,
       ...options,
     };
     if (this.options.shutdownListener) {
@@ -38,7 +38,7 @@ export class Bar {
     } else if (this.options.enableCursorOnShutdown === true) {
       this.shutdownListener = new ShutdownListener({
         cleanupFunction: () => {
-          this.terminal.cursor(true);
+          this.enableCursorOnShutdown();
         },
       }).attach();
     }
@@ -144,6 +144,10 @@ export class Bar {
     this.nextUpdate = null;
     this.started = false;
     return this;
+  }
+
+  public enableCursorOnShutdown() {
+    this.terminal.cursor(true);
   }
 
   protected addListenerToProgress(item: IBarItem) {
