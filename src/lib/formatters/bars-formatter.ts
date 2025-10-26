@@ -52,9 +52,6 @@ export class BarsFormatter {
     if (this.formatters.length === progresses.length + 1) {
       return this.formatters[this.formatters.length - 1];
     }
-    // if (this.formatters.length == result.getParts().length) {
-    //  return this.formatters[this.formatters.length - 1];
-    // }
     return undefined;
   }
 }

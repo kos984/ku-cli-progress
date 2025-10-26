@@ -12,7 +12,7 @@ export class DataProviders {
       string,
       { getData: IDataProvider<unknown, unknown> }
     >[];
-  }) {
+  }): DataProviders {
     const dataProviders = new DataProviders(params);
     DataProviders.defineProperties(dataProviders, params.customDataProviders);
     return dataProviders;

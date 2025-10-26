@@ -122,4 +122,12 @@ describe('progress', () => {
     progress.setTotal(50);
     expect(progress.getTotal()).toBe(50);
   });
+
+  it('setPayload', () => {
+    const progress = new Progress({ total: 100, start: 0 });
+    const newPayload = { foo: 'baz', bar: 'qux' };
+    const result = progress.setPayload(newPayload);
+    expect(progress.getPayload()).toEqual(newPayload);
+    expect(result).toBe(progress); // Should return this for chaining
+  });
 });

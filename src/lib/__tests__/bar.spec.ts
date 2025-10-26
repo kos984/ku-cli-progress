@@ -1,9 +1,11 @@
 import { Bar, Progress, BarItem, ITerminal } from '../../';
 
+// eslint-disable-next-line max-statements
 describe('Bar', () => {
   const mockTerminal = {
     clear: jest.fn(),
     refresh: jest.fn(),
+    cursor: jest.fn(),
     write: jest.fn((str: string) => undefined),
   };
 
@@ -230,6 +232,7 @@ describe('Bar', () => {
     };
     const terminalMock = {
       clear: jest.fn(),
+      cursor: jest.fn(),
       refresh: jest.fn(),
       write: jest.fn(),
     };
@@ -245,5 +248,108 @@ describe('Bar', () => {
     expect(logger.info).toBeCalledWith('test');
     expect(terminalMock.clear).toBeCalledTimes(1);
     expect(terminalMock.refresh).toBeCalledTimes(1);
+  });
+
+  it('should use custom shutdown listener when provided', () => {
+    const mockShutdownListener = {
+      attach: jest.fn().mockReturnThis(),
+      detach: jest.fn().mockReturnThis(),
+    };
+    const bar = new Bar(mockTerminal, {
+      refreshTimeMs: 300,
+      shutdownListener: mockShutdownListener,
+    });
+    expect(
+      (bar as unknown as { shutdownListener: unknown }).shutdownListener,
+    ).toBe(mockShutdownListener);
+  });
+
+  it('should create default shutdown listener when enableCursorOnShutdown is true', () => {
+    const bar = new Bar(mockTerminal, {
+      refreshTimeMs: 300,
+      enableCursorOnShutdown: true,
+    });
+    expect(
+      (bar as unknown as { shutdownListener: unknown }).shutdownListener,
+    ).toBeDefined();
+    expect(
+      (bar as unknown as { shutdownListener: { isAttached: boolean } })
+        .shutdownListener.isAttached,
+    ).toBe(true);
+  });
+
+  it('should not create shutdown listener when enableCursorOnShutdown is false', () => {
+    const bar = new Bar(mockTerminal, {
+      refreshTimeMs: 300,
+      enableCursorOnShutdown: false,
+    });
+    expect(
+      (bar as unknown as { shutdownListener?: unknown }).shutdownListener,
+    ).toBeUndefined();
+  });
+
+  it('should call terminal.cursor(true) in shutdown listener cleanup function', () => {
+    const bar = new Bar(mockTerminal, {
+      refreshTimeMs: 300,
+      enableCursorOnShutdown: true,
+    });
+
+    const shutdownListener = (
+      bar as unknown as { shutdownListener: { cleanupFunction: () => void } }
+    ).shutdownListener;
+    expect(shutdownListener).toBeDefined();
+
+    // Call the cleanup function to test line 41 coverage
+    shutdownListener.cleanupFunction();
+
+    expect(mockTerminal.cursor).toHaveBeenCalledWith(true);
+  });
+
+  it('should render without newline when addNewLineAfterProgress is false', () => {
+    const bar = new Bar(mockTerminal, {
+      refreshTimeMs: 300,
+      addNewLineAfterProgress: false,
+    });
+
+    const progress = new Progress({ total: 100 });
+    bar.add(new BarItem(progress));
+
+    bar.render();
+
+    // Should not add newline at the end
+    expect(mockTerminal.write).toHaveBeenCalledWith(
+      expect.stringMatching(
+        /\[.*\] 0% ETA: ∞ speed: 0\/s duration: 0s 0\/100$/,
+      ),
+    );
+  });
+
+  it('should disable cursor when disableCursor is true in start', () => {
+    const bar = new Bar(mockTerminal, {
+      refreshTimeMs: 300,
+      disableCursor: true,
+    });
+
+    const progress = new Progress({ total: 100 });
+    bar.add(new BarItem(progress));
+
+    bar.start();
+
+    expect(mockTerminal.cursor).toHaveBeenCalledWith(false);
+  });
+
+  it('should enable cursor when disableCursor is true in stop', () => {
+    const bar = new Bar(mockTerminal, {
+      refreshTimeMs: 300,
+      disableCursor: true,
+    });
+
+    const progress = new Progress({ total: 100 });
+    bar.add(new BarItem(progress));
+
+    bar.start();
+    bar.stop();
+
+    expect(mockTerminal.cursor).toHaveBeenCalledWith(true);
   });
 });

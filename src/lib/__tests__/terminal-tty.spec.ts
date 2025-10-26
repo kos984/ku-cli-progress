@@ -53,4 +53,39 @@ describe('terminal tty', () => {
       expect(s.length).toEqual(mockStream.columns);
     });
   });
+
+  it('should handle cursor method', () => {
+    const terminal = new TerminalTty(mockStream as never as WriteStream);
+    terminal.cursor(true);
+    expect(mockStream.write).toHaveBeenCalledWith('\x1B[?25h');
+
+    mockStream.write.mockClear();
+    terminal.cursor(false);
+    expect(mockStream.write).toHaveBeenCalledWith('\x1B[?25l');
+  });
+
+  it('should handle writeCursor with force parameter', () => {
+    const terminal = new TerminalTty(mockStream as never as WriteStream);
+
+    // Test with force = true (should write regardless of updateCursor state)
+    (terminal as unknown as { updateCursor: boolean }).updateCursor = false;
+    terminal.cursor(true);
+    expect(mockStream.write).toHaveBeenCalledWith('\x1B[?25h');
+
+    // Test with force = false and updateCursor = false (should not write)
+    mockStream.write.mockClear();
+    (terminal as unknown as { writeCursor: (...params) => void }).writeCursor(
+      false,
+      false,
+    );
+    expect(mockStream.write).not.toHaveBeenCalled();
+
+    // Test with force = false and updateCursor = true (should write)
+    (terminal as unknown as { updateCursor: boolean }).updateCursor = true;
+    (terminal as unknown as { writeCursor: (...params) => void }).writeCursor(
+      false,
+      false,
+    );
+    expect(mockStream.write).toHaveBeenCalledWith('\x1B[?25l');
+  });
 });
