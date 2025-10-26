@@ -30,7 +30,7 @@ export class Bar {
       refreshTimeMs: 300,
       disableCursor: false,
       addNewLineAfterProgress: true,
-      enableCursorOnShutdown: true,
+      enableCursorOnShutdown: false,
       ...options,
     };
     if (this.options.shutdownListener) {
